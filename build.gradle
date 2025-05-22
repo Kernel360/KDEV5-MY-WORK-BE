@@ -57,6 +57,8 @@ dependencies {
     asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.19.2'
     implementation 'org.springdoc:springdoc-openapi-ui:1.8.0'
+
+    implementation 'com.fasterxml.uuid:java-uuid-generator:5.1.0'
 }
 
 openapi3 {
