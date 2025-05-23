@@ -63,8 +63,8 @@ dependencies {
 
 openapi3 {
     server = 'http://localhost:8080'
-    title = 'Cooper API'
-    description = 'Cooper API description'
+    title = 'My Work API'
+    description = 'My Work API description'
     // tagDescriptionsPropertiesFile = 'src/docs/tag-descriptions.yaml'
     version = '0.1.0'
     format = 'yaml'
