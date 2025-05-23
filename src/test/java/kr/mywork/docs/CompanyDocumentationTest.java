@@ -161,9 +161,6 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// JSON 요청 본문 생성
 		String requestBody = objectMapper.writeValueAsString(deleteReq);
-		System.out.println("==========================test=======================");
-		System.out.println(requestBody);
-		System.out.println("==========================test=======================");
 
 		// When
 		ResultActions result = mockMvc.perform(
