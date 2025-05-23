@@ -36,4 +36,14 @@ public class CompanyService {
 		final Company savedCompany = companyRepository.save(companyCreateRequest);
 		return savedCompany.getId();
 	}
+
+	@Transactional
+	public UUID deleteCompany(final UUID companyId) {
+		companyIdRepository.findById(companyId)
+				.orElseThrow(() -> new CompanyIdNotFoundException(CompanyErrorType.ID_NOT_FOUND));
+
+		final UUID deletedCompanyId = companyRepository.delete(companyId);
+		System.out.println(deletedCompanyId);
+		return deletedCompanyId;
+	}
 }

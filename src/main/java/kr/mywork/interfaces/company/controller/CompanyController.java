@@ -2,10 +2,9 @@ package kr.mywork.interfaces.company.controller;
 
 import java.util.UUID;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
+import kr.mywork.interfaces.company.controller.dto.response.CompanyDeleteWebResponse;
+import org.springframework.web.bind.annotation.*;
 
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.company.service.CompanyService;
@@ -39,5 +38,13 @@ public class CompanyController {
 		final CompanyCreateWebResponse companyCreateWebResponse = new CompanyCreateWebResponse(createdCompanyId);
 
 		return ApiResponse.success(companyCreateWebResponse);
+	}
+	@DeleteMapping("delete/{id}")
+	public ApiResponse<CompanyDeleteWebResponse> deleteCompany(
+			@RequestBody final CompanyDeleteWebRequest companyDeleteWebRequest
+			){
+		final UUID deleteCompanyId = companyService.deleteCompany(companyDeleteWebRequest.companyId());
+		final CompanyDeleteWebResponse companyDeleteWebResponse = new CompanyDeleteWebResponse(deleteCompanyId);
+		return ApiResponse.success(companyDeleteWebResponse);
 	}
 }
