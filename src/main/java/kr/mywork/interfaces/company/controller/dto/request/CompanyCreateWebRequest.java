@@ -1,9 +1,7 @@
 package kr.mywork.interfaces.company.controller.dto.request;
 
-import java.util.Objects;
 import java.util.UUID;
 
-import kr.mywork.domain.company.model.CompanyType;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
