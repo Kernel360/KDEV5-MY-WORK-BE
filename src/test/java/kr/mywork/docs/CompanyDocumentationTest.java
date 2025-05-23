@@ -3,13 +3,16 @@ package kr.mywork.docs;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestBody;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
 
+import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -149,4 +152,30 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		);
 	}
 
+	@Test
+	@DisplayName("회사 삭제 성공")
+	@Sql("classpath:sql/company-id.sql")
+	void 회사_삭제_성공() throws Exception {
+		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // company-id.sql과 동일한 값
+		CompanyDeleteWebRequest deleteReq = new CompanyDeleteWebRequest(companyId);
+
+		// JSON 요청 본문 생성
+		String requestBody = objectMapper.writeValueAsString(deleteReq);
+		System.out.println("==========================test=======================");
+		System.out.println(requestBody);
+		System.out.println("==========================test=======================");
+
+		// When
+		ResultActions result = mockMvc.perform(
+				delete("/api/company/delete/{id}", companyId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody)
+		);
+
+		// Then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.data.companyId").value(companyId.toString())
+		);
+	}
 }
