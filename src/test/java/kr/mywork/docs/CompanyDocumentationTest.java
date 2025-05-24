@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.snippet.Snippet;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -164,7 +165,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// When
 		ResultActions result = mockMvc.perform(
-				delete("/api/company/delete/{id}", companyId)
+				delete("/api/company/{id}", companyId)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(requestBody)
 		);
@@ -172,7 +173,24 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		// Then
 		result.andExpectAll(
 				status().isOk(),
-				jsonPath("$.data.companyId").value(companyId.toString())
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data.companyId").value(companyId.toString()),
+				jsonPath("$.error").doesNotExist()
+		).andDo(document("company-del-success",companyDeleteSuccess()));
+	}
+	private ResourceSnippet companyDeleteSuccess() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Company API")
+				.summary("회사 삭제 API")
+				.description("발급받은 회사 아이디를 통해 회사를 삭제한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+						fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+						fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("삭제한 회사 아이디"),
+						fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+					.build()
 		);
 	}
 }
