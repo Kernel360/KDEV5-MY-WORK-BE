@@ -39,11 +39,12 @@ public class CompanyService {
 
 	@Transactional
 	public UUID deleteCompany(final UUID companyId) {
-		companyIdRepository.findById(companyId)
+		// 에러코드 추후 작성된 버전으로 수정 필요.
+		Company company= companyRepository.findById(companyId)
 				.orElseThrow(() -> new CompanyIdNotFoundException(CompanyErrorType.ID_NOT_FOUND));
 
-		final UUID deletedCompanyId = companyRepository.delete(companyId);
+		company.setDeleted(true);
 
-		return deletedCompanyId;
+		return company.getId();
 	}
 }

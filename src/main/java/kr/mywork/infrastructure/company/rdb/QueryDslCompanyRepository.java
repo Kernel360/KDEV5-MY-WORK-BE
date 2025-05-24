@@ -7,6 +7,7 @@ import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -21,10 +22,9 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 	}
 
 	@Override
-	public UUID delete(UUID companyId) {
-		companyRepository.deleteById(companyId);
+	public Optional<Company> findById(UUID companyId) {
 
-		return companyId;
+		return companyRepository.findById(companyId);
 	}
 
 
