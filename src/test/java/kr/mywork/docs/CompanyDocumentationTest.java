@@ -3,18 +3,27 @@ package kr.mywork.docs;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestBody;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
 
+import kr.mywork.domain.company.model.Company;
+import kr.mywork.infrastructure.company.rdb.JpaCompanyRepository;
+import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.snippet.Snippet;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -26,6 +35,9 @@ import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
 
 public class CompanyDocumentationTest extends RestDocsDocumentation {
+
+    @Autowired
+    private JpaCompanyRepository jpaCompanyRepository;
 
 	@Test
 	@DisplayName("회사 아이디 생성 테스트 성공")
@@ -149,4 +161,47 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		);
 	}
 
+	@Test
+	@DisplayName("회사 삭제 성공")
+	@Sql("classpath:sql/company-id.sql")
+	void 회사_삭제_성공() throws Exception {
+		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // company-id.sql과 동일한 값
+		CompanyDeleteWebRequest deleteReq = new CompanyDeleteWebRequest(companyId);
+
+		// JSON 요청 본문 생성
+		String requestBody = objectMapper.writeValueAsString(deleteReq);
+
+		// When
+		ResultActions result = mockMvc.perform(
+				delete("/api/company", companyId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody)
+		);
+
+		// Then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data.companyId").value(companyId.toString()),
+				jsonPath("$.error").doesNotExist()
+		).andDo(document("company-del-success",companyDeleteSuccess()));
+
+		Company deletedCompany = jpaCompanyRepository.findById(companyId).orElseThrow();
+		assertTrue(deletedCompany.getDeleted()); // deleted가 true인지 확인
+	}
+	private ResourceSnippet companyDeleteSuccess() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Company API")
+				.summary("회사 삭제 API")
+				.description("발급받은 회사 아이디를 통해 회사를 삭제한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+						fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+						fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("삭제한 회사 아이디"),
+						fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+					.build()
+		);
+	}
 }

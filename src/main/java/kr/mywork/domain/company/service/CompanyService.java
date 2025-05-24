@@ -36,4 +36,15 @@ public class CompanyService {
 		final Company savedCompany = companyRepository.save(companyCreateRequest);
 		return savedCompany.getId();
 	}
+
+	@Transactional
+	public UUID deleteCompany(final UUID companyId) {
+		// 에러코드 추후 작성된 버전으로 수정 필요.
+		Company company= companyRepository.findById(companyId)
+				.orElseThrow(() -> new CompanyIdNotFoundException(CompanyErrorType.ID_NOT_FOUND));
+
+		company.setDeleted(true);
+
+		return company.getId();
+	}
 }
