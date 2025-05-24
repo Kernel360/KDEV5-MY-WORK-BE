@@ -39,7 +39,7 @@ public class CompanyController {
 
 		return ApiResponse.success(companyCreateWebResponse);
 	}
-	@DeleteMapping("delete/{id}")
+	@DeleteMapping("/{id}")
 	public ApiResponse<CompanyDeleteWebResponse> deleteCompany(
 			@RequestBody final CompanyDeleteWebRequest companyDeleteWebRequest
 			){
