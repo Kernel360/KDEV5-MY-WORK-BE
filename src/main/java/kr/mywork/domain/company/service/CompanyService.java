@@ -43,7 +43,7 @@ public class CompanyService {
 				.orElseThrow(() -> new CompanyIdNotFoundException(CompanyErrorType.ID_NOT_FOUND));
 
 		final UUID deletedCompanyId = companyRepository.delete(companyId);
-		System.out.println(deletedCompanyId);
+
 		return deletedCompanyId;
 	}
 }
