@@ -3,6 +3,7 @@ package kr.mywork.domain.company.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -55,6 +56,7 @@ public class Company {
 	@UpdateTimestamp
 	private LocalDateTime modifiedAt;
 
+	@Setter
 	private Boolean deleted = false;
 
 	public Company(final UUID id, final String name, final String detail, final String businessNumber,
