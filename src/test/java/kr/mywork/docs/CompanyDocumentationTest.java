@@ -9,12 +9,17 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestBody;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
 
+import kr.mywork.domain.company.model.Company;
+import kr.mywork.infrastructure.company.rdb.JpaCompanyRepository;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -30,6 +35,9 @@ import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
 
 public class CompanyDocumentationTest extends RestDocsDocumentation {
+
+    @Autowired
+    private JpaCompanyRepository jpaCompanyRepository;
 
 	@Test
 	@DisplayName("회사 아이디 생성 테스트 성공")
@@ -165,7 +173,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// When
 		ResultActions result = mockMvc.perform(
-				delete("/api/company/{id}", companyId)
+				delete("/api/company", companyId)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(requestBody)
 		);
@@ -177,6 +185,9 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				jsonPath("$.data.companyId").value(companyId.toString()),
 				jsonPath("$.error").doesNotExist()
 		).andDo(document("company-del-success",companyDeleteSuccess()));
+
+		Company deletedCompany = jpaCompanyRepository.findById(companyId).orElseThrow();
+		assertTrue(deletedCompany.getDeleted()); // deleted가 true인지 확인
 	}
 	private ResourceSnippet companyDeleteSuccess() {
 		return resource(
