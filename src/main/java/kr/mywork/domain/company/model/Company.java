@@ -57,6 +57,7 @@ public class Company {
 	private LocalDateTime modifiedAt;
 
 	@Setter
+	@Getter
 	private Boolean deleted = false;
 
 	public Company(final UUID id, final String name, final String detail, final String businessNumber,
