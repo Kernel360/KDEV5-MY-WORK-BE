@@ -163,7 +163,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("회사 삭제 성공")
-	@Sql("classpath:sql/company-id.sql")
+	@Sql("classpath:sql/company-delete.sql")
 	void 회사_삭제_성공() throws Exception {
 		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // company-id.sql과 동일한 값
 		CompanyDeleteWebRequest deleteReq = new CompanyDeleteWebRequest(companyId);
