@@ -12,3 +12,6 @@ spring:
     username: root
     password: mywork2503
     driver-class-name: com.mysql.cj.jdbc.Driver
+  messages:
+    basename: messages/messages
+    fallback-to-system-locale: false
