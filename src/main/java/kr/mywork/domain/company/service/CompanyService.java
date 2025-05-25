@@ -2,6 +2,7 @@ package kr.mywork.domain.company.service;
 
 import java.util.UUID;
 
+import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,5 +36,13 @@ public class CompanyService {
 
 		final Company savedCompany = companyRepository.save(companyCreateRequest);
 		return savedCompany.getId();
+	}
+
+	@Transactional
+	public UUID updateCompany(CompanyUpdateRequest companyUpdateRequest) {
+		Company company = companyRepository.findById(companyUpdateRequest.getId());
+
+		company.updateFrom(companyUpdateRequest);
+		return company.getId();
 	}
 }

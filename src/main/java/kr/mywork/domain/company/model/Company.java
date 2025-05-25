@@ -3,6 +3,7 @@ package kr.mywork.domain.company.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -69,6 +70,18 @@ public class Company {
 		this.contactPhoneNumber = contactPhoneNumber;
 		this.contactEmail = contactEmail;
 		this.logoImagePath = logoImagePath;
+	}
+
+	public void updateFrom(CompanyUpdateRequest companyUpdateRequest) {
+		this.id = companyUpdateRequest.getId();
+		this.name = companyUpdateRequest.getName();
+		this.detail = companyUpdateRequest.getDetail();
+		this.businessNumber = companyUpdateRequest.getBusinessNumber();
+		this.address = companyUpdateRequest.getAddress();
+		this.type = CompanyType.from(companyUpdateRequest.getType());
+		this.contactPhoneNumber = companyUpdateRequest.getContactPhoneNumber();
+		this.contactEmail = companyUpdateRequest.getContactEmail();
+		this.logoImagePath = companyUpdateRequest.getLogoImagePath();
 	}
 
 }
