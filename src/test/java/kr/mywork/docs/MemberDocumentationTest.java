@@ -53,11 +53,11 @@ public class MemberDocumentationTest extends RestDocsDocumentation{
                 jsonPath("$.result").value(ResultType.SUCCESS.name()),
                 jsonPath("$.data").exists(),
                 jsonPath("$.error").doesNotExist())
-        .andDo(document("member-create-success", memberCreateSuccessResourse()));
+        .andDo(document("member-create-success", memberCreateSuccessResource()));
 
     }
 
-    private ResourceSnippet memberCreateSuccessResourse() {
+    private ResourceSnippet memberCreateSuccessResource() {
         return resource(
                 ResourceSnippetParameters.builder()
                     .tag("Member API")
