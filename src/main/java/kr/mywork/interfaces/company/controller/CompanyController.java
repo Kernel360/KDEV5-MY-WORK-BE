@@ -2,7 +2,11 @@ package kr.mywork.interfaces.company.controller;
 
 import java.util.UUID;
 
+import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
+import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
+import kr.mywork.interfaces.company.controller.dto.response.CompanyUpdateWebResponse;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,4 +44,18 @@ public class CompanyController {
 
 		return ApiResponse.success(companyCreateWebResponse);
 	}
+
+	@PutMapping()
+	public ApiResponse<CompanyUpdateWebResponse> updateCompany(
+			@RequestBody final CompanyUpdateWebRequest companyUpdateWebRequest) {
+
+		final CompanyUpdateRequest companyUpdateRequest = companyUpdateWebRequest.toServiceDto();
+
+		final UUID companyId = companyService.updateCompany(companyUpdateRequest);
+
+		final CompanyUpdateWebResponse companyUpdateWebResponse = new CompanyUpdateWebResponse(companyId);
+
+		return ApiResponse.success(companyUpdateWebResponse);
+	}
+
 }
