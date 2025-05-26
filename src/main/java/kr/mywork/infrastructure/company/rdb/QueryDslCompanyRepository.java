@@ -1,8 +1,7 @@
 package kr.mywork.infrastructure.company.rdb;
 
+import java.util.Optional;
 import java.util.UUID;
-import kr.mywork.domain.company.errors.CompanyErrorType;
-import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
@@ -21,10 +20,7 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 	}
 
 	@Override
-	public Company findById(UUID id) {
-		Company company = companyRepository.findById(id)
-				.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
-
-		return company;
+	public Optional<Company> findById(UUID companyId) {
+		return companyRepository.findById(companyId);
 	}
 }

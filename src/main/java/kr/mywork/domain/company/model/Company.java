@@ -1,19 +1,18 @@
 package kr.mywork.domain.company.model;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -56,6 +55,7 @@ public class Company {
 	@UpdateTimestamp
 	private LocalDateTime modifiedAt;
 
+	@Setter
 	private Boolean deleted = false;
 
 	public Company(final UUID id, final String name, final String detail, final String businessNumber,
