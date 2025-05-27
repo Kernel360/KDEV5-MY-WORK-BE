@@ -1,14 +1,16 @@
 package kr.mywork.interfaces.company.controller;
 
+import java.util.List;
 import java.util.UUID;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.service.CompanyService;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
-import kr.mywork.domain.company.service.dto.response.CompanyDetailResponse;
+import kr.mywork.domain.member.model.Member;
+import kr.mywork.domain.member.service.MemberService;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
-import kr.mywork.interfaces.company.controller.dto.request.CompanyDetailWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
 import kr.mywork.interfaces.company.controller.dto.response.*;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class CompanyController {
 
 	private final CompanyService companyService;
+	private final MemberService memberService;
 
 	@PostMapping("/id/generate")
 	public ApiResponse<CompanyIdCreateWebResponse> createCompanyId() {
@@ -66,10 +69,11 @@ public class CompanyController {
 	@GetMapping("/{companyId}")
 	public ApiResponse<CompanyDetailWebResponse> companyDetail(
 			@PathVariable final UUID companyId
-	) {
-		final CompanyDetailResponse companyDetailResponse = companyService.searchCompanyDetail(companyId);
+			) {
+		Company company = companyService.findCompanyById(companyId); // 회사 정보만
+		List<Member> members = memberService.findAllByCompanyId(companyId); // 직원 목록만
 
-		final CompanyDetailWebResponse companyDetailWebResponse = new CompanyDetailWebResponse(companyDetailResponse);
+		CompanyDetailWebResponse companyDetailWebResponse = CompanyDetailWebResponse.from(company, members);
 
 		return ApiResponse.success(companyDetailWebResponse);
 	}

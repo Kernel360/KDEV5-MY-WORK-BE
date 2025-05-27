@@ -1,6 +1,5 @@
 package kr.mywork.domain.company.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -15,11 +14,7 @@ import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.repository.CompanyIdRepository;
 import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
-import kr.mywork.domain.company.service.dto.request.CompanyDetailResquest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
-import kr.mywork.domain.company.service.dto.response.CompanyDetailResponse;
-import kr.mywork.domain.member.model.Member;
-import kr.mywork.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,7 +23,6 @@ public class CompanyService {
 
 	private final CompanyRepository companyRepository;
 	private final CompanyIdRepository companyIdRepository;
-	private final MemberRepository memberRepositroy;
 
 
 	@Transactional
@@ -66,14 +60,9 @@ public class CompanyService {
 	}
 
 	@Transactional
-	public CompanyDetailResponse searchCompanyDetail (final UUID companyId){
+	public Company findCompanyById(UUID companyId) {
 		Company company = companyRepository.findById(companyId)
 				.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
-		
-		//멤버 정보에 대한 엔티티 기준으로 멤버 조회 
-		List<Member> companyMember = memberRepositroy.findAllMemberByCompanyId();
-
-
-		return CompanyDetailResponse.from(company, companyMember);
+		return company;
 	}
 }

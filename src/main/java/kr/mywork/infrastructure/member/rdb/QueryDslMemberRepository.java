@@ -1,22 +1,32 @@
 package kr.mywork.infrastructure.member.rdb;
 
-import kr.mywork.domain.company.model.Company;
-import kr.mywork.domain.company.repository.CompanyRepository;
-import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.mywork.domain.member.model.Member;
+
 import kr.mywork.domain.member.repository.MemberRepository;
-import kr.mywork.infrastructure.company.rdb.JpaCompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.lang.reflect.Member;
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
+
+import static kr.mywork.domain.member.model.QMember.member;
+
 
 @Repository
 @RequiredArgsConstructor
 public class QueryDslMemberRepository implements MemberRepository {
 
-	private final JpaMemberRepository memberRepository;
+	private final JPAQueryFactory queryFactory;
 
-
+	@Override
+	public List<Member> findAllMemberByCompanyId(UUID companyId) {
+		List<Member> members = queryFactory
+				.selectFrom(member)
+				.where(
+						member.companyId.eq(companyId),
+						member.deleted.isFalse()
+				).fetch();
+		return members;
+	}
 }

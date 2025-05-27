@@ -16,10 +16,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Company {
 
 	@Id
-	@Getter
 	private UUID id;
 
 	@Column(nullable = false, length = 30)
