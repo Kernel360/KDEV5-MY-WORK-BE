@@ -11,11 +11,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
 	@Id
-	@Getter
 	private UUID id;
 
 	@Column(nullable = false, length = 30)
@@ -25,18 +25,21 @@ public class Member {
 	private String department;
 
 	@Column(nullable = false, length = 30)
-	private String postion;
+	private String position;
 
 	@Column(nullable = false, length = 30)
 	private String role;
 
 	@Column(nullable = false, length = 50)
-	private String phoneNmeber;
+	private String phoneNumber;
 
 	@Column(nullable = false, length = 300)
 	private String email;
 
 	private String password;
+
+	@Column(name = "company_id")
+	private UUID companyId;
 
 	private Boolean deleted = false;
 
