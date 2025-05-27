@@ -5,20 +5,14 @@ import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.company.service.CompanyService;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
+import kr.mywork.domain.company.service.dto.response.CompanyDetailResponse;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
+import kr.mywork.interfaces.company.controller.dto.request.CompanyDetailWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyCreateWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyDeleteWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyIdCreateWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyUpdateWebResponse;
+import kr.mywork.interfaces.company.controller.dto.response.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,5 +62,15 @@ public class CompanyController {
 		final CompanyDeleteWebResponse companyDeleteWebResponse = new CompanyDeleteWebResponse(deleteCompanyId);
 
 		return ApiResponse.success(companyDeleteWebResponse);
+	}
+	@GetMapping("/{companyId}")
+	public ApiResponse<CompanyDetailWebResponse> companyDetail(
+			@PathVariable final UUID companyId
+	) {
+		final CompanyDetailResponse companyDetailResponse = companyService.searchCompanyDetail(companyId);
+
+		final CompanyDetailWebResponse companyDetailWebResponse = new CompanyDetailWebResponse(companyDetailResponse);
+
+		return ApiResponse.success(companyDetailWebResponse);
 	}
 }
