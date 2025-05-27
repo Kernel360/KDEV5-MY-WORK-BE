@@ -7,6 +7,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,6 +19,7 @@ import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.infrastructure.company.rdb.JpaCompanyRepository;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
+import kr.mywork.interfaces.company.controller.dto.request.CompanyDetailWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -281,6 +283,63 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 						fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("삭제한 회사 아이디"),
 						fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 					.build()
+		);
+	}
+	@Test
+	@DisplayName("회사 상세조회 성공")
+	@Sql("classpath:sql/company-detail.sql")
+	void 회사_상세조회_성공() throws Exception {
+		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // company-id.sql과 동일한 값
+		CompanyDetailWebRequest detailReq = new CompanyDetailWebRequest(companyId);
+
+		// JSON 요청 본문 생성
+		String requestBody = objectMapper.writeValueAsString(detailReq);
+
+		// When
+		ResultActions result = mockMvc.perform(
+				get("/api/company/{companyId}", companyId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON)
+		);
+
+		// Then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist()
+		).andDo(document("company-del-success",companyDetailSuccess()));
+	}
+
+	private ResourceSnippet companyDetailSuccess() {
+		return resource(
+				ResourceSnippetParameters.builder()
+						.tag("Company API")
+						.summary("회사 상세조회 API")
+						.description("회사 상세정보를 조회한다.")
+						.requestHeaders(
+								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+						.responseFields(
+								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+								fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("회사 ID"),
+								fieldWithPath("data.name").type(JsonFieldType.STRING).description("회사명"),
+								fieldWithPath("data.detail").type(JsonFieldType.STRING).description("상세 설명"),
+								fieldWithPath("data.businessNumber").type(JsonFieldType.STRING).description("사업자 등록번호"),
+								fieldWithPath("data.address").type(JsonFieldType.STRING).description("주소"),
+								fieldWithPath("data.type").type(JsonFieldType.STRING).description("회사 타입 (CLIENT/DEV)"),
+								fieldWithPath("data.contactPhoneNumber").type(JsonFieldType.STRING).description("연락처"),
+								fieldWithPath("data.contactEmail").type(JsonFieldType.STRING).description("이메일"),
+								fieldWithPath("data.logoImagePath").type(JsonFieldType.STRING).description("로고 이미지 경로").optional(),
+								fieldWithPath("data.members[].id").type(JsonFieldType.STRING).description("멤버 ID"),
+								fieldWithPath("data.members[].name").type(JsonFieldType.STRING).description("멤버 이름"),
+								fieldWithPath("data.members[].department").type(JsonFieldType.STRING).description("부서"),
+								fieldWithPath("data.members[].position").type(JsonFieldType.STRING).description("직급"),
+								fieldWithPath("data.members[].role").type(JsonFieldType.STRING).description("역할"),
+								fieldWithPath("data.members[].phoneNumber").type(JsonFieldType.STRING).description("전화번호"),
+								fieldWithPath("data.members[].email").type(JsonFieldType.STRING).description("이메일"),
+								fieldWithPath("data.members[].deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
+								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+						.build()
 		);
 	}
 }
