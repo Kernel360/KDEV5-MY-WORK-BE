@@ -7,25 +7,27 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.epages.restdocs.apispec.ResourceSnippet;
-import com.epages.restdocs.apispec.ResourceSnippetParameters;
-import com.fasterxml.uuid.Generators;
 import java.util.UUID;
-import kr.mywork.common.api.support.response.ResultType;
-import kr.mywork.infrastructure.company.rdb.JpaCompanyRepository;
-import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
-import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
+
+import com.epages.restdocs.apispec.ResourceSnippet;
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.fasterxml.uuid.Generators;
+
+import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
+import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
 
 public class CompanyDocumentationTest extends RestDocsDocumentation {
 
@@ -159,41 +161,41 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
 		final CompanyCreateWebRequest companyCreateWebRequest = new CompanyCreateWebRequest(id, "현대", "바뀐회사설명",
-				"010234034", "부산", "DEV", "010-9999-9999", "suha730@naver.com", "/image/url");
+			"010234034", "부산", "DEV", "010-9999-9999", "suha730@naver.com", "/image/url");
 
 		final String requestBody = objectMapper.writeValueAsString(companyCreateWebRequest);
 
 		//when
 		final ResultActions result = mockMvc.perform(
-				put("/api/company")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(requestBody)
+			put("/api/company")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody)
 		);
 
 		//then
 		result.andExpectAll(
-						status().isOk(),
-						jsonPath("$.result").value(ResultType.SUCCESS.name()),
-						jsonPath("$.data").exists(),
-						jsonPath("$.error").doesNotExist())
-				.andDo(document("company-update-success", companyUpdateSuccessResource()));
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("company-update-success", companyUpdateSuccessResource()));
 
 	}
 
 	private ResourceSnippet companyUpdateSuccessResource() {
 		return resource(
-				ResourceSnippetParameters.builder()
-						.tag("Company API")
-						.summary("회사 업데이트 API")
-						.description("새로운 회사 정보로 업데이트한다.")
-						.requestHeaders(
-								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
-						.responseFields(
-								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-								fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("업데이트된 회사 아이디"),  // 수정
-								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))  // 수정
-						.build()
-				);
+			ResourceSnippetParameters.builder()
+				.tag("Company API")
+				.summary("회사 업데이트 API")
+				.description("새로운 회사 정보로 업데이트한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("업데이트된 회사 아이디"),  // 수정
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))  // 수정
+				.build()
+		);
 	}
 
 	@Test
@@ -203,42 +205,43 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		//given
 		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
-		final CompanyCreateWebRequest companyCreateWebRequest = new CompanyCreateWebRequest(id, "삼성", "회사 타입을 존재하지 않는 타입으로 변경 요청",
-				"010234034", "부산", "INVALID_TYPE", "010-9999-9999", "suha730@naver.com", "/image/url");
+		final CompanyCreateWebRequest companyCreateWebRequest = new CompanyCreateWebRequest(id, "삼성",
+			"회사 타입을 존재하지 않는 타입으로 변경 요청",
+			"010234034", "부산", "INVALID_TYPE", "010-9999-9999", "suha730@naver.com", "/image/url");
 
 		final String requestBody = objectMapper.writeValueAsString(companyCreateWebRequest);
 
 		//when
 		final ResultActions result = mockMvc.perform(
-				put("/api/company")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(requestBody)
+			put("/api/company")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody)
 		);
 
 		//then
 		result.andExpectAll(
-						status().is4xxClientError(),
-						jsonPath("$.result").value(ResultType.ERROR.name()),
-						jsonPath("$.data").doesNotExist(),
-						jsonPath("$.error").exists())
-				.andDo(document("company-update-fail", companyUpdateFailResource()));
+				status().is4xxClientError(),
+				jsonPath("$.result").value(ResultType.ERROR.name()),
+				jsonPath("$.data").doesNotExist(),
+				jsonPath("$.error").exists())
+			.andDo(document("company-update-fail", companyUpdateFailResource()));
 	}
 
 	private ResourceSnippet companyUpdateFailResource() {
 		return resource(
-				ResourceSnippetParameters.builder()
-						.tag("Company API")
-						.summary("회사 업데이트 API")
-						.description("새로운 회사 정보로 업데이트한다.")
-						.requestHeaders(
-								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
-						.responseFields(
-								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-								fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터"),
-								fieldWithPath("error.code").type(JsonFieldType.STRING).description("에러 코드"),
-								fieldWithPath("error.message").type(JsonFieldType.STRING).description("에러 정보"),
-								fieldWithPath("error.data").type(JsonFieldType.NULL).description("에러 정보"))
-						.build()
+			ResourceSnippetParameters.builder()
+				.tag("Company API")
+				.summary("회사 업데이트 API")
+				.description("새로운 회사 정보로 업데이트한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터"),
+					fieldWithPath("error.code").type(JsonFieldType.STRING).description("에러 코드"),
+					fieldWithPath("error.message").type(JsonFieldType.STRING).description("에러 정보"),
+					fieldWithPath("error.data").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
 		);
 	}
 
@@ -254,18 +257,18 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// When
 		ResultActions result = mockMvc.perform(
-				delete("/api/company", companyId)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(requestBody)
+			delete("/api/company", companyId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody)
 		);
 
 		// Then
 		result.andExpectAll(
-				status().isOk(),
-				jsonPath("$.result").value(ResultType.SUCCESS.name()),
-				jsonPath("$.data.companyId").value(companyId.toString()),
-				jsonPath("$.error").doesNotExist()
-		).andDo(document("company-del-success",companyDeleteSuccess()));
+			status().isOk(),
+			jsonPath("$.result").value(ResultType.SUCCESS.name()),
+			jsonPath("$.data.companyId").value(companyId.toString()),
+			jsonPath("$.error").doesNotExist()
+		).andDo(document("company-del-success", companyDeleteSuccess()));
 	}
 
 	private ResourceSnippet companyDeleteSuccess() {
@@ -277,10 +280,55 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.requestHeaders(
 					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
 				.responseFields(
-						fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-						fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("삭제한 회사 아이디"),
-						fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
-					.build()
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("삭제한 회사 아이디"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("회사 상세조회 성공")
+	@Sql("classpath:sql/company-detail.sql")
+	void 회사_상세조회_성공() throws Exception {
+		// given
+		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // company-id.sql과 동일한 값
+
+		// When
+		ResultActions result = mockMvc.perform(get("/api/company/{companyId}", companyId)
+			.contentType(MediaType.APPLICATION_JSON)
+			.accept(MediaType.APPLICATION_JSON));
+
+		// Then
+		result.andExpectAll(
+			status().isOk(),
+			jsonPath("$.result").value(ResultType.SUCCESS.name()),
+			jsonPath("$.data").exists(),
+			jsonPath("$.error").doesNotExist()
+		).andDo(document("company-del-success", companyDetailSuccess()));
+	}
+
+	private ResourceSnippet companyDetailSuccess() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Company API")
+				.summary("회사 상세조회 API")
+				.description("회사 상세정보를 조회한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("회사 ID"),
+					fieldWithPath("data.name").type(JsonFieldType.STRING).description("회사명"),
+					fieldWithPath("data.detail").type(JsonFieldType.STRING).description("상세 설명"),
+					fieldWithPath("data.businessNumber").type(JsonFieldType.STRING).description("사업자 등록번호"),
+					fieldWithPath("data.address").type(JsonFieldType.STRING).description("주소"),
+					fieldWithPath("data.type").type(JsonFieldType.STRING).description("회사 타입 (CLIENT/DEV)"),
+					fieldWithPath("data.contactPhoneNumber").type(JsonFieldType.STRING).description("연락처"),
+					fieldWithPath("data.contactEmail").type(JsonFieldType.STRING).description("이메일"),
+					fieldWithPath("data.logoImagePath").type(JsonFieldType.STRING).description("로고 이미지 경로").optional(),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
 		);
 	}
 }
