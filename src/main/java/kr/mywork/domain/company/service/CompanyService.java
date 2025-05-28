@@ -1,7 +1,12 @@
 package kr.mywork.domain.company.service;
 
-import com.fasterxml.uuid.Generators;
 import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.uuid.Generators;
+
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyIdNotFoundException;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
@@ -10,9 +15,8 @@ import kr.mywork.domain.company.repository.CompanyIdRepository;
 import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
+import kr.mywork.domain.company.service.dto.response.CompanyDetailResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -53,5 +57,13 @@ public class CompanyService {
 
 		company.updateFrom(companyUpdateRequest);
 		return company.getId();
+	}
+
+	@Transactional(readOnly = true)
+	public CompanyDetailResponse findCompanyById(UUID companyId) {
+		final Company company = companyRepository.findById(companyId)
+				.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
+
+		return CompanyDetailResponse.fromEntity(company);
 	}
 }
