@@ -30,6 +30,7 @@ public class ProjectCheckListHistory {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_check_list_id")
     private ProjectCheckList projectCheckList;
+    private UUID projectStepId;
 
     @Column(nullable = false)
     private Boolean approval;

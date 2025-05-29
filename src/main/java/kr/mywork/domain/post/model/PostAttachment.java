@@ -19,6 +19,8 @@ public class PostAttachment {
     @UnixTimeOrderedUuidGeneratedValue
     private UUID id;
 
+    private UUID postId;
+
     @Column(length = 300)
     private String path;
 
