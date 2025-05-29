@@ -34,9 +34,6 @@ public class ProjectCheckListHistory {
     @Column(nullable = false)
     private Boolean approval;
 
-    @Column(length = 50)
-    private String title;
-
     @Column(length = 500)
     private String content;
 
