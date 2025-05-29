@@ -2,12 +2,13 @@ package kr.mywork.docs;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -327,6 +328,56 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.contactPhoneNumber").type(JsonFieldType.STRING).description("연락처"),
 					fieldWithPath("data.contactEmail").type(JsonFieldType.STRING).description("이메일"),
 					fieldWithPath("data.logoImagePath").type(JsonFieldType.STRING).description("로고 이미지 경로").optional(),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("회사 목록 기본 조회 성공")
+	@Sql("classpath:sql/company-list.sql")
+	void 회사_목록_기본_조회_성공() throws Exception {
+		// given
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			get("/api/company?page={page}&type={type}&keyword={keyword}&deleted={deleted}",
+				1, "DEV", null, null)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("company-list-success01", companyListSuccessResource01()));
+	}
+
+	private ResourceSnippet companyListSuccessResource01() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Company API")
+				.summary("회사 목록 조회 API")
+				.description("회사 목록을 조회한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.queryParameters(
+					parameterWithName("page").description("페이지 번호"),
+					parameterWithName("type").description("회사 타입(DEV/CLIENT)"),
+					parameterWithName("keyword").description("검색어").optional(),
+					parameterWithName("deleted").description("삭제 여부").optional()
+				)
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.companies.[].companyName").type(JsonFieldType.STRING).description("회사 이름"),
+					fieldWithPath("data.companies.[].businessNumber").type(JsonFieldType.STRING).description("사업자 번호"),
+					fieldWithPath("data.companies.[].address").type(JsonFieldType.STRING).description("사업자 주소"),
+					fieldWithPath("data.companies.[].contactPhoneNumber").type(JsonFieldType.STRING)
+						.description("대표 번호"),
+					fieldWithPath("data.companies.[].deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
+					fieldWithPath("data.companies.[].createdAt").type(JsonFieldType.STRING).description("생성 일자"),
+					fieldWithPath("data.totalCount").type(JsonFieldType.NUMBER).description("총 갯수"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
