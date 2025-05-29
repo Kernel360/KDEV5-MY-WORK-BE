@@ -15,3 +15,6 @@ spring:
   messages:
     basename: messages/messages
     fallback-to-system-locale: false
+company:
+  page:
+    size: 10
