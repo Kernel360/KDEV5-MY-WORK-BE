@@ -1,7 +1,9 @@
 package kr.mywork.interfaces.company.controller;
 
+import java.util.List;
 import java.util.UUID;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,13 +11,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.company.service.CompanyService;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import kr.mywork.domain.company.service.dto.response.CompanyDetailResponse;
+import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
@@ -23,13 +29,18 @@ import kr.mywork.interfaces.company.controller.dto.response.CompanyCreateWebResp
 import kr.mywork.interfaces.company.controller.dto.response.CompanyDeleteWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyDetailWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyIdCreateWebResponse;
+import kr.mywork.interfaces.company.controller.dto.response.CompanyListWebResponse;
+import kr.mywork.interfaces.company.controller.dto.response.CompanySelectWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyUpdateWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/company")
+@Validated
 public class CompanyController {
+
+	private static final String COMPANY_TYPE_REGX = "^(DEV|CLIENT)$";
 
 	private final CompanyService companyService;
 
@@ -52,7 +63,7 @@ public class CompanyController {
 		return ApiResponse.success(companyCreateWebResponse);
 	}
 
-	@PutMapping()
+	@PutMapping
 	public ApiResponse<CompanyUpdateWebResponse> updateCompany(
 		@RequestBody final CompanyUpdateWebRequest companyUpdateWebRequest) {
 
@@ -82,5 +93,23 @@ public class CompanyController {
 		CompanyDetailWebResponse companyDetailWebResponse = CompanyDetailWebResponse.from(companyDetailResponse);
 
 		return ApiResponse.success(companyDetailWebResponse);
+	}
+
+	@GetMapping
+	public ApiResponse<CompanyListWebResponse> findCompaniesByOffset(
+		@RequestParam(name = "page") @Min(value = 1, message = "{invalid.page-size}") final int page,
+		@RequestParam(name = "type") @Pattern(regexp = COMPANY_TYPE_REGX, message = "{invalid.company-type}") final String companyType,
+		@RequestParam(name = "keyword", required = false) final String keyword,
+		@RequestParam(name = "deleted", required = false) final Boolean deleted
+	) {
+		final List<CompanySelectResponse> companySelectResponses =
+			companyService.findCompaniesBySearchConditionWithPaging(page, companyType, keyword, deleted);
+
+		final Long totalCount = companyService.countTotalCompaniesByCondition(companyType, keyword, deleted);
+
+		List<CompanySelectWebResponse> companySelectWebResponses =
+			companySelectResponses.stream().map(CompanySelectWebResponse::from).toList();
+
+		return ApiResponse.success(new CompanyListWebResponse(companySelectWebResponses, totalCount));
 	}
 }
