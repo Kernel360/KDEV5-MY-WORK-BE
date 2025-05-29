@@ -9,3 +9,6 @@ spring:
     username: root
     password: cooper2025
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+company:
+  page:
+    size: 10
