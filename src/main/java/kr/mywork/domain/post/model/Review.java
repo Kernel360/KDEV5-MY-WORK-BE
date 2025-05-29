@@ -22,6 +22,8 @@ public class Review {
     @UnixTimeOrderedUuidGeneratedValue
     private UUID id;
 
+    private UUID postId;
+
     @Column(length = 200)
     private String comment;
 

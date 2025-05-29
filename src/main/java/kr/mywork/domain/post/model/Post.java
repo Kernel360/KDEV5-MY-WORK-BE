@@ -19,6 +19,8 @@ public class Post {
     @UnixTimeOrderedUuidGeneratedValue
     private UUID id;
 
+    private UUID projectStepId;
+
     @Column(length = 200)
     private String title;
 
