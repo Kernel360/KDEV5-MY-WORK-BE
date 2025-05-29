@@ -18,11 +18,6 @@ public class ProjectStep {
     @UnixTimeOrderedUuidGeneratedValue
     private UUID id;
 
-//    이 필드는 Project entity가 작성되면 주석 해제 예정.
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "project_id")
-//    private Project project;
-
     @Column(length = 30)
     private String title;
 
