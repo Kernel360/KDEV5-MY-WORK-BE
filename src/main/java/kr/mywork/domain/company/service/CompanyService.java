@@ -1,7 +1,9 @@
 package kr.mywork.domain.company.service;
 
+import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,11 +18,15 @@ import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import kr.mywork.domain.company.service.dto.response.CompanyDetailResponse;
+import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class CompanyService {
+
+	@Value("${company.page.size}")
+	private int companyPageSize;
 
 	private final CompanyRepository companyRepository;
 	private final CompanyIdRepository companyIdRepository;
@@ -42,8 +48,8 @@ public class CompanyService {
 
 	@Transactional
 	public UUID deleteCompany(final UUID companyId) {
-		Company company= companyRepository.findById(companyId)
-				.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
+		Company company = companyRepository.findById(companyId)
+			.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
 
 		company.setDeleted(true);
 
@@ -53,7 +59,7 @@ public class CompanyService {
 	@Transactional
 	public UUID updateCompany(CompanyUpdateRequest companyUpdateRequest) {
 		Company company = companyRepository.findById(companyUpdateRequest.getId())
-				.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
+			.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
 
 		company.updateFrom(companyUpdateRequest);
 		return company.getId();
@@ -62,8 +68,20 @@ public class CompanyService {
 	@Transactional(readOnly = true)
 	public CompanyDetailResponse findCompanyById(UUID companyId) {
 		final Company company = companyRepository.findById(companyId)
-				.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
+			.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
 
 		return CompanyDetailResponse.fromEntity(company);
+	}
+
+	@Transactional(readOnly = true)
+	public List<CompanySelectResponse> findCompaniesBySearchConditionWithPaging(final int page, String companyType,
+		String keyword, Boolean deleted) {
+		return companyRepository.findCompaniesBySearchConditionWithPaging(page, companyPageSize, companyType, keyword,
+			deleted);
+	}
+
+	@Transactional(readOnly = true)
+	public Long countTotalCompaniesByCondition(String companyType, String keyword, Boolean deleted) {
+		return companyRepository.countTotalCompaniesByCondition(companyType, keyword, deleted);
 	}
 }
