@@ -21,11 +21,11 @@ public class ProjectCheckListHistory {
     @UnixTimeOrderedUuidGeneratedValue
     private UUID id;
 
-    @Column(length = 50)
-    private String devManager;
+    @Column(length = 30)
+    private String devManagerName;
 
-    @Column(length = 50)
-    private String clientManager;
+    @Column(length = 30)
+    private String clientManagerName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_check_list_id")
