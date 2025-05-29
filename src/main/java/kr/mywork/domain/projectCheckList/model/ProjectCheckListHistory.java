@@ -2,10 +2,7 @@ package kr.mywork.domain.projectCheckList.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
@@ -27,9 +24,8 @@ public class ProjectCheckListHistory {
     @Column(length = 30)
     private String clientManagerName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_check_list_id")
-    private ProjectCheckList projectCheckList;
+    private UUID projectCheckListId;
+
     private UUID projectStepId;
 
     @Column(nullable = false)
