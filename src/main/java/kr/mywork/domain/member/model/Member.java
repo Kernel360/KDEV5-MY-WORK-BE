@@ -2,9 +2,7 @@ package kr.mywork.domain.member.model;
 
 import java.util.UUID;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +28,8 @@ public class Member {
 	private String position;
 
 	@Column(name = "role", length = 20)
-	private String role;
+	@Enumerated(value = jakarta.persistence.EnumType.STRING)
+	private MemberType role;
 
 	@Column(name = "phone_number", length = 300)
 	private String phoneNumber;
