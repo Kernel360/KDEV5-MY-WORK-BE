@@ -4,12 +4,16 @@ import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
+import kr.mywork.interfaces.member.controller.dto.resquest.MemberCreateWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +32,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 직원 목록 조회 테스트 성공")
 	@Sql("classpath:sql/company-member-get.sql")
-	 void 회사직원_조회_테스트_성공() throws Exception{
+	void 회사직원_조회_테스트_성공() throws Exception {
 		//given
 		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
@@ -36,37 +40,84 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 		final ResultActions result = mockMvc.perform(
 				get("/api/member/company/{companyId}", id)
 						.param("page", "1")
-				.contentType(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON)
 		);
 
 		//then
 		result.andExpectAll(
-				status().isOk(),
-				jsonPath("$.result").value(ResultType.SUCCESS.name()),
-				jsonPath("$.data").exists(),
-				jsonPath("$.error").doesNotExist())
-			.andDo(document("companyMember-get-success", CompanyMemberGetSuccess()));
-
+						status().isOk(),
+						jsonPath("$.result").value(ResultType.SUCCESS.name()),
+						jsonPath("$.data").exists(),
+						jsonPath("$.error").doesNotExist())
+				.andDo(document("companyMember-get-success", CompanyMemberGetSuccess()));
 
 
 	}
+
 	private ResourceSnippet CompanyMemberGetSuccess() {
+		return resource(
+				ResourceSnippetParameters.builder()
+						.tag("Member API")
+						.summary("회사 직원 조회 API")
+						.description("회사의 직원 목록을 조회한다.")
+						.requestHeaders(
+								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+						.responseFields(
+								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+								fieldWithPath("data.total").type(JsonFieldType.NUMBER).description("전체 멤버 수"),
+								fieldWithPath("data.members[].id").type(JsonFieldType.STRING).description("멤버 고유 식별자 (UUID)"),
+								fieldWithPath("data.members[].name").type(JsonFieldType.STRING).description("멤버 이름"),
+								fieldWithPath("data.members[].phoneNumber").type(JsonFieldType.STRING).description("멤버 전화번호"),
+								fieldWithPath("data.members[].position").type(JsonFieldType.STRING).description("멤버 직급"),
+								fieldWithPath("data.members[].department").type(JsonFieldType.STRING).description("멤버 부서"),
+								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+						.build()
+		);
+	}
+
+	@Test
+	@DisplayName("멤버 생성 성공")
+	void 멤버_생성_성공() throws Exception {
+		//given
+		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
+		LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");
+
+		final MemberCreateWebRequest memberCreateWebRequest =
+				new MemberCreateWebRequest(
+						null, companyId, "김두만", "개발",
+						"부장", "USER", "010-4040-5050",
+						"eme@naver.com", birthDate
+				);
+		final String requestBody = objectMapper.writeValueAsString(memberCreateWebRequest);
+
+		//when
+		final ResultActions result = mockMvc.perform(
+				post("/api/member")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody));
+
+		//then
+		result.andExpectAll(
+						status().isOk(),
+						jsonPath("$.result").value(ResultType.SUCCESS.name()),
+						jsonPath("$.data").exists(),
+						jsonPath("$.error").doesNotExist())
+				.andDo(MockMvcRestDocumentationWrapper.document("member-create-success", memberCreateSuccessResource()));
+
+	}
+
+	private ResourceSnippet memberCreateSuccessResource() {
 		return resource(
 			ResourceSnippetParameters.builder()
 				.tag("Member API")
-				.summary("회사 직원 조회 API")
-				.description("회사의 직원 목록을 조회한다.")
+				.summary("멤버 생성 API")
+				.description("멤버 아이디를 생성한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+						headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
 				.responseFields(
-					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-					fieldWithPath("data.total").type(JsonFieldType.NUMBER).description("전체 멤버 수"),
-					fieldWithPath("data.members[].id").type(JsonFieldType.STRING).description("멤버 고유 식별자 (UUID)"),
-					fieldWithPath("data.members[].name").type(JsonFieldType.STRING).description("멤버 이름"),
-					fieldWithPath("data.members[].phoneNumber").type(JsonFieldType.STRING).description("멤버 전화번호"),
-					fieldWithPath("data.members[].position").type(JsonFieldType.STRING).description("멤버 직급"),
-					fieldWithPath("data.members[].department").type(JsonFieldType.STRING).description("멤버 부서"),
-					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+						fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+						fieldWithPath("data.id").type(JsonFieldType.STRING).description("생성한 멤버 아이디"),
+						fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
 	}
