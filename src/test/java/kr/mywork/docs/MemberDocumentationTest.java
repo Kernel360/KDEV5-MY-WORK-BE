@@ -34,7 +34,8 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 		//when
 		final ResultActions result = mockMvc.perform(
-			get("/api/member/company/{companyId}",id,0)
+				get("/api/member/company/{companyId}", id)
+						.param("page", "1")
 				.contentType(MediaType.APPLICATION_JSON)
 		);
 
