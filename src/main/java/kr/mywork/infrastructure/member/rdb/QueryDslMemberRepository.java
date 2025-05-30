@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -44,4 +45,16 @@ public class QueryDslMemberRepository implements MemberRepository {
 	public long countByCompanyIdAndDeletedFalse(UUID companyId) {
 		return memberRepository.countByCompanyIdAndDeletedFalse(companyId);
 	}
+
+	@Override
+	public Member save(final MemberCreateRequest memberCreateRequest) {
+		return memberRepository.save(memberCreateRequest.toEntity());
+	}
+
+	@Override
+	public boolean existsByEmail(String email) {
+		return memberRepository.existsByEmail(email);
+	}
+
+
 }

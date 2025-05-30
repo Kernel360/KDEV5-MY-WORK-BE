@@ -10,4 +10,6 @@ import kr.mywork.domain.member.model.Member;
 public interface JpaMemberRepository extends JpaRepository<Member, UUID> {
     Optional<Member> findByEmailAndDeletedFalse(String email);
 	long countByCompanyIdAndDeletedFalse(UUID companyId);
+
+	boolean existsByEmail(String email);
 }
