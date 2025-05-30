@@ -3,13 +3,12 @@ package kr.mywork.interfaces.member.controller;
 import java.util.List;
 import java.util.UUID;
 
+import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
+import kr.mywork.interfaces.member.controller.dto.response.MemberCreateWebResponse;
+import kr.mywork.interfaces.member.controller.dto.resquest.MemberCreateWebRequest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.member.service.MemberService;
@@ -39,5 +38,18 @@ public class MemberController {
 		return ApiResponse.success(companyMemberWebResponse);
 	}
 
+	@PostMapping
+	public ApiResponse<MemberCreateWebResponse> memberCreateWebResponseApiResponse(
+			@RequestBody final MemberCreateWebRequest memberCreateWebRequest
+	){
+
+		final MemberCreateRequest memberCreateRequest = memberCreateWebRequest.toServiceDto();
+
+		final UUID createdMemberId = memberService.createMember(memberCreateRequest);
+
+		final MemberCreateWebResponse memberCreateWebResponse = new MemberCreateWebResponse(createdMemberId);
+
+		return ApiResponse.success(memberCreateWebResponse);
+	}
 
 }
