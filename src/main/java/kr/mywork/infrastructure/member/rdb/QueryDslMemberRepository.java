@@ -5,6 +5,7 @@ import static kr.mywork.domain.member.model.QMember.member;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -21,15 +22,16 @@ public class QueryDslMemberRepository implements MemberRepository {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<Member> findMemberByComapnyId(UUID companyId, long offset) {
+	public List<Member> findMemberByComapnyId(UUID companyId, Pageable pageable) {
 		return queryFactory
 			.selectFrom(member)
 			.where(
 				member.companyId.eq(companyId),
 				member.deleted.eq(false)
 			)
-			.offset(offset)
-			.limit(10)
+			.orderBy(member.name.asc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
 			.fetch();
 	}
 	@Override
