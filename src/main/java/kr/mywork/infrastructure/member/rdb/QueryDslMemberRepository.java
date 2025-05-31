@@ -56,4 +56,9 @@ public class QueryDslMemberRepository implements MemberRepository {
 	public boolean existsByEmail(String email) {
 		return memberRepository.existsByEmail(email);
 	}
+
+	@Override
+	public Optional<Member> findById(UUID memberId) {
+		return memberRepository.findById(memberId);
+	}
 }
