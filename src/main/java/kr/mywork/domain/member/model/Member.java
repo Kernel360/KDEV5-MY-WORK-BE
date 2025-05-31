@@ -77,4 +77,11 @@ public class Member {
 		this.password = password;
 		this.birthDate = birthDate;
 	}
+
+
+	// 소프트 딜리트 전용 메서드
+	public void softDelete() {
+		this.deleted = true; // ← 더티 체킹 대상
+	}
+
 }
