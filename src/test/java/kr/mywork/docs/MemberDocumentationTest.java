@@ -3,6 +3,7 @@ package kr.mywork.docs;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -25,6 +26,7 @@ import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
 import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
 import kr.mywork.interfaces.member.controller.dto.resquest.MemberCreateWebRequest;
 
 public class MemberDocumentationTest extends RestDocsDocumentation {
@@ -68,6 +70,46 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.members[].position").type(JsonFieldType.STRING).description("멤버 직급"),
 					fieldWithPath("data.members[].department").type(JsonFieldType.STRING).description("멤버 부서"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("멤버 삭제 테스트 성공")
+	@Sql("classpath:sql/member-delete.sql")
+	void 멤버_삭제_테스트_성공() throws Exception {
+		//given
+		UUID memberId = UUID.fromString("6516f3fe-057b-efdc-9aa9-87bf7b33a1d0");
+
+		final MemberDeleteWebRequest memberDeleteWebRequest = new MemberDeleteWebRequest(memberId);
+
+		final String requestBody = objectMapper.writeValueAsString(memberDeleteWebRequest);
+
+		//when
+		final ResultActions result = mockMvc.perform(delete("/api/member")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody));
+		//then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(MockMvcRestDocumentationWrapper.document("memeber-delete-success", memberDeleteSuccessResource()));
+	}
+
+	private ResourceSnippet memberDeleteSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Member API")
+				.summary("멤버 삭제 API")
+				.description("멤버를 소프트 딜리트 한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("삭제된 멤버 아이디"),  // 수정
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))  // 수정
 				.build()
 		);
 	}
