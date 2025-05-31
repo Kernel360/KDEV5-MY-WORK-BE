@@ -17,4 +17,6 @@ public interface MemberRepository{
     Member save(MemberCreateRequest memberCreateRequest);
 
 	boolean existsByEmail(String email);
+
+	Optional<Member> findById(UUID memberId);
 }

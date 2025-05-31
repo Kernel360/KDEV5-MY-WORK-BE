@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.domain.member.errors.EmailAlreadyExistsException;
 import kr.mywork.domain.member.errors.MemberErrorType;
+import kr.mywork.domain.member.errors.MemberIdNotFoundException;
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
@@ -64,5 +65,16 @@ public class MemberService {
 		final Member savedMember = memberRepository.save(memberCreateRequest);
 
 		return savedMember.getId();
+	}
+
+	@Transactional
+    public UUID deleteMember(UUID memberId) {
+		Member member = memberRepository.findById(memberId)
+				.orElseThrow(()-> new MemberIdNotFoundException(MemberErrorType.ID_NOT_FOUND));
+
+		//더티체킹
+		member.softDelete();
+
+		return member.getId();
 	}
 }
