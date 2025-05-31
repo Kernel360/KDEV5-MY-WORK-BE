@@ -55,17 +55,18 @@ public class Member {
 
 	@Column(nullable = false, columnDefinition = "timestamp")
 	@CreationTimestamp
-	private LocalDateTime created;
+	private LocalDateTime createdAt;
 
 	@Column(nullable = false, columnDefinition = "timestamp")
 	@UpdateTimestamp
-	private LocalDateTime modified;
+	private LocalDateTime modifiedAt;
 
-	@Column(nullable = false,columnDefinition = "timestamp")
+	@Column(nullable = false, columnDefinition = "timestamp")
 	private LocalDateTime birthDate;
 
-
-	public Member(final UUID id , final UUID companyId, final String name, final String department, final String position, final String role, final String phoneNumber, final String email, final String password, final LocalDateTime birthDate) {
+	public Member(final UUID id, final UUID companyId, final String name, final String department,
+		final String position, final String role, final String phoneNumber, final String email, final String password,
+		final LocalDateTime birthDate) {
 		this.id = id;
 		this.companyId = companyId;
 		this.name = name;
@@ -77,7 +78,6 @@ public class Member {
 		this.password = password;
 		this.birthDate = birthDate;
 	}
-
 
 	// 소프트 딜리트 전용 메서드
 	public void softDelete() {
