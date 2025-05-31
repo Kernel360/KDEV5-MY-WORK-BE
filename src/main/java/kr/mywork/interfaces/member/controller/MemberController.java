@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +18,10 @@ import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.member.service.MemberService;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
 import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
+import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
 import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberCreateWebResponse;
+import kr.mywork.interfaces.member.controller.dto.response.MemberDeleteWebResponse;
 import kr.mywork.interfaces.member.controller.dto.resquest.MemberCreateWebRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +49,7 @@ public class MemberController {
 
 	@PostMapping
 	public ApiResponse<MemberCreateWebResponse> memberCreateWebResponseApiResponse(
-			@RequestBody final MemberCreateWebRequest memberCreateWebRequest
+		@RequestBody final MemberCreateWebRequest memberCreateWebRequest
 	){
 
 		final MemberCreateRequest memberCreateRequest = memberCreateWebRequest.toServiceDto();
@@ -58,4 +61,14 @@ public class MemberController {
 		return ApiResponse.success(memberCreateWebResponse);
 	}
 
+	@DeleteMapping
+	public ApiResponse<MemberDeleteWebResponse> deleteMember(
+		@RequestBody MemberDeleteWebRequest memberDeleteWebRequest
+	){
+		final UUID memberId = memberService.deleteMember(memberDeleteWebRequest.memberId());
+
+		MemberDeleteWebResponse memberDeleteWebResponse = new MemberDeleteWebResponse(memberId);
+
+		return ApiResponse.success(memberDeleteWebResponse);
+	}
 }
