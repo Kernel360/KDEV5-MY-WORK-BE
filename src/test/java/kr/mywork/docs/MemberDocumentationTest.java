@@ -38,40 +38,37 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 		//when
 		final ResultActions result = mockMvc.perform(
-				get("/api/member/company/{companyId}", id)
-						.param("page", "1")
-						.contentType(MediaType.APPLICATION_JSON)
-		);
+			get("/api/member/company/{companyId}", id)
+				.param("page", "1")
+				.contentType(MediaType.APPLICATION_JSON));
 
 		//then
 		result.andExpectAll(
-						status().isOk(),
-						jsonPath("$.result").value(ResultType.SUCCESS.name()),
-						jsonPath("$.data").exists(),
-						jsonPath("$.error").doesNotExist())
-				.andDo(document("companyMember-get-success", CompanyMemberGetSuccess()));
-
-
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("company-member-get-success", CompanyMemberGetSuccess()));
 	}
 
 	private ResourceSnippet CompanyMemberGetSuccess() {
 		return resource(
-				ResourceSnippetParameters.builder()
-						.tag("Member API")
-						.summary("회사 직원 조회 API")
-						.description("회사의 직원 목록을 조회한다.")
-						.requestHeaders(
-								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
-						.responseFields(
-								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-								fieldWithPath("data.total").type(JsonFieldType.NUMBER).description("전체 멤버 수"),
-								fieldWithPath("data.members[].id").type(JsonFieldType.STRING).description("멤버 고유 식별자 (UUID)"),
-								fieldWithPath("data.members[].name").type(JsonFieldType.STRING).description("멤버 이름"),
-								fieldWithPath("data.members[].phoneNumber").type(JsonFieldType.STRING).description("멤버 전화번호"),
-								fieldWithPath("data.members[].position").type(JsonFieldType.STRING).description("멤버 직급"),
-								fieldWithPath("data.members[].department").type(JsonFieldType.STRING).description("멤버 부서"),
-								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
-						.build()
+			ResourceSnippetParameters.builder()
+				.tag("Member API")
+				.summary("회사 직원 조회 API")
+				.description("회사의 직원 목록을 조회한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.total").type(JsonFieldType.NUMBER).description("전체 멤버 수"),
+					fieldWithPath("data.members[].id").type(JsonFieldType.STRING).description("멤버 고유 식별자 (UUID)"),
+					fieldWithPath("data.members[].name").type(JsonFieldType.STRING).description("멤버 이름"),
+					fieldWithPath("data.members[].phoneNumber").type(JsonFieldType.STRING).description("멤버 전화번호"),
+					fieldWithPath("data.members[].position").type(JsonFieldType.STRING).description("멤버 직급"),
+					fieldWithPath("data.members[].department").type(JsonFieldType.STRING).description("멤버 부서"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
 		);
 	}
 
@@ -83,26 +80,26 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 		LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");
 
 		final MemberCreateWebRequest memberCreateWebRequest =
-				new MemberCreateWebRequest(
-						null, companyId, "김두만", "개발",
-						"부장", "USER", "010-4040-5050",
-						"eme@naver.com", birthDate
-				);
+			new MemberCreateWebRequest(
+				null, companyId, "김두만", "개발",
+				"부장", "USER", "010-4040-5050",
+				"eme@naver.com", birthDate
+			);
 		final String requestBody = objectMapper.writeValueAsString(memberCreateWebRequest);
 
 		//when
 		final ResultActions result = mockMvc.perform(
-				post("/api/member")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(requestBody));
+			post("/api/member")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody));
 
 		//then
 		result.andExpectAll(
-						status().isOk(),
-						jsonPath("$.result").value(ResultType.SUCCESS.name()),
-						jsonPath("$.data").exists(),
-						jsonPath("$.error").doesNotExist())
-				.andDo(MockMvcRestDocumentationWrapper.document("member-create-success", memberCreateSuccessResource()));
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(MockMvcRestDocumentationWrapper.document("member-create-success", memberCreateSuccessResource()));
 
 	}
 
@@ -113,11 +110,50 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				.summary("멤버 생성 API")
 				.description("멤버 아이디를 생성한다.")
 				.requestHeaders(
-						headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
 				.responseFields(
-						fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-						fieldWithPath("data.id").type(JsonFieldType.STRING).description("생성한 멤버 아이디"),
-						fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("생성한 멤버 아이디"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("회사 직원 조회 샐패 (page 검증)")
+	void 회사_직원_조회_실패_페이징() throws Exception {
+		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
+
+		//when
+		final ResultActions result = mockMvc.perform(
+			get("/api/member/company/{companyId}", id)
+				.param("page", "-1")
+				.contentType(MediaType.APPLICATION_JSON)
+		);
+
+		//then
+		result.andExpectAll(
+				status().is4xxClientError(),
+				jsonPath("$.result").value(ResultType.ERROR.name()),
+				jsonPath("$.data").doesNotExist(),
+				jsonPath("$.error").exists())
+			.andDo(document("company-member-get-page-fail", CompanyMemberGetPageFailResource()));
+	}
+
+	private ResourceSnippet CompanyMemberGetPageFailResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Member API")
+				.summary("멤버 조회 API")
+				.description("회사의 직원 목록을 조회한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터"),
+					fieldWithPath("error.code").type(JsonFieldType.STRING).description("에러 코드"),
+					fieldWithPath("error.message").type(JsonFieldType.STRING).description("에러 정보"),
+					fieldWithPath("error.data").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
 	}

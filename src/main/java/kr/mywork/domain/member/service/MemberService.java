@@ -4,28 +4,31 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import kr.mywork.domain.member.errors.EmailAlreadyExistsException;
-import kr.mywork.domain.member.errors.MemberErrorType;
-import kr.mywork.domain.member.model.Member;
-import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.mywork.domain.member.errors.EmailAlreadyExistsException;
+import kr.mywork.domain.member.errors.MemberErrorType;
+import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
+import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
+	@Value("${member.page.size}")
+	private int memberPageSize;
+
 	private final MemberRepository memberRepository;
 
 	@Transactional
-	public List<CompanyMemberResponse> findMemberByCompanyId(UUID companyId, Pageable pageable) {
+	public List<CompanyMemberResponse> findMemberByCompanyId(UUID companyId, int page) {
 
-		return memberRepository.findMemberByComapnyId(companyId,pageable).stream()
+		return memberRepository.findMemberByCompanyId(companyId,page,memberPageSize).stream()
 			.map(CompanyMemberResponse::fromEntity)
 			.collect(Collectors.toList());
 
