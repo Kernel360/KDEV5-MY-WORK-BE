@@ -12,8 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
-import kr.mywork.interfaces.member.controller.dto.resquest.MemberCreateWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -22,10 +20,12 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
 import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.member.controller.dto.resquest.MemberCreateWebRequest;
 
 public class MemberDocumentationTest extends RestDocsDocumentation {
 
