@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
@@ -35,7 +36,7 @@ public class PostController {
 
 	@PostMapping
 	public ApiResponse<PostCreateWebResponse> createPost(
-		@RequestBody final PostCreateWebRequest postCreateWebRequest) {
+		@RequestBody @Valid final PostCreateWebRequest postCreateWebRequest) {
 
 		final PostCreateRequest postCreateRequest = postCreateWebRequest.toServiceDto();
 
@@ -49,7 +50,7 @@ public class PostController {
 
 	@PutMapping("")
 	public ApiResponse<PostUpdateWebResponse> updatePost(
-		@RequestBody final PostUpdateWebRequest postUpdateWebRequest) {
+		@RequestBody @Valid final PostUpdateWebRequest postUpdateWebRequest) {
 
 		final PostUpdateRequest postUpdateRequest = postUpdateWebRequest.toServiceDto();
 
