@@ -16,21 +16,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProjectStep {
 
-    @Id
-    @UnixTimeOrderedUuidGeneratedValue
-    private UUID id;
+	@Id
+	@UnixTimeOrderedUuidGeneratedValue
+	private UUID id;
 
-    @Column(length = 30)
-    private String title;
+	@Column(length = 30)
+	private String title;
 
-    private Integer orderNum;
+	private Integer orderNum;
 
-    @CreationTimestamp
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+	@CreationTimestamp
+	@Column(nullable = false)
+	private LocalDateTime createdAt;
 
-    public ProjectStep(final String title, final Integer orderNum) {
-        this.title = title;
-        this.orderNum = orderNum;
-    }
+	public ProjectStep(final String title, final Integer orderNum) {
+		this.title = title;
+		this.orderNum = orderNum;
+	}
 }
