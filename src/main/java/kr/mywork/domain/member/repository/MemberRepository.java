@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 
 import kr.mywork.domain.member.model.Member;
+import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
 
 public interface MemberRepository{
     Optional<Member> findByEmailAndDeletedFalse(String email);
@@ -14,4 +15,8 @@ public interface MemberRepository{
 	List<Member> findMemberByComapnyId(UUID companyId, Pageable pageable);
 
 	long countByCompanyIdAndDeletedFalse(UUID companyId);
+
+    Member save(MemberCreateRequest memberCreateRequest);
+
+	boolean existsByEmail(String email);
 }
