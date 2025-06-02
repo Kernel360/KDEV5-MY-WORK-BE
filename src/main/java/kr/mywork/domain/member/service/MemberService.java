@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +18,9 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 
 	@Transactional
-	public List<CompanyMemberResponse> findMemberByCompanyId(UUID companyId, Pageable pageable) {
+	public List<CompanyMemberResponse> findMemberByCompanyId(UUID companyId, int page) {
 
-		return memberRepository.findMemberByComapnyId(companyId,pageable).stream()
+		return memberRepository.findMemberByCompanyId(companyId,page).stream()
 			.map(CompanyMemberResponse::fromEntity)
 			.collect(Collectors.toList());
 
