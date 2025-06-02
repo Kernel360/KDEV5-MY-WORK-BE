@@ -22,6 +22,7 @@ import com.fasterxml.uuid.Generators;
 
 import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.post.controller.dto.request.PostCreateWebRequest;
+import kr.mywork.interfaces.post.controller.dto.request.PostUpdateWebRequest;
 
 public class PostDocumentationTest extends RestDocsDocumentation {
 
@@ -144,6 +145,54 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("error.code").type(JsonFieldType.STRING).description("에러 코드"),
 					fieldWithPath("error.message").type(JsonFieldType.STRING).description("에러 정보"),
 					fieldWithPath("error.data").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("게시글 수정 성공")
+	@Sql("classpath:sql/post-for-update.sql")
+	void 게시글_수정_성공() throws Exception {
+		// given
+		UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
+
+		final PostUpdateWebRequest postUpdateWebRequest =
+			new PostUpdateWebRequest(postId, "바뀐 제목", "바뀐 컨텐츠");
+
+		final String requestBody = objectMapper.writeValueAsString(postUpdateWebRequest);
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			put("/api/posts") // HTTP method (URL)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("post-update-success", postUpdateSuccessResource()));
+	}
+
+	private ResourceSnippet postUpdateSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Post API")
+				.summary("게시글 수정 API")
+				.description("게시글의 title, content를 수정한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.postId").type(JsonFieldType.STRING).description("수정한 게시글 아이디"),
+					fieldWithPath("data.title").type(JsonFieldType.STRING).description("수정한 게시글 제목"),
+					fieldWithPath("data.content").type(JsonFieldType.STRING).description("수정한 게시글 내용"),
+					fieldWithPath("data.companyName").type(JsonFieldType.STRING).description("회사 이름"),
+					fieldWithPath("data.authorName").type(JsonFieldType.STRING).description("작성자"),
+					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
 	}
