@@ -28,14 +28,14 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 직원 목록 조회 테스트 성공")
 	@Sql("classpath:sql/company-member-get.sql")
-	 void 회사직원_조회_테스트_성공() throws Exception{
+	void 회사직원_조회_테스트_성공() throws Exception {
 		//given
 		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
 		//when
 		final ResultActions result = mockMvc.perform(
-				get("/api/member/company/{companyId}", id)
-						.param("page", "1")
+			get("/api/member/company/{companyId}", id)
+				.param("page", "2")
 				.contentType(MediaType.APPLICATION_JSON)
 		);
 
@@ -45,11 +45,10 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				jsonPath("$.result").value(ResultType.SUCCESS.name()),
 				jsonPath("$.data").exists(),
 				jsonPath("$.error").doesNotExist())
-			.andDo(document("companyMember-get-success", CompanyMemberGetSuccess()));
-
-
+			.andDo(document("company-member-get-success", CompanyMemberGetSuccess()));
 
 	}
+
 	private ResourceSnippet CompanyMemberGetSuccess() {
 		return resource(
 			ResourceSnippetParameters.builder()
@@ -67,6 +66,84 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.members[].position").type(JsonFieldType.STRING).description("멤버 직급"),
 					fieldWithPath("data.members[].department").type(JsonFieldType.STRING).description("멤버 부서"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+
+	@Test
+	@DisplayName("회사 직원 조회 샐패 (page 검증)")
+	void 회사_직원_조회_실패_페이징()	throws Exception{
+		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
+
+		//when
+		final ResultActions result = mockMvc.perform(
+			get("/api/member/company/{companyId}", id)
+				.param("page", "-1")
+				.contentType(MediaType.APPLICATION_JSON)
+		);
+
+		//then
+		result.andExpectAll(
+				status().is4xxClientError(),
+				jsonPath("$.result").value(ResultType.ERROR.name()),
+				jsonPath("$.data").doesNotExist(),
+				jsonPath("$.error").exists())
+			.andDo(document("company-member-get-page-fail", CompanyMemberGetPageFailResource()));
+	}
+
+	private ResourceSnippet CompanyMemberGetPageFailResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Member API")
+				.summary("멤버 조회 API")
+				.description("회사의 직원 목록을 조회한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터"),
+					fieldWithPath("error.code").type(JsonFieldType.STRING).description("에러 코드"),
+					fieldWithPath("error.message").type(JsonFieldType.STRING).description("에러 정보"),
+					fieldWithPath("error.data").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("회사 직원 조회 샐패 (유효하지 않는 회사 아이디)")
+	void 회사_직원_조회_실패_유효하지_않는_회사_아이디()	throws Exception{
+
+		//when
+		final ResultActions result = mockMvc.perform(
+			get("/api/member/company/{companyId}", "0196f7a6-10b6-7123-a2dc")
+				.param("page", "-1")
+				.contentType(MediaType.APPLICATION_JSON)
+		);
+
+		//then
+		result.andExpectAll(
+				status().is4xxClientError(),
+				jsonPath("$.result").value(ResultType.ERROR.name()),
+				jsonPath("$.data").doesNotExist(),
+				jsonPath("$.error").exists())
+			.andDo(document("company-member-get-uuid-fail", companyMemberGetUuidFailResource()));
+	}
+
+	private ResourceSnippet companyMemberGetUuidFailResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Member API")
+				.summary("멤버 조회 API")
+				.description("회사의 직원 목록을 조회한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터"),
+					fieldWithPath("error.code").type(JsonFieldType.STRING).description("에러 코드"),
+					fieldWithPath("error.message").type(JsonFieldType.STRING).description("에러 정보"),
+					fieldWithPath("error.data").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
 	}
