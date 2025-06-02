@@ -10,10 +10,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class ProjectStep {
 
     @Id
@@ -32,5 +34,11 @@ public class ProjectStep {
     public ProjectStep(final String title, final Integer orderNum) {
         this.title = title;
         this.orderNum = orderNum;
+    }
+
+    public boolean update(final String title, final Integer orderNum) {
+        this.title = title;
+        this.orderNum = orderNum;
+        return true;
     }
 }
