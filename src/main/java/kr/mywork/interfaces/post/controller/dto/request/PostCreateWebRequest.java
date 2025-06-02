@@ -2,6 +2,9 @@ package kr.mywork.interfaces.post.controller.dto.request;
 
 import java.util.UUID;
 
+import org.hibernate.validator.constraints.Length;
+
+import jakarta.validation.constraints.NotNull;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,16 +13,24 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostCreateWebRequest {
 
+	@NotNull
 	private final UUID id;
 
+	@NotNull
 	private final UUID projectStepId;
 
+	@Length(min = 1, max = 200)
 	private final String title;
 
+	@NotNull
+	@Length(min = 1, max = 30)
 	private final String companyName;
 
+	@NotNull
+	@Length(min = 1, max = 30)
 	private final String authorName;
 
+	@Length(min = 1, max = 500)
 	private final String content;
 
 	public PostCreateRequest toServiceDto() {
