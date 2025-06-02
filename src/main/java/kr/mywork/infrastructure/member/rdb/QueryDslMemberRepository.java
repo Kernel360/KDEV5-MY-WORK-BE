@@ -27,9 +27,9 @@ public class QueryDslMemberRepository implements MemberRepository {
     }
 
 	@Override
-	public List<Member> findMemberByCompanyId(UUID companyId, int page) {
+	public List<Member> findMemberByCompanyId(UUID companyId, int page, int memberPageSize) {
 
-		final int offset = (page - 1) * 10;
+		final int offset = (page - 1) * memberPageSize;
 
 		return queryFactory
 			.selectFrom(member)
@@ -39,7 +39,7 @@ public class QueryDslMemberRepository implements MemberRepository {
 			)
 			.orderBy(member.name.asc())
 			.offset(offset)
-			.limit(10)
+			.limit(memberPageSize)
 			.fetch();
 	}
 	@Override

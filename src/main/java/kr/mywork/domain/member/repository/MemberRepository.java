@@ -9,7 +9,7 @@ import kr.mywork.domain.member.model.Member;
 public interface MemberRepository{
     Optional<Member> findByEmailAndDeletedFalse(String email);
 
-	List<Member> findMemberByCompanyId(UUID companyId, int page);
+	List<Member> findMemberByCompanyId(UUID companyId, int page,int memberPageSize);
 
 	long countByCompanyIdAndDeletedFalse(UUID companyId);
 }
