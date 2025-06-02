@@ -1,0 +1,1 @@
+INSERT INTO post_id VALUES (UNHEX(REPLACE('1234a9a9-90b6-9898-a9dc-92c9861aa98c', '-', '')));
