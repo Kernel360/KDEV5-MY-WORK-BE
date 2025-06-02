@@ -1,46 +1,60 @@
 package kr.mywork.domain.post.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Post {
 
-    @Id
-    @UnixTimeOrderedUuidGeneratedValue
-    private UUID id;
+	@Id
+	private UUID id;
 
-    private UUID projectStepId;
+	private UUID projectStepId;
 
-    @Column(length = 200)
-    private String title;
+	@Column(length = 200)
+	private String title;
 
-    @Column(length = 30)
-    private String companyName;
+	@Column(length = 30)
+	private String companyName;
 
-    @Column(length = 30)
-    private String authorName;
+	@Column(length = 30)
+	private String authorName;
 
-    @Column(length = 500)
-    private String content;
+	@Column(length = 500)
+	private String content;
 
-    @Column(length = 30)
-    private String approval;
+	@Column(length = 30)
+	private String approval;
 
-    private Boolean deleted;
+	private Boolean deleted;
 
-    @UpdateTimestamp
-    private LocalDateTime modifiedAt;
+	@UpdateTimestamp
+	private LocalDateTime modifiedAt;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+	@CreationTimestamp
+	private LocalDateTime createdAt;
+
+	public Post(final UUID id, final UUID projectStepId, final String title, final String companyName,
+		final String authorName, final String content, String approval, Boolean deleted) {
+		this.id = id;
+		this.projectStepId = projectStepId;
+		this.title = title;
+		this.companyName = companyName;
+		this.authorName = authorName;
+		this.content = content;
+		this.approval = approval;
+		this.deleted = deleted;
+	}
 }
