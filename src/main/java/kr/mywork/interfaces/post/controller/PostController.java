@@ -2,7 +2,9 @@ package kr.mywork.interfaces.post.controller;
 
 import java.util.UUID;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,13 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
+import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
+import kr.mywork.domain.post.service.dto.response.PostUpdateResponse;
 import kr.mywork.interfaces.post.controller.dto.request.PostCreateWebRequest;
+import kr.mywork.interfaces.post.controller.dto.request.PostUpdateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.response.PostCreateWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostIdCreateWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.PostUpdateWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/post")
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostController {
 
@@ -40,5 +46,19 @@ public class PostController {
 
 		return ApiResponse.success(postCreateWebResponse);
 
+	}
+
+	@PutMapping("/{id}")
+	public ApiResponse<PostUpdateWebResponse> updatePost(
+		@RequestBody final PostUpdateWebRequest postUpdateWebRequest,
+		@PathVariable final UUID id) {
+
+		final PostUpdateRequest postUpdateRequest = postUpdateWebRequest.toServiceDto(id);
+
+		final PostUpdateResponse postUpdateResponse = postService.updatePost(postUpdateRequest);
+
+		final PostUpdateWebResponse postUpdateWebResponse = PostUpdateWebResponse.from(postUpdateResponse);
+
+		return ApiResponse.success(postUpdateWebResponse);
 	}
 }
