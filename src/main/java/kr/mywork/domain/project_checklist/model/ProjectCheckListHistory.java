@@ -1,4 +1,4 @@
-package kr.mywork.domain.projectCheckList.model;
+package kr.mywork.domain.project_checklist.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
