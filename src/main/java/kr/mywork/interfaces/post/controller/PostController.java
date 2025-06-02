@@ -1,0 +1,44 @@
+package kr.mywork.interfaces.post.controller;
+
+import java.util.UUID;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.domain.post.service.PostService;
+import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
+import kr.mywork.interfaces.post.controller.dto.request.PostCreateWebRequest;
+import kr.mywork.interfaces.post.controller.dto.response.PostCreateWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.PostIdCreateWebResponse;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/post")
+@RequiredArgsConstructor
+public class PostController {
+
+	private final PostService postService;
+
+	@PostMapping("/id/generate")
+	public ApiResponse<PostIdCreateWebResponse> createPostId() {
+		final UUID postId = postService.createPostId();
+		return ApiResponse.success(new PostIdCreateWebResponse(postId));
+	}
+
+	@PostMapping
+	public ApiResponse<PostCreateWebResponse> createPost(
+		@RequestBody final PostCreateWebRequest postCreateWebRequest) {
+
+		final PostCreateRequest postCreateRequest = postCreateWebRequest.toServiceDto();
+
+		final UUID createdPostId = postService.createPost(postCreateRequest);
+
+		final PostCreateWebResponse postCreateWebResponse = new PostCreateWebResponse(createdPostId);
+
+		return ApiResponse.success(postCreateWebResponse);
+
+	}
+}
