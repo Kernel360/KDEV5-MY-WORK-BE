@@ -1,5 +1,8 @@
 package kr.mywork.infrastructure.post.rdb;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.stereotype.Repository;
 
 import kr.mywork.domain.post.model.Post;
@@ -16,6 +19,11 @@ public class QueryDslPostRepository implements PostRepository {
 	@Override
 	public Post save(final PostCreateRequest postCreateRequest) {
 		return postRepository.save(postCreateRequest.toEntity());
+	}
+
+	@Override
+	public Optional<Post> findById(final UUID id) {
+		return postRepository.findById(id);
 	}
 
 }
