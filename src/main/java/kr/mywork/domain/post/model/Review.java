@@ -1,46 +1,67 @@
 package kr.mywork.domain.post.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review {
 
-    @Id
-    @UnixTimeOrderedUuidGeneratedValue
-    private UUID id;
+	@Id
+	@UnixTimeOrderedUuidGeneratedValue
+	private UUID id;
 
-    private UUID postId;
+	@Column(nullable = false)
+	private UUID postId;
 
-    @Column(length = 200)
-    private String comment;
+	@Column
+	private UUID parentId;
 
-    @Column(length = 30)
-    private String companyName;
+	@Column(nullable = false)
+	private UUID memberId; // 작성자 검증을 위한 필드
 
-    @Column(length = 30)
-    private String authorName;
+	@Column(nullable = false, length = 200)
+	private String comment;
 
-    @Column(nullable = false)
-    private Boolean deleted;
+	@Column(nullable = false, length = 30)
+	private String companyName;
 
-    private UUID parentReviewId;
+	private String authorName;
 
-    private Integer level;
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	private Boolean deleted = false;
 
-    @UpdateTimestamp
-    private LocalDateTime modifiedAt;
+	@Column(nullable = false, columnDefinition = "timestamp")
+	@CreationTimestamp
+	private LocalDateTime createdAt;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+	@Column(nullable = false, columnDefinition = "timestamp")
+	@UpdateTimestamp
+	private LocalDateTime modifiedAt;
+
+	public Review(final UUID postId, final UUID parentId, final UUID memberId, final String comment,
+		final String companyName, final String authorName) {
+		this.postId = postId;
+		this.parentId = parentId;
+		this.memberId = memberId;
+		this.comment = comment;
+		this.companyName = companyName;
+		this.authorName = authorName;
+		this.deleted = false;
+	}
 
 }
