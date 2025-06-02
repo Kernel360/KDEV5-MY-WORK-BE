@@ -2,6 +2,8 @@ package kr.mywork.domain.member.model;
 
 import java.util.Arrays;
 
+import kr.mywork.domain.member.errors.MemberErrorType;
+import kr.mywork.domain.member.errors.MemberTypeNotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -21,5 +23,12 @@ public enum MemberRole {
 			.filter(role -> role.getRoleName().equalsIgnoreCase(inputRole))
 			.findFirst()
 			.orElseThrow(() -> new IllegalArgumentException("invalid role name: " + inputRole));
+	}
+
+	public static MemberRole from(String value) {
+		return Arrays.stream(MemberRole.values())
+			.filter(memberRole -> memberRole.name().equals(value))
+			.findAny()
+			.orElseThrow(() -> new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND));
 	}
 }

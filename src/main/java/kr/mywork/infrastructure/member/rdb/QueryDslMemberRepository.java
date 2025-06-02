@@ -12,38 +12,48 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
+import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
 public class QueryDslMemberRepository implements MemberRepository {
 
-    private final JpaMemberRepository memberRepository;
-    private final JPAQueryFactory queryFactory;
+	private final JpaMemberRepository memberRepository;
+	private final JPAQueryFactory queryFactory;
 
-    @Override
-    public Optional<Member> findByEmailAndDeletedFalse(String email) {
-        return memberRepository.findByEmailAndDeletedFalse(email);
-    }
+	@Override
+	public Optional<Member> findByEmailAndDeletedFalse(String email) {
+		return memberRepository.findByEmailAndDeletedFalse(email);
+	}
 
 	@Override
 	public List<Member> findMemberByCompanyId(UUID companyId, int page, int memberPageSize) {
-
 		final int offset = (page - 1) * memberPageSize;
 
 		return queryFactory
 			.selectFrom(member)
 			.where(
 				member.companyId.eq(companyId),
-				member.deleted.eq(false)
-			)
+				member.deleted.eq(false))
 			.orderBy(member.name.asc())
 			.offset(offset)
 			.limit(memberPageSize)
 			.fetch();
 	}
+
 	@Override
 	public long countByCompanyIdAndDeletedFalse(UUID companyId) {
 		return memberRepository.countByCompanyIdAndDeletedFalse(companyId);
+	}
+
+	@Override
+	public Member save(final MemberCreateRequest memberCreateRequest) {
+		return memberRepository.save(memberCreateRequest.toEntity());
+	}
+
+	@Override
+	public boolean existsByEmail(String email) {
+		return memberRepository.existsByEmail(email);
 	}
 }

@@ -12,3 +12,6 @@ spring:
 company:
   page:
     size: 10
+member:
+  page:
+    size: 10

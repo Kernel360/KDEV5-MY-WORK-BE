@@ -1,12 +1,17 @@
 package kr.mywork.domain.member.model;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +22,7 @@ import lombok.NoArgsConstructor;
 public class Member {
 
 	@Id
+	@UnixTimeOrderedUuidGeneratedValue
 	private UUID id;
 
 	@Column(nullable = false)
@@ -46,4 +52,29 @@ public class Member {
 
 	@Column(nullable = false)
 	private boolean deleted;
+
+	@Column(nullable = false, columnDefinition = "timestamp")
+	@CreationTimestamp
+	private LocalDateTime created;
+
+	@Column(nullable = false, columnDefinition = "timestamp")
+	@UpdateTimestamp
+	private LocalDateTime modified;
+
+	@Column(nullable = false,columnDefinition = "timestamp")
+	private LocalDateTime birthDate;
+
+
+	public Member(final UUID id , final UUID companyId, final String name, final String department, final String position, final String role, final String phoneNumber, final String email, final String password, final LocalDateTime birthDate) {
+		this.id = id;
+		this.companyId = companyId;
+		this.name = name;
+		this.department = department;
+		this.position = position;
+		this.role = MemberRole.from(role);
+		this.phoneNumber = phoneNumber;
+		this.email = email;
+		this.password = password;
+		this.birthDate = birthDate;
+	}
 }

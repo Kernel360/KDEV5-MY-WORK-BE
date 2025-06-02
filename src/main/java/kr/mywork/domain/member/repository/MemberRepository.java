@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import kr.mywork.domain.member.model.Member;
+import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
 
 public interface MemberRepository{
     Optional<Member> findByEmailAndDeletedFalse(String email);
@@ -12,4 +13,8 @@ public interface MemberRepository{
 	List<Member> findMemberByCompanyId(UUID companyId, int page,int memberPageSize);
 
 	long countByCompanyIdAndDeletedFalse(UUID companyId);
+
+    Member save(MemberCreateRequest memberCreateRequest);
+
+	boolean existsByEmail(String email);
 }

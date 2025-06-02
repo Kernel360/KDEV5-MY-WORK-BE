@@ -4,10 +4,12 @@ import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
@@ -18,10 +20,12 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
 import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.member.controller.dto.resquest.MemberCreateWebRequest;
 
 public class MemberDocumentationTest extends RestDocsDocumentation {
 
@@ -36,8 +40,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 		final ResultActions result = mockMvc.perform(
 			get("/api/member/company/{companyId}", id)
 				.param("page", "1")
-				.contentType(MediaType.APPLICATION_JSON)
-		);
+				.contentType(MediaType.APPLICATION_JSON));
 
 		//then
 		result.andExpectAll(
@@ -46,7 +49,6 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				jsonPath("$.data").exists(),
 				jsonPath("$.error").doesNotExist())
 			.andDo(document("company-member-get-success", CompanyMemberGetSuccess()));
-
 	}
 
 	private ResourceSnippet CompanyMemberGetSuccess() {
@@ -70,10 +72,56 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 		);
 	}
 
+	@Test
+	@DisplayName("멤버 생성 성공")
+	void 멤버_생성_성공() throws Exception {
+		//given
+		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
+		LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");
+
+		final MemberCreateWebRequest memberCreateWebRequest =
+			new MemberCreateWebRequest(
+				null, companyId, "김두만", "개발",
+				"부장", "USER", "010-4040-5050",
+				"eme@naver.com", birthDate
+			);
+		final String requestBody = objectMapper.writeValueAsString(memberCreateWebRequest);
+
+		//when
+		final ResultActions result = mockMvc.perform(
+			post("/api/member")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody));
+
+		//then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(MockMvcRestDocumentationWrapper.document("member-create-success", memberCreateSuccessResource()));
+
+	}
+
+	private ResourceSnippet memberCreateSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Member API")
+				.summary("멤버 생성 API")
+				.description("멤버 아이디를 생성한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("생성한 멤버 아이디"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
 
 	@Test
 	@DisplayName("회사 직원 조회 샐패 (page 검증)")
-	void 회사_직원_조회_실패_페이징()	throws Exception{
+	void 회사_직원_조회_실패_페이징() throws Exception {
 		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
 		//when
