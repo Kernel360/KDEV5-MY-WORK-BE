@@ -31,7 +31,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 		//given, when
 		ResultActions result = mockMvc.perform(
-			post("/api/post/id/generate")
+			post("/api/posts/id/generate")
 				.contentType(MediaType.APPLICATION_JSON));
 
 		//then
@@ -74,7 +74,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			post("/api/post") // HTTP method (URL)
+			post("/api/posts") // HTTP method (URL)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody));
 
@@ -117,7 +117,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			post("/api/post") // HTTP method (URL)
+			post("/api/posts") // HTTP method (URL)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody));
 
