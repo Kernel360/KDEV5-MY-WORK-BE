@@ -1,5 +1,7 @@
 package kr.mywork.domain.member.model;
 
+import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,8 +11,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -19,7 +19,7 @@ public class Member {
 	@Id
 	private UUID id;
 
-	@Column(name = "company_id", nullable = false)
+	@Column(nullable = false)
 	private UUID companyId;
 
 	@Column(length = 30, nullable = false)
