@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberService {
 
-	@Value("10")
+	@Value("${member.page.size}")
 	private int memberPageSize;
 
 	private final MemberRepository memberRepository;
