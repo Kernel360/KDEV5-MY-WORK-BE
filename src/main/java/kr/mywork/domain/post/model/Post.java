@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,5 +57,10 @@ public class Post {
 		this.content = content;
 		this.approval = approval;
 		this.deleted = deleted;
+	}
+
+	public void update(PostUpdateRequest postUpdateRequest) {
+		this.content = postUpdateRequest.getContent();
+		this.title = postUpdateRequest.getTitle();
 	}
 }
