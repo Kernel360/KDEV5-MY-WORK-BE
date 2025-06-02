@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -28,7 +27,10 @@ public class QueryDslMemberRepository implements MemberRepository {
     }
 
 	@Override
-	public List<Member> findMemberByComapnyId(UUID companyId, Pageable pageable) {
+	public List<Member> findMemberByCompanyId(UUID companyId, int page) {
+
+		final int offset = (page - 1) * 10;
+
 		return queryFactory
 			.selectFrom(member)
 			.where(
@@ -36,8 +38,8 @@ public class QueryDslMemberRepository implements MemberRepository {
 				member.deleted.eq(false)
 			)
 			.orderBy(member.name.asc())
-			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
+			.offset(offset)
+			.limit(10)
 			.fetch();
 	}
 	@Override
