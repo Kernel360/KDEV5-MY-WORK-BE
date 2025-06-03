@@ -17,6 +17,7 @@ import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
 import kr.mywork.domain.member.service.dto.request.MemberUpdateRequest;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
+import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -82,4 +83,17 @@ public class MemberService {
 
 		return member.getId();
 	}
+
+	@Transactional
+	public long countTotalmembersByCondition(String keyword, String keywordType) {
+		return memberRepository.countTotalmembersByCondition(keyword, keywordType);
+	}
+
+	@Transactional
+	public List<MemberSelectResponse> findMembersBySearchWithPaging(final int page, String keyword,
+		String keywordType) {
+
+		return memberRepository.findMembersBySearchWithPaging(page, memberPageSize, keyword, keywordType);
+	}
+
 }
