@@ -16,7 +16,7 @@ import kr.mywork.interfaces.post.controller.dto.response.PostIdCreateWebResponse
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/post")
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostController {
 
