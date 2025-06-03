@@ -32,4 +32,12 @@ public class QueryDslProjectStepRepository implements ProjectStepRepository {
 			.where(projectStep.id.in(projectStepIds))
 			.fetch();
 	}
+
+	@Override
+	public List<ProjectStep> findAllStepsByProjectIdOrderByNumAsc(UUID projectId) {
+		return queryFactory.selectFrom(projectStep)
+			.where(projectStep.projectId.eq(projectId))
+			.orderBy(projectStep.orderNum.asc())
+			.fetch();
+	}
 }
