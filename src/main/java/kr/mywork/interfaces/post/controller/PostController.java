@@ -2,6 +2,7 @@ package kr.mywork.interfaces.post.controller;
 
 import java.util.UUID;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,11 +49,12 @@ public class PostController {
 
 	}
 
-	@PutMapping("")
+	@PutMapping("/{postId}")
 	public ApiResponse<PostUpdateWebResponse> updatePost(
-		@RequestBody @Valid final PostUpdateWebRequest postUpdateWebRequest) {
+		@RequestBody @Valid final PostUpdateWebRequest postUpdateWebRequest,
+		@PathVariable final UUID postId) {
 
-		final PostUpdateRequest postUpdateRequest = postUpdateWebRequest.toServiceDto();
+		final PostUpdateRequest postUpdateRequest = postUpdateWebRequest.toServiceDto(postId);
 
 		final PostUpdateResponse postUpdateResponse = postService.updatePost(postUpdateRequest);
 

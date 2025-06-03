@@ -157,13 +157,13 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 		UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
 
 		final PostUpdateWebRequest postUpdateWebRequest =
-			new PostUpdateWebRequest(postId, "바뀐 제목", "바뀐 컨텐츠");
+			new PostUpdateWebRequest("바뀐 제목", "바뀐 컨텐츠");
 
 		final String requestBody = objectMapper.writeValueAsString(postUpdateWebRequest);
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			put("/api/posts") // HTTP method (URL)
+			put("/api/posts/1234a9a9-90b6-9898-a9dc-92c9861aa98c") // HTTP method (URL)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody));
 

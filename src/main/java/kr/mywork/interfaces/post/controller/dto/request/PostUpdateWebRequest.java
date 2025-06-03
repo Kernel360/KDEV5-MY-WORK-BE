@@ -14,9 +14,6 @@ import lombok.RequiredArgsConstructor;
 public class PostUpdateWebRequest {
 
 	@NotNull
-	private final UUID id;
-
-	@NotNull
 	@Length(min = 1, max = 200)
 	private final String title;
 
@@ -24,8 +21,8 @@ public class PostUpdateWebRequest {
 	@Length(min = 1, max = 500)
 	private final String content;
 
-	public PostUpdateRequest toServiceDto() {
-		return new PostUpdateRequest(this.id, this.title, this.content);
+	public PostUpdateRequest toServiceDto(final UUID postId) {
+		return new PostUpdateRequest(postId, this.title, this.content);
 	}
 
 }
