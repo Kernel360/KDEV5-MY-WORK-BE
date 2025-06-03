@@ -12,7 +12,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
-import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
+import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
 import lombok.RequiredArgsConstructor;
 
 @Repository

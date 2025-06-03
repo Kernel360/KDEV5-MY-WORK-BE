@@ -1,4 +1,4 @@
-package kr.mywork.domain.member.service.dto.resquest;
+package kr.mywork.domain.member.service.dto.request;
 
 import kr.mywork.domain.member.model.Member;
 import lombok.Getter;
