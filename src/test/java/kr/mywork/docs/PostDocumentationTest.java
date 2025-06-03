@@ -163,7 +163,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			put("/api/posts/1234a9a9-90b6-9898-a9dc-92c9861aa98c") // HTTP method (URL)
+			put("/api/posts/{postId}", postId) // HTTP method (URL)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody));
 
