@@ -247,4 +247,41 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 			.build());
 	}
+
+	@Test
+	@DisplayName("멤버 조회 성공")
+	@Sql("classpath:sql/member-search.sql")
+	void 멤버_조회_성공() throws Exception {
+		//given
+		//when
+		final ResultActions result = mockMvc.perform(
+			get("/api/member")
+				.param("page","1")
+				.param("keyword","기획팀")
+				.param("keywordType","DEPARTMENT")
+				.contentType(MediaType.APPLICATION_JSON));
+		//then
+		result.andExpectAll(status().isOk(), jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(), jsonPath("$.error").doesNotExist())
+			.andDo(document("member-search-success", memberSearchSuccessResource()));
+	}
+
+	private ResourceSnippet memberSearchSuccessResource() {
+		return resource(ResourceSnippetParameters.builder()
+			.tag("Member API")
+			.summary("멤버 조회 API")
+			.description("전달 받은 정보로 멤버 조회한다.")
+			.requestHeaders(headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+			.responseFields(fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+				fieldWithPath("data.members[].name").type(JsonFieldType.STRING).description("멤버 이름"),
+				fieldWithPath("data.members[].email").type(JsonFieldType.STRING).description("멤버 이메일"),
+				fieldWithPath("data.members[].position").type(JsonFieldType.STRING).description("멤버 직급"),
+				fieldWithPath("data.members[].department").type(JsonFieldType.STRING).description("멤버 부서"),
+				fieldWithPath("data.members[].phoneNumber").type(JsonFieldType.STRING).description("멤버 전화번호"),
+				fieldWithPath("data.members[].deleted").type(JsonFieldType.BOOLEAN).description("멤버 삭제여부"),
+				fieldWithPath("data.members[].createdAt").type(JsonFieldType.STRING).description("멤버 생성일"),
+				fieldWithPath("data.totalCount").type(JsonFieldType.NUMBER).description("조회된 멤버 총 갯수"),
+				fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+			.build());
+	}
 }
