@@ -15,17 +15,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.member.service.MemberService;
 import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
 import kr.mywork.domain.member.service.dto.request.MemberUpdateRequest;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
+import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
 import kr.mywork.interfaces.member.controller.dto.request.MemberCreateWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberUpdateWebRequest;
+import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberListWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberCreateWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberDeleteWebResponse;
+import kr.mywork.interfaces.member.controller.dto.response.MemberListWebResponse;
+import kr.mywork.interfaces.member.controller.dto.response.MemberSelectWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberUpdateWebResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -35,26 +40,26 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class MemberController {
 
+	private static final String MEMBER_SEARCH_TYPE = "^(NAME|EMAIL|POSITION|DEPARTMENT|PHONENUMBER|)$";
 	private final MemberService memberService;
 
 	@GetMapping("/company/{companyId}")
-	public ApiResponse<CompanyMemberWebResponse> getCompanyMember(
-		@PathVariable(name = "companyId") UUID companyId,
-		@RequestParam(defaultValue = "1") @Min(value = 1, message = "{invalid.page-size}") int page
-	) {
-		List<CompanyMemberResponse> companyMemberResponse = memberService.findMemberByCompanyId(companyId, page);
+	public ApiResponse<CompanyMemberWebResponse> getCompanyMember(@PathVariable(name = "companyId") UUID companyId,
+		@RequestParam(defaultValue = "1") @Min(value = 1, message = "{invalid.page-size}") int page) {
+		List<CompanyMemberResponse> companyMemberResponses = memberService.findMemberByCompanyId(companyId, page);
 
 		long total = memberService.countMembersByCompanyId(companyId);
 
-		CompanyMemberWebResponse companyMemberWebResponse = CompanyMemberWebResponse.from(companyMemberResponse, total);
+		List<CompanyMemberListWebResponse> companyMemberWebResponses = companyMemberResponses.stream()
+			.map(CompanyMemberListWebResponse::fromService)
+			.toList();
 
-		return ApiResponse.success(companyMemberWebResponse);
+		return ApiResponse.success(new CompanyMemberWebResponse(total, companyMemberWebResponses));
 	}
 
 	@PostMapping
 	public ApiResponse<MemberCreateWebResponse> memberCreateWebResponseApiResponse(
-		@RequestBody final MemberCreateWebRequest memberCreateWebRequest
-	) {
+		@RequestBody final MemberCreateWebRequest memberCreateWebRequest) {
 
 		final MemberCreateRequest memberCreateRequest = memberCreateWebRequest.toServiceDto();
 
@@ -67,8 +72,7 @@ public class MemberController {
 
 	@DeleteMapping
 	public ApiResponse<MemberDeleteWebResponse> deleteMember(
-		@RequestBody MemberDeleteWebRequest memberDeleteWebRequest
-	) {
+		@RequestBody MemberDeleteWebRequest memberDeleteWebRequest) {
 		final UUID memberId = memberService.deleteMember(memberDeleteWebRequest.memberId());
 
 		MemberDeleteWebResponse memberDeleteWebResponse = new MemberDeleteWebResponse(memberId);
@@ -78,8 +82,7 @@ public class MemberController {
 
 	@PutMapping
 	public ApiResponse<MemberUpdateWebResponse> updateMember(
-		@RequestBody MemberUpdateWebRequest memberUpdateWebRequest
-	) {
+		@RequestBody MemberUpdateWebRequest memberUpdateWebRequest) {
 		final MemberUpdateRequest memberUpdateRequest = memberUpdateWebRequest.toServiceDto();
 
 		final UUID updatedId = memberService.updateMember(memberUpdateRequest);
@@ -88,4 +91,22 @@ public class MemberController {
 
 		return ApiResponse.success(memberUpdateWebResponse);
 	}
+
+	@GetMapping
+	public ApiResponse<MemberListWebResponse> findMembersByOffset(
+		@RequestParam(name = "page") @Min(value = 1, message = "{invalid.page-size}") final int page,
+		@RequestParam(name = "keyword", required = false) final String keyword,
+		@RequestParam(name = "keywordType", required = false) @Pattern(regexp = MEMBER_SEARCH_TYPE, message = "{member-search-type}") final String keywordType
+	) {
+		final List<MemberSelectResponse> memberSelectResponses = memberService.findMembersBySearchWithPaging(page,
+			keyword, keywordType);
+		final long totalCount = memberService.countTotalmembersByCondition(keyword, keywordType);
+
+		List<MemberSelectWebResponse> memberSelectWebResponses = memberSelectResponses.stream()
+			.map(MemberSelectWebResponse::from)
+			.toList();
+
+		return ApiResponse.success(new MemberListWebResponse(memberSelectWebResponses, totalCount));
+	}
+
 }
