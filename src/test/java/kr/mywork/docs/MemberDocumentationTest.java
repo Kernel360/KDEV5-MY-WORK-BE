@@ -1,11 +1,15 @@
 package kr.mywork.docs;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -195,5 +199,39 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("error.data").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
+	}
+	@Test
+	@DisplayName("멤버 정보 업데이트 성공")
+	@Sql("classpath:sql/member-update.sql")
+	void 멤버_정보_업데이트_성공() throws Exception {
+		//given
+		UUID memberId = UUID.fromString("6516f3fe-057b-efdc-9aa9-87bf7b33a1d0");
+		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
+		LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");
+
+		final MemberUpdateWebRequest memberUpdateWebRequest = new MemberUpdateWebRequest(memberId, companyId, "홍길동",
+			"개발팀", "사원", "DEV_ADMIN", "010-1234-5633", "emwi@naver.com", "1234", true, birthDate);
+
+		final String requestBody = objectMapper.writeValueAsString(memberUpdateWebRequest);
+
+		//when
+		final ResultActions result = mockMvc.perform(
+			put("/api/member").contentType(MediaType.APPLICATION_JSON).content(requestBody));
+		//then
+		result.andExpectAll(status().isOk(), jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(), jsonPath("$.error").doesNotExist())
+			.andDo(document("member-update-success", memberUpdateSuccessResource()));
+	}
+
+	private ResourceSnippet memberUpdateSuccessResource() {
+		return resource(ResourceSnippetParameters.builder()
+			.tag("Member API")
+			.summary("멤버 수정 API")
+			.description("전달 받은 정보로 멤버 정보를 수정한다.")
+			.requestHeaders(headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+			.responseFields(fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+				fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("수정한 멤버 아이디"),
+				fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+			.build());
 	}
 }
