@@ -3,6 +3,7 @@ package kr.mywork.docs;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -34,7 +34,6 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("프로젝트 단계 생성 성공")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 프로젝트_단계_생성_성공() throws Exception {
 		// given
 		// TODO Project 생성 API 개발 후, ProjectId 생성 및 검증 샘플 데이터 추가 필요
@@ -87,7 +86,6 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("프로젝트 단계 수정 성공")
 	@Sql("classpath:sql/project-step-update.sql")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 프로젝트_단계_수정_성공() throws Exception {
 		// given
 		// TODO Project 생성 API 개발 후, ProjectId 생성 및 검증 샘플 데이터 추가 필요
@@ -135,6 +133,46 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 						.description("프로젝트 단계 아이디"),
 					fieldWithPath("data.projectSteps.[].title").type(JsonFieldType.STRING).description("프로젝트 단계 이름"),
 					fieldWithPath("data.projectSteps.[].orderNumber").type(JsonFieldType.NUMBER)
+						.description("프로젝트 단계 순서"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
+	}
+
+	@Test
+	@DisplayName("프로젝트 단계 조회 성공")
+	@Sql("classpath:sql/project-step-get.sql")
+	void 프로젝트_단계_조회_성공() throws Exception {
+		//given
+		UUID projectId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			get("/api/projects/{projectId}/steps", projectId)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		//then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("project-get-steps-success", projectGetSetpsSuccessResource()));
+	}
+
+	public ResourceSnippet projectGetSetpsSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project Step API")
+				.summary("프로젝트 단계 조회 API")
+				.description("프로젝트 단계를 조회한다")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.steps[].projectStepId").type(JsonFieldType.STRING)
+						.description("프로젝트 단계 아이디"),
+					fieldWithPath("data.steps[].title").type(JsonFieldType.STRING).description("프로젝트 단계 이름"),
+					fieldWithPath("data.steps[].orderNum").type(JsonFieldType.NUMBER)
 						.description("프로젝트 단계 순서"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
