@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,7 +16,9 @@ import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.project_step.serivce.ProjectStepService;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepCreateRequest;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepUpdateRequest;
+import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepGetResponse;
 import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepUpdateResponse;
+import kr.mywork.interfaces.post.controller.dto.response.ProjectStepsGetWebResponse;
 import kr.mywork.interfaces.project_step.dto.request.ProjectStepsCreateWebRequest;
 import kr.mywork.interfaces.project_step.dto.request.ProjectStepsUpdateWebRequest;
 import kr.mywork.interfaces.project_step.dto.response.ProjectStepUpdateWebResponse;
@@ -55,5 +58,15 @@ public class ProjectStepController {
 			ProjectStepsUpdateWebResponse.fromServiceResponses(projectStepUpdateResponses);
 
 		return ApiResponse.success(new ProjectStepsUpdateWebResponse(projectStepUpdateWebResponses));
+	}
+	@GetMapping("/api/projects/{projectId}/steps")
+	public ApiResponse<ProjectStepsGetWebResponse> getProjectSteps(
+		@PathVariable(name = "projectId") UUID projectId
+	){
+		final List<ProjectStepGetResponse> projectStepGetResponses = projectStepService.getProjectSteps(projectId);
+
+		final ProjectStepsGetWebResponse projectStepGetWebResponse = new ProjectStepsGetWebResponse(projectStepGetResponses);
+
+		return ApiResponse.success(projectStepGetWebResponse);
 	}
 }
