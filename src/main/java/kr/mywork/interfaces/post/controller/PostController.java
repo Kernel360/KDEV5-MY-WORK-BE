@@ -37,7 +37,7 @@ public class PostController {
 
 	@PostMapping
 	public ApiResponse<PostCreateWebResponse> createPost(
-		@RequestBody final PostCreateWebRequest postCreateWebRequest) {
+		@RequestBody @Valid final PostCreateWebRequest postCreateWebRequest) {
 
 		final PostCreateRequest postCreateRequest = postCreateWebRequest.toServiceDto();
 
