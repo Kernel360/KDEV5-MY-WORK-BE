@@ -14,11 +14,11 @@ import lombok.RequiredArgsConstructor;
 public class PostUpdateWebRequest {
 
 	@NotNull
-	@Length(min = 1, max = 200)
+	@Length(min = 1, max = 200, message = "{post-invalid-length-title}")
 	private final String title;
 
 	@NotNull
-	@Length(min = 1, max = 500)
+	@Length(min = 1, max = 500, message = "{post-invalid-length-content}")
 	private final String content;
 
 	public PostUpdateRequest toServiceDto(final UUID postId) {
