@@ -13,6 +13,7 @@ import kr.mywork.domain.project_step.model.ProjectStep;
 import kr.mywork.domain.project_step.repository.ProjectStepRepository;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepCreateRequest;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepUpdateRequest;
+import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepGetResponse;
 import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepUpdateResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -62,4 +63,16 @@ public class ProjectStepService {
 			Collectors.toMap(ProjectStepUpdateRequest::projectStepId,
 				projectStepUpdateRequest -> projectStepUpdateRequest));
 	}
+
+	public List<ProjectStepGetResponse> getProjectSteps(UUID projectId) {
+		// TODO ProjectId 검증 로직 추가
+		List<ProjectStep> steps = projectStepRepository.findAllStepsByProjectIdOrderByNumAsc(projectId);
+
+		return steps.stream()
+			.map(ProjectStepGetResponse::fromEntity)
+			.toList();
+
+
+	}
+
 }
