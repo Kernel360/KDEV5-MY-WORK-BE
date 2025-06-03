@@ -8,11 +8,13 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
-import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
+import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
 import kr.mywork.domain.project.model.QProjectMember;
 import lombok.RequiredArgsConstructor;
 
@@ -83,6 +85,61 @@ public class QueryDslMemberRepository implements MemberRepository {
 					)
 					.notExists()
 			)
+			.fetch();
+	}
+
+	@Override
+	public Long countTotalmembersByCondition(final String keyword, final String keywordType) {
+
+		BooleanExpression condition = null;
+		if (keyword != null && keywordType != null) {
+			condition = switch (keywordType) {
+				case "NAME" -> member.name.containsIgnoreCase(keyword);
+				case "EMAIL" -> member.email.containsIgnoreCase(keyword);
+				case "POSITION" -> member.position.containsIgnoreCase(keyword);
+				case "DEPARTMENT" -> member.department.containsIgnoreCase(keyword);
+				case "PHONENUMBER" -> member.phoneNumber.containsIgnoreCase(keyword);
+				default -> null;
+			};
+		}
+
+		return queryFactory.select(member.id.count())
+			.from(member)
+			.where(condition)
+			.fetchOne();
+	}
+
+	@Override
+	public List<MemberSelectResponse> findMembersBySearchWithPaging(int page, int memberPageSize, String keyword,
+		String keywordType) {
+
+		final int offset = (page - 1) * memberPageSize;
+
+		BooleanExpression condition = null;
+		if (keyword != null && keywordType != null) {
+			condition = switch (keywordType) {
+				case "NAME" -> member.name.containsIgnoreCase(keyword);
+				case "EMAIL" -> member.email.containsIgnoreCase(keyword);
+				case "POSITION" -> member.position.containsIgnoreCase(keyword);
+				case "DEPARTMENT" -> member.department.containsIgnoreCase(keyword);
+				case "PHONENUMBER" -> member.phoneNumber.containsIgnoreCase(keyword);
+				default -> null;
+			};
+		}
+
+		return queryFactory.select(Projections.constructor(MemberSelectResponse.class,
+				member.name,
+				member.email,
+				member.position,
+				member.department,
+				member.phoneNumber,
+				member.deleted,
+				member.createdAt
+			))
+			.from(member)
+			.where(condition)
+			.offset(offset)
+			.limit(memberPageSize)
 			.fetch();
 	}
 }
