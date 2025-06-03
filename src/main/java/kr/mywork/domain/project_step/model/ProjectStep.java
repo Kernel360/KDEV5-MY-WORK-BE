@@ -22,6 +22,8 @@ public class ProjectStep {
 	@UnixTimeOrderedUuidGeneratedValue
 	private UUID id;
 
+	private UUID projectId;
+
 	@Column(length = 30)
 	private String title;
 
