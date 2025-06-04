@@ -1,10 +1,13 @@
 package kr.mywork.docs;
 
-import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.*;
-import static com.epages.restdocs.apispec.ResourceDocumentation.*;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
 
@@ -13,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -29,7 +31,6 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("게시글 ID 생성 테스트")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 게시글_아이디_생성_테스트_성공() throws Exception {
 
 		//given, when
@@ -65,7 +66,6 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("게시글 생성 성공")
 	@Sql("classpath:sql/post-id.sql")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 게시글_생성_성공() throws Exception {
 		// given
 		UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
@@ -109,7 +109,6 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("게시글 생성 실패 - 아이디가 존재하지 않는 경우")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 게시글_생성_실패_아이디_미존재() throws Exception {
 		// given
 		UUID postId = Generators.timeBasedEpochGenerator().generate(); // UUID ver7
