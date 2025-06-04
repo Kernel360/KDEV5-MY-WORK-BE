@@ -15,8 +15,8 @@ import kr.mywork.domain.post.repository.PostIdRepository;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
+import kr.mywork.domain.post.service.dto.response.PostDetailResponse;
 import kr.mywork.domain.post.service.dto.response.PostUpdateResponse;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -48,5 +48,13 @@ public class PostService {
 
 		post.update(postUpdateRequest);
 		return PostUpdateResponse.from(post);
+	}
+
+	@Transactional
+	public PostDetailResponse getPostDetail(UUID postId) {
+		final Post post = postRepository.findById(postId)
+			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
+
+		return PostDetailResponse.from(post);
 	}
 }
