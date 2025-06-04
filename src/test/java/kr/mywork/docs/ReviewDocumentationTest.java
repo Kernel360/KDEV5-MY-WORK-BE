@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.epages.restdocs.apispec.ResourceSnippet;
@@ -23,6 +24,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
 import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.post.controller.dto.request.ReviewCreateWebRequest;
+import kr.mywork.interfaces.post.controller.dto.request.ReviewModifyWebRequest;
 
 public class ReviewDocumentationTest extends RestDocsDocumentation {
 
@@ -67,6 +69,48 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.comment").type(JsonFieldType.STRING).description("코멘트 내용"),
 					fieldWithPath("data.authorName").type(JsonFieldType.STRING).description("작성자 이름"),
 					fieldWithPath("data.companyName").type(JsonFieldType.STRING).description("회사 이름"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
+	}
+
+	@Test
+	@DisplayName("리뷰 수정 테스트 성공")
+	@Sql("classpath:sql/review-modify.sql")
+	void 리뷰_수정_테스트_성공() throws Exception {
+		// given
+		final UUID memberId = UUID.fromString("01973844-b287-73d0-8f9d-f86fad4ac4c3"); // TODO 인증 로직 추가 시 변경
+		final UUID reviewId = UUID.fromString("0197385a-eda5-7e17-a3ce-4252908f8d1f");
+
+		final ReviewModifyWebRequest reviewModifyWebRequest = new ReviewModifyWebRequest("코멘트01_수정");
+
+		final String requestBody = objectMapper.writeValueAsString(reviewModifyWebRequest);
+
+		// when
+		final ResultActions result = mockMvc.perform(put("/api/reviews/{reviewId}", reviewId)
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(requestBody));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("review-modify-success", reviewModifySuccessResource()));
+	}
+
+	private ResourceSnippet reviewModifySuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Review API")
+				.summary("리뷰 수정 API")
+				.description("리뷰를 수정한다")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.reviewId").type(JsonFieldType.STRING).description("수정된 리뷰 아이디"),
+					fieldWithPath("data.comment").type(JsonFieldType.STRING).description("수정된 리뷰 글"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
