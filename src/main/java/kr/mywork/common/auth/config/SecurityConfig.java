@@ -40,10 +40,12 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
+			.cors(cors -> {})
 			.csrf(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)
-			.sessionManagement(sessionManagementConfigurer ->
-				sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+			.sessionManagement(session ->
+				session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			);
 
 		http.authorizeHttpRequests(authorize -> {
 				authorize
