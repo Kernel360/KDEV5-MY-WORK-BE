@@ -1,5 +1,6 @@
 package kr.mywork.interfaces.post.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -16,12 +18,15 @@ import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
 import kr.mywork.domain.post.service.dto.response.PostDetailResponse;
+import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
 import kr.mywork.domain.post.service.dto.response.PostUpdateResponse;
 import kr.mywork.interfaces.post.controller.dto.request.PostCreateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostUpdateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.response.PostCreateWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostDetailWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostIdCreateWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.PostListSelectWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.PostSelectWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostUpdateWebResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -74,6 +79,27 @@ public class PostController {
 		PostDetailWebResponse postDetailWebResponse = PostDetailWebResponse.from(postDetailResponse);
 
 		return ApiResponse.success(postDetailWebResponse);
+	}
+
+	@GetMapping
+	public ApiResponse<PostListSelectWebResponse> findPostsByOffset(
+		@RequestParam final int page,
+		@RequestParam(name = "keyword", required = false) final String keyword,
+		@RequestParam(name = "projectStepId", required = false) final UUID projectStepId,
+		@RequestParam(name = "deleted", required = false) final Boolean deleted
+	) {
+
+		final List<PostSelectResponse> postSelectResponses = postService.findPostsBySearchConditionWithPaging(page,
+			projectStepId, keyword, deleted);
+
+		final Long totalCount = postService.countTotalPostsByCondition(projectStepId, keyword, deleted);
+
+		final List<PostSelectWebResponse> postSelectWebResponses = postSelectResponses.stream()
+			.map(PostSelectWebResponse::from)
+			.toList();
+
+		return ApiResponse.success(new PostListSelectWebResponse(postSelectWebResponses, totalCount));
+
 	}
 
 }
