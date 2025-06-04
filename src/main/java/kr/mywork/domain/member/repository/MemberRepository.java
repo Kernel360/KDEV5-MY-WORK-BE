@@ -14,7 +14,7 @@ public interface MemberRepository {
 
 	long countByCompanyIdAndDeletedFalse(UUID companyId);
 
-	Member save(MemberCreateRequest memberCreateRequest);
+	Member save(MemberCreateRequest memberCreateRequest,String encPassword);
 
 	boolean existsByEmail(String email);
 

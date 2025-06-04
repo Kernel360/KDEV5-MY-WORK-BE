@@ -48,8 +48,8 @@ public class QueryDslMemberRepository implements MemberRepository {
 	}
 
 	@Override
-	public Member save(final MemberCreateRequest memberCreateRequest) {
-		return memberRepository.save(memberCreateRequest.toEntity());
+	public Member save(final MemberCreateRequest memberCreateRequest,String encPassword) {
+		return memberRepository.save(memberCreateRequest.toEntity(encPassword));
 	}
 
 	@Override

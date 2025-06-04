@@ -1,11 +1,11 @@
 package kr.mywork.domain.member.service.dto.request;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import kr.mywork.domain.member.model.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Getter
@@ -19,10 +19,9 @@ public class MemberCreateRequest {
     private final String phoneNumber;
     private final String email;
     private final LocalDateTime birthDate;
-    private final String password;
 
 
-    public Member toEntity() {
+    public Member toEntity(String encPassword) {
         return new Member(
             this.id,
             this.companyId,
@@ -32,7 +31,7 @@ public class MemberCreateRequest {
             this.role,
             this.phoneNumber,
             this.email,
-            this.password,
+            encPassword,
             this.birthDate
 
         );

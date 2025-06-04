@@ -1,5 +1,6 @@
 package kr.mywork.domain.member.service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -49,15 +50,15 @@ public class MemberService {
 			throw new EmailAlreadyExistsException(MemberErrorType.EMAIL_ALREADY_EXISTS);
 		}
 
-		String encPassword = request.getPassword(); // TODO 암호화 필요.
+		String encPassword = request.getBirthDate().toLocalDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
 		MemberCreateRequest memberCreateRequest = new MemberCreateRequest(request.getId(), request.getCompanyId(),
 			request.getName(), request.getDepartment(), request.getPosition(), request.getRole(),
-			request.getPhoneNumber(), request.getEmail(), request.getBirthDate(), encPassword
+			request.getPhoneNumber(), request.getEmail(), request.getBirthDate()
 
 		);
 
-		final Member savedMember = memberRepository.save(memberCreateRequest);
+		final Member savedMember = memberRepository.save(memberCreateRequest,encPassword);
 
 		return savedMember.getId();
 	}
