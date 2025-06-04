@@ -3,6 +3,7 @@ package kr.mywork.docs;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,7 @@ abstract class RestDocsDocumentation {
 	public void setUp(RestDocumentationContextProvider restDocumentation) {
 		this.mockMvc = MockMvcBuilders
 			.webAppContextSetup(this.context)
+			.apply(springSecurity())
 			.addFilters(new CharacterEncodingFilter("UTF-8", true))
 			.apply(documentationConfiguration(restDocumentation)
 				.operationPreprocessors()
