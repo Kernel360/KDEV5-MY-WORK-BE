@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.ResultActions;
+
 import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
@@ -30,7 +30,7 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("리뷰 생성 테스트 성공")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
+	// @Sql("classpath:sql/member-test-users.sql")
 	void 리뷰_생성_테스트_성공() throws Exception {
 		// given
 		final UUID postId = UUID.fromString("01972f9b-232a-7dbe-aad2-3bffc0b78ced");
