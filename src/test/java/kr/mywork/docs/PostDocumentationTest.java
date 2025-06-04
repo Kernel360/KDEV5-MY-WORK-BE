@@ -197,4 +197,46 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 		);
 	}
 
+
+	@Test
+	@DisplayName("게시글 단건 조회 성공")
+	@Sql("classpath:sql/post-for-get.sql")
+	void 게시글_단건_조회_성공() throws Exception {
+		// given
+		UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			get("/api/posts/{postId}", postId) // HTTP method (URL)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("post-get-success", postGetSuccessResource()));
+	}
+
+	private ResourceSnippet postGetSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Post API")
+				.summary("게시글 단건 조회 API")
+				.description("게시글 ID로 조회를 한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.postId").type(JsonFieldType.STRING).description("게시글 아이디"),
+					fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
+					fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 내용"),
+					fieldWithPath("data.companyName").type(JsonFieldType.STRING).description("회사 이름"),
+					fieldWithPath("data.authorName").type(JsonFieldType.STRING).description("작성자"),
+					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
 }
