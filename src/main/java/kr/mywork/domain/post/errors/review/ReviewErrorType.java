@@ -1,0 +1,14 @@
+package kr.mywork.domain.post.errors.review;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public enum ReviewErrorType {
+
+	REVIEW_NOT_FOUND(ReviewErrorCode.ERROR_REVIEW01, "리뷰를 찾을 수 없습니다.");
+
+	private final ReviewErrorCode errorCode;
+	private final String message;
+}
