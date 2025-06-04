@@ -29,7 +29,7 @@ public class ReviewController {
 
 	private final ReviewService reviewService;
 
-	@PostMapping("/api/posts/reviews")
+	@PostMapping("/api/reviews")
 	public ApiResponse<ReviewCreateWebResponse> createReview(
 		//TODO 인증 객체 전달 로직 필요
 		@RequestBody @Valid ReviewCreateWebRequest reviewCreateWebRequest) {

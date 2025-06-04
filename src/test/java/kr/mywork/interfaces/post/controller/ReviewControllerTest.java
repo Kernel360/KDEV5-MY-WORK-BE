@@ -60,7 +60,7 @@ class ReviewControllerTest {
 		final String requestBody = objectMapper.writeValueAsString(reviewCreateWebRequest);
 
 		// when
-		final ResultActions result = mockMvc.perform(post("/api/posts/reviews")
+		final ResultActions result = mockMvc.perform(post("/api/reviews")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(requestBody));
 
@@ -88,7 +88,7 @@ class ReviewControllerTest {
 		final String requestBody = objectMapper.writeValueAsString(reviewCreateWebRequest);
 
 		// when
-		final ResultActions result = mockMvc.perform(post("/api/posts/reviews")
+		final ResultActions result = mockMvc.perform(post("/api/reviews")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(requestBody));
 

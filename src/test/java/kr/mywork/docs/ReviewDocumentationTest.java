@@ -4,6 +4,7 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.docume
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,7 +38,7 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 		final String requestBody = objectMapper.writeValueAsString(reviewCreateWebRequest);
 
 		// when
-		final ResultActions result = mockMvc.perform(post("/api/posts/reviews")
+		final ResultActions result = mockMvc.perform(post("/api/reviews")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(requestBody));
 
