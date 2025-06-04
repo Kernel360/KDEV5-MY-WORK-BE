@@ -1,0 +1,114 @@
+package kr.mywork.common.auth.config;
+
+import java.util.List;
+
+import kr.mywork.domain.auth.service.TokenAuthenticationService;
+import kr.mywork.interfaces.auth.handler.error.JwtAccessDeniedHandler;
+import kr.mywork.interfaces.auth.handler.error.JwtAuthenticationEntryPoint;
+import kr.mywork.common.auth.JwtProperties;
+import kr.mywork.domain.auth.service.JwtTokenProvider;
+import kr.mywork.interfaces.auth.filter.JwtAuthenticationFilter;
+import kr.mywork.interfaces.auth.filter.JwtLoginFilter;
+import kr.mywork.interfaces.auth.handler.error.LoginFailureHandler;
+import kr.mywork.interfaces.auth.handler.success.LoginSuccessHandler;
+import kr.mywork.domain.member.model.MemberRole;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@Configuration
+@RequiredArgsConstructor
+@EnableConfigurationProperties(JwtProperties.class)
+public class SecurityConfig {
+	private final JwtProperties jwtProperties;
+	private final ObjectMapper objectMapper;
+	private final AuthenticationProvider loginAuthenticationProvider;
+
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http
+			.csrf(AbstractHttpConfigurer::disable)
+			.formLogin(AbstractHttpConfigurer::disable)
+			.sessionManagement(sessionManagementConfigurer ->
+				sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+		http.authorizeHttpRequests(authorize -> {
+				authorize
+					.requestMatchers("/api/login", "/api/reissue", "/swagger-ui/**",  "/v3/api-docs/**",
+						"/swagger-ui.html",  "/swagger/**"
+					).permitAll()
+					.requestMatchers("/api/company/**").hasAuthority(MemberRole.SYSTEM_ADMIN.getRoleName())
+					.anyRequest().authenticated();
+			})
+			.addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+			.exceptionHandling(exception -> exception
+				.authenticationEntryPoint(jwtAuthenticationEntryPoint())
+				.accessDeniedHandler(jwtAccessDeniedHandler())
+			);
+
+		return http.build();
+	}
+
+	@Bean
+	public JwtLoginFilter loginFilter() throws Exception {
+		final JwtLoginFilter jwtLoginFilter = new JwtLoginFilter("/api/login", objectMapper);
+		jwtLoginFilter.setAuthenticationSuccessHandler(jwtLoginAuthenticationSuccessHandler());
+		jwtLoginFilter.setAuthenticationFailureHandler(jwtLoginAuthenticationFailureHandler());
+		jwtLoginFilter.setAuthenticationManager(authenticationManager());
+		return jwtLoginFilter;
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManager() {
+		return new ProviderManager(List.of(loginAuthenticationProvider));
+	}
+
+	@Bean
+	public JwtTokenProvider jwtTokenProvider() {
+		return new JwtTokenProvider(jwtProperties);
+	}
+
+	@Bean
+	public AuthenticationSuccessHandler jwtLoginAuthenticationSuccessHandler() {
+		return new LoginSuccessHandler(jwtTokenProvider(), objectMapper);
+	}
+
+	@Bean
+	public AuthenticationFailureHandler jwtLoginAuthenticationFailureHandler() {
+		return new LoginFailureHandler(objectMapper);
+	}
+
+	@Bean
+	public JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter(jwtTokenProvider(), tokenAuthenticationService(), objectMapper);
+	}
+
+	@Bean
+	public TokenAuthenticationService tokenAuthenticationService() {
+		return new TokenAuthenticationService(jwtTokenProvider());
+	}
+
+	@Bean
+	public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
+		return new JwtAuthenticationEntryPoint(objectMapper);
+	}
+
+	@Bean
+	public JwtAccessDeniedHandler jwtAccessDeniedHandler() {
+		return new JwtAccessDeniedHandler(objectMapper);
+	}
+}
