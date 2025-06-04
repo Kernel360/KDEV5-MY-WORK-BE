@@ -39,7 +39,9 @@ import kr.mywork.interfaces.project_step.dto.request.ProjectStepUpdateWebRequest
 import kr.mywork.interfaces.project_step.dto.request.ProjectStepsCreateWebRequest;
 import kr.mywork.interfaces.project_step.dto.request.ProjectStepsUpdateWebRequest;
 
-@WebMvcTest(ProjectStepController.class)
+@WebMvcTest(value = ProjectStepController.class,
+	excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebSecurityConfigurer.class)}, //security 설정을 종료하기 위한 설정
+	excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class ProjectStepControllerTest {
 
 	@Autowired

@@ -18,6 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -36,7 +37,9 @@ import kr.mywork.domain.post.service.dto.response.ReviewModifyResponse;
 import kr.mywork.interfaces.post.controller.dto.request.ReviewCreateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.ReviewModifyWebRequest;
 
-@WebMvcTest(ReviewController.class)
+@WebMvcTest(value = ReviewController.class,
+	excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebSecurityConfigurer.class)}, //security 설정을 종료하기 위한 설정
+	excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class ReviewControllerTest {
 
 	@Autowired
