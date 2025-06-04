@@ -63,9 +63,8 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-					fieldWithPath("data.postId").type(JsonFieldType.STRING).description("생성된 리뷰의 게시글 아이디"),
-					fieldWithPath("data.parentId").type(JsonFieldType.NULL).description("리뷰의 부모 아이디"),
-					fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("작성자 아이디"),
+					fieldWithPath("data.reviewId").type(JsonFieldType.STRING).description("생성된 리뷰 아이디"),
+					fieldWithPath("data.reviewParentId").type(JsonFieldType.NULL).description("리뷰의 부모 아이디"),
 					fieldWithPath("data.comment").type(JsonFieldType.STRING).description("코멘트 내용"),
 					fieldWithPath("data.authorName").type(JsonFieldType.STRING).description("작성자 이름"),
 					fieldWithPath("data.companyName").type(JsonFieldType.STRING).description("회사 이름"),

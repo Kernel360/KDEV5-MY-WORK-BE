@@ -50,9 +50,9 @@ class ReviewControllerTest {
 	void 리뷰_생성_요청_성공() throws Exception {
 		// given
 		final UUID postId = UUID.fromString("01972f9b-232a-7dbe-aad2-3bffc0b78ced");
+		final UUID reviewId = UUID.fromString("01972ea5-73ff-75e1-9083-d1d51a0f186a");
 
-		when(reviewService.save(any())).thenReturn(new ReviewCreateResponse(postId, null,
-			UUID.fromString("01972ea5-73ff-75e1-9083-d1d51a0f186a"), "코멘트01", "작성자1", "회사01"));
+		when(reviewService.save(any())).thenReturn(new ReviewCreateResponse(reviewId, null, "코멘트01", "작성자1", "회사01"));
 
 		final ReviewCreateWebRequest reviewCreateWebRequest = new ReviewCreateWebRequest(
 			postId, "코멘트01", null);
@@ -78,9 +78,9 @@ class ReviewControllerTest {
 	void 리뷰_생성_요청_입력_값_실패() throws Exception {
 		// given
 		final UUID postId = UUID.fromString("01972f9b-232a-7dbe-aad2-3bffc0b78ced");
+		final UUID reviewId = UUID.fromString("01972ea5-73ff-75e1-9083-d1d51a0f186a");
 
-		when(reviewService.save(any())).thenReturn(new ReviewCreateResponse(postId, null,
-			UUID.fromString("01972ea5-73ff-75e1-9083-d1d51a0f186a"), "코멘트01", "작성자1", "회사01"));
+		when(reviewService.save(any())).thenReturn(new ReviewCreateResponse(reviewId, null, "코멘트01", "작성자1", "회사01"));
 
 		final ReviewCreateWebRequest reviewCreateWebRequest = new ReviewCreateWebRequest(
 			postId, "", null);
