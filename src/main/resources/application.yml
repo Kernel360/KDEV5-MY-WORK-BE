@@ -21,3 +21,6 @@ company:
 member:
   page:
     size: 10
+post:
+  page:
+    size: 10
