@@ -2,6 +2,7 @@ package kr.mywork.interfaces.post.controller;
 
 import java.util.UUID;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +21,7 @@ import kr.mywork.interfaces.post.controller.dto.request.PostUpdateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.response.PostCreateWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostIdCreateWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostUpdateWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.PostDeleteWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -61,5 +63,15 @@ public class PostController {
 		final PostUpdateWebResponse postUpdateWebResponse = PostUpdateWebResponse.from(postUpdateResponse);
 
 		return ApiResponse.success(postUpdateWebResponse);
+	}
+
+	@DeleteMapping("/{postId}")
+	public ApiResponse<PostDeleteWebResponse> deletePost(
+		@PathVariable final UUID postId) {
+
+		final UUID deletedPostId = postService.deletePost(postId);
+		final PostDeleteWebResponse postDeleteWebResponse = new PostDeleteWebResponse(deletedPostId);
+
+		return ApiResponse.success(postDeleteWebResponse);
 	}
 }
