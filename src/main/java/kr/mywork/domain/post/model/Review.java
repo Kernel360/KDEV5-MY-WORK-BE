@@ -34,6 +34,7 @@ public class Review {
 	private UUID memberId; // 작성자 검증을 위한 필드
 
 	@Column(nullable = false, length = 200)
+	@Getter
 	private String comment;
 
 	@Column(nullable = false, length = 30)
@@ -64,4 +65,8 @@ public class Review {
 		this.deleted = false;
 	}
 
+	public boolean modifyComment(final String comment) {
+		this.comment = comment;
+		return true;
+	}
 }
