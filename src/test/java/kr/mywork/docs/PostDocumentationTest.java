@@ -197,4 +197,41 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 		);
 	}
 
+	@Test
+	@DisplayName("게시글 삭제 성공")
+	@Sql("classpath:sql/post-for-delete.sql")
+	void 게시글_삭제_성공() throws Exception {
+		// given
+		UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			delete("/api/posts/{postId}", postId) // HTTP method (URL)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("post-delete-success", postDeleteSuccessResource()));
+	}
+
+	private ResourceSnippet postDeleteSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Post API")
+				.summary("게시글 삭제 API")
+				.description("게시글을 삭제한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.postId").type(JsonFieldType.STRING).description("수정한 게시글 아이디"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
 }
