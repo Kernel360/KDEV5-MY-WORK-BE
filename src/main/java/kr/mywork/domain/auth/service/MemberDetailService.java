@@ -23,6 +23,7 @@ public class MemberDetailService implements UserDetailsService {
 			.map(member -> {
 				return new MemberDetails(
 					member.getId(),
+					member.getName(),
 					member.getEmail(),
 					member.getPassword(),
 					new SimpleGrantedAuthority(member.getRole().getRoleName())
