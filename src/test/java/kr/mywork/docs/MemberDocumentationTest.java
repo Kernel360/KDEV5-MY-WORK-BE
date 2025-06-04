@@ -7,6 +7,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -92,9 +93,9 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 		//when
 		final ResultActions result = mockMvc.perform(delete("/api/member")
-				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestBody));
+			.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(requestBody));
 		//then
 		result.andExpectAll(
 				status().isOk(),
@@ -111,13 +112,13 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				.summary("멤버 삭제 API")
 				.description("멤버를 소프트 딜리트 한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("삭제된 멤버 아이디"),  // 수정
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))  // 수정
-				.build()
-		);
+				.build());
 	}
 
 	@Test
@@ -160,7 +161,8 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				.summary("멤버 생성 API")
 				.description("멤버 아이디를 생성한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.id").type(JsonFieldType.STRING).description("생성한 멤버 아이디"),
