@@ -11,6 +11,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
+import kr.mywork.domain.post.errors.review.ReviewAlreadyDeletedException;
+import kr.mywork.domain.post.errors.review.ReviewErrorType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -67,6 +69,15 @@ public class Review {
 
 	public boolean modifyComment(final String comment) {
 		this.comment = comment;
+		return true;
+	}
+
+	public boolean delete() {
+		if (this.deleted) {
+			throw new ReviewAlreadyDeletedException(ReviewErrorType.REVIEW_ALREADY_DELETED);
+		}
+
+		this.deleted = true;
 		return true;
 	}
 }

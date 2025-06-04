@@ -8,8 +8,10 @@ import kr.mywork.domain.post.errors.review.ReviewNotFoundException;
 import kr.mywork.domain.post.model.Review;
 import kr.mywork.domain.post.repository.ReviewRepository;
 import kr.mywork.domain.post.service.dto.request.ReviewCreateRequest;
+import kr.mywork.domain.post.service.dto.request.ReviewDeleteRequest;
 import kr.mywork.domain.post.service.dto.request.ReviewModifyRequest;
 import kr.mywork.domain.post.service.dto.response.ReviewCreateResponse;
+import kr.mywork.domain.post.service.dto.response.ReviewDeleteResponse;
 import kr.mywork.domain.post.service.dto.response.ReviewModifyResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +33,7 @@ public class ReviewService {
 
 	public ReviewModifyResponse modifyComment(final ReviewModifyRequest reviewModifyRequest) {
 		// TODO Project 유효성 검증 코드 추가 필요
+		// TODO 본인 수정 내용 추가
 
 		final Review review = reviewRepository.findById(reviewModifyRequest.reviewId())
 			.orElseThrow(() -> new ReviewNotFoundException(ReviewErrorType.REVIEW_NOT_FOUND));
@@ -38,5 +41,15 @@ public class ReviewService {
 		review.modifyComment(reviewModifyRequest.comment());
 
 		return new ReviewModifyResponse(review.getId(), review.getComment());
+	}
+
+	public ReviewDeleteResponse deleteReview(final ReviewDeleteRequest reviewDeleteRequest) {
+		// TODO 본인 작성 검증 내용 추가
+		final Review review = reviewRepository.findById(reviewDeleteRequest.reviewId())
+			.orElseThrow(() -> new ReviewNotFoundException(ReviewErrorType.REVIEW_NOT_FOUND));
+
+		review.delete();
+
+		return new ReviewDeleteResponse(review.getId());
 	}
 }
