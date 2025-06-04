@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -47,6 +48,7 @@ class ReviewControllerTest {
 
 	@Test
 	@DisplayName("리뷰 생성 요청 성공")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 리뷰_생성_요청_성공() throws Exception {
 		// given
 		final UUID postId = UUID.fromString("01972f9b-232a-7dbe-aad2-3bffc0b78ced");
@@ -75,6 +77,7 @@ class ReviewControllerTest {
 
 	@Test
 	@DisplayName("리뷰 생성 요청 입력 값 실패 (빈 코멘트)")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 리뷰_생성_요청_입력_값_실패() throws Exception {
 		// given
 		final UUID postId = UUID.fromString("01972f9b-232a-7dbe-aad2-3bffc0b78ced");
