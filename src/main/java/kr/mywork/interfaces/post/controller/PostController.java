@@ -2,6 +2,7 @@ package kr.mywork.interfaces.post.controller;
 
 import java.util.UUID;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,10 +15,12 @@ import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
+import kr.mywork.domain.post.service.dto.response.PostDetailResponse;
 import kr.mywork.domain.post.service.dto.response.PostUpdateResponse;
 import kr.mywork.interfaces.post.controller.dto.request.PostCreateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostUpdateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.response.PostCreateWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.PostDetailWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostIdCreateWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostUpdateWebResponse;
 import lombok.RequiredArgsConstructor;
@@ -62,4 +65,15 @@ public class PostController {
 
 		return ApiResponse.success(postUpdateWebResponse);
 	}
+
+	@GetMapping("/{postId}")
+	public ApiResponse<PostDetailWebResponse> getPostDetail(@PathVariable @Valid final UUID postId) {
+
+		PostDetailResponse postDetailResponse = postService.getPostDetail(postId);
+
+		PostDetailWebResponse postDetailWebResponse = PostDetailWebResponse.from(postDetailResponse);
+
+		return ApiResponse.success(postDetailWebResponse);
+	}
+
 }
