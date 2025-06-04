@@ -3,6 +3,7 @@ package kr.mywork.interfaces.post.controller;
 import java.util.UUID;
 
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,12 +14,15 @@ import jakarta.validation.Valid;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.post.service.ReviewService;
 import kr.mywork.domain.post.service.dto.request.ReviewCreateRequest;
+import kr.mywork.domain.post.service.dto.request.ReviewDeleteRequest;
 import kr.mywork.domain.post.service.dto.request.ReviewModifyRequest;
 import kr.mywork.domain.post.service.dto.response.ReviewCreateResponse;
+import kr.mywork.domain.post.service.dto.response.ReviewDeleteResponse;
 import kr.mywork.domain.post.service.dto.response.ReviewModifyResponse;
 import kr.mywork.interfaces.post.controller.dto.request.ReviewCreateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.ReviewModifyWebRequest;
 import kr.mywork.interfaces.post.controller.dto.response.ReviewCreateWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.ReviewDeleteWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.ReviewModifyWebResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -59,5 +63,18 @@ public class ReviewController {
 		final ReviewModifyResponse reviewModifyResponse = reviewService.modifyComment(reviewModifyRequest);
 
 		return ApiResponse.success(ReviewModifyWebResponse.fromServiceRequest(reviewModifyResponse));
+	}
+
+	@DeleteMapping("/api/reviews/{reviewId}")
+	public ApiResponse<ReviewDeleteWebResponse> deleteReview(
+		// TODO 사용자 인증 정보 첨부하기
+		@PathVariable("reviewId") UUID reviewId) {
+
+		final ReviewDeleteResponse reviewDeleteResponse = reviewService.deleteReview(new ReviewDeleteRequest(
+			UUID.fromString("019738c6-a0e8-7cbf-9b39-fb91ac12af33"), // TODO 사용자 아이디 추가
+			reviewId
+		));
+
+		return ApiResponse.success(new ReviewDeleteWebResponse(reviewDeleteResponse.reviewId()));
 	}
 }
