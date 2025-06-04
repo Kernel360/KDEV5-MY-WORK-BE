@@ -197,7 +197,6 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 		);
 	}
 
-
 	@Test
 	@DisplayName("게시글 단건 조회 성공")
 	@Sql("classpath:sql/post-for-get.sql")
@@ -235,6 +234,55 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.companyName").type(JsonFieldType.STRING).description("회사 이름"),
 					fieldWithPath("data.authorName").type(JsonFieldType.STRING).description("작성자"),
 					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("게시글 목록 조회 성공")
+	@Sql("classpath:sql/post-for-get-list.sql")
+	void 게시글_목록_조회_성공() throws Exception {
+		// given
+		UUID projectStepId = UUID.fromString("019739d2-2e80-709f-a9c5-7da758c956d1");
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			get("/api/posts?page={page}&projectStepId={projectStepId}&keyword={keyword}&deleted={deleted}",
+				1, projectStepId, null, null) // HTTP method (URL)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("post-get-list-success", postGetListSuccessResource()));
+	}
+
+	private ResourceSnippet postGetListSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Post API")
+				.summary("게시글 목록 조회 API")
+				.description("게시글 목록을 검색조건에 따라 조회를 한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.queryParameters(
+					parameterWithName("page").description("페이지 번호"),
+					parameterWithName("projectStepId").description("프로젝트 단계 ID").optional(),
+					parameterWithName("keyword").description("검색어").optional(),
+					parameterWithName("deleted").description("삭제 여부").optional()
+				)
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.posts.[].postId").type(JsonFieldType.STRING).description("게시글 아이디"),
+					fieldWithPath("data.posts.[].authorName").type(JsonFieldType.STRING).description("작성자"),
+					fieldWithPath("data.posts.[].title").type(JsonFieldType.STRING).description("게시글 제목"),
+					fieldWithPath("data.posts.[].createdAt").type(JsonFieldType.STRING).description("생성 일자"),
+					fieldWithPath("data.posts.[].approval").type(JsonFieldType.STRING).description("승인여부"),
+					fieldWithPath("data.totalCount").type(JsonFieldType.NUMBER).description("총 갯수"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
