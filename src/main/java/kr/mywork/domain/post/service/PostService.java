@@ -1,7 +1,9 @@
 package kr.mywork.domain.post.service;
 
+import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.uuid.Generators;
@@ -16,12 +18,16 @@ import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
 import kr.mywork.domain.post.service.dto.response.PostDetailResponse;
+import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
 import kr.mywork.domain.post.service.dto.response.PostUpdateResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
+	@Value("${post.page.size}")
+	private int postPageSize;
 
 	private final PostRepository postRepository;
 	private final PostIdRepository postIdRepository;
@@ -56,5 +62,18 @@ public class PostService {
 			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
 
 		return PostDetailResponse.from(post);
+	}
+
+	@Transactional
+	public List<PostSelectResponse> findPostsBySearchConditionWithPaging(final int page, final UUID projectStepId,
+		final String keyword, final Boolean deleted) {
+
+		// TODO projectStepId가 null이 아니고, DB에도 존재 하지 않을때 에러 처리해아함.
+
+		return postRepository.findPostsBySearchConditionWithPaging(page, postPageSize, projectStepId, keyword, deleted);
+	}
+
+	public Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted) {
+		return postRepository.countTotalPostsByCondition(projectStepId, keyword, deleted);
 	}
 }
