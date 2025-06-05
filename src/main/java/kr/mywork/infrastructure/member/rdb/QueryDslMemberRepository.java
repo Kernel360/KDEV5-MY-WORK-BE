@@ -49,8 +49,8 @@ public class QueryDslMemberRepository implements MemberRepository {
 	}
 
 	@Override
-	public Member save(final MemberCreateRequest memberCreateRequest) {
-		return memberRepository.save(memberCreateRequest.toEntity());
+	public Member save(final Member member) {
+		return memberRepository.save(member);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,13 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.constraints.Min;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.member.service.MemberService;
+import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
+import kr.mywork.domain.member.service.dto.request.MemberUpdateRequest;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
-import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
+import kr.mywork.interfaces.member.controller.dto.request.MemberCreateWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
+import kr.mywork.interfaces.member.controller.dto.request.MemberUpdateWebRequest;
 import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberCreateWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberDeleteWebResponse;
-import kr.mywork.interfaces.member.controller.dto.resquest.MemberCreateWebRequest;
+import kr.mywork.interfaces.member.controller.dto.response.MemberUpdateWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -36,13 +40,13 @@ public class MemberController {
 	@GetMapping("/company/{companyId}")
 	public ApiResponse<CompanyMemberWebResponse> getCompanyMember(
 		@PathVariable(name = "companyId") UUID companyId,
-		@RequestParam(defaultValue = "1")@Min(value = 1, message = "{invalid.page-size}") int page
-	){
-		List<CompanyMemberResponse> companyMemberResponse = memberService.findMemberByCompanyId(companyId,page);
+		@RequestParam(defaultValue = "1") @Min(value = 1, message = "{invalid.page-size}") int page
+	) {
+		List<CompanyMemberResponse> companyMemberResponse = memberService.findMemberByCompanyId(companyId, page);
 
 		long total = memberService.countMembersByCompanyId(companyId);
 
-		CompanyMemberWebResponse companyMemberWebResponse = CompanyMemberWebResponse.from(companyMemberResponse,total);
+		CompanyMemberWebResponse companyMemberWebResponse = CompanyMemberWebResponse.from(companyMemberResponse, total);
 
 		return ApiResponse.success(companyMemberWebResponse);
 	}
@@ -50,7 +54,7 @@ public class MemberController {
 	@PostMapping
 	public ApiResponse<MemberCreateWebResponse> memberCreateWebResponseApiResponse(
 		@RequestBody final MemberCreateWebRequest memberCreateWebRequest
-	){
+	) {
 
 		final MemberCreateRequest memberCreateRequest = memberCreateWebRequest.toServiceDto();
 
@@ -64,11 +68,24 @@ public class MemberController {
 	@DeleteMapping
 	public ApiResponse<MemberDeleteWebResponse> deleteMember(
 		@RequestBody MemberDeleteWebRequest memberDeleteWebRequest
-	){
+	) {
 		final UUID memberId = memberService.deleteMember(memberDeleteWebRequest.memberId());
 
 		MemberDeleteWebResponse memberDeleteWebResponse = new MemberDeleteWebResponse(memberId);
 
 		return ApiResponse.success(memberDeleteWebResponse);
+	}
+
+	@PutMapping
+	public ApiResponse<MemberUpdateWebResponse> updateMember(
+		@RequestBody MemberUpdateWebRequest memberUpdateWebRequest
+	) {
+		final MemberUpdateRequest memberUpdateRequest = memberUpdateWebRequest.toServiceDto();
+
+		final UUID updatedId = memberService.updateMember(memberUpdateRequest);
+
+		final MemberUpdateWebResponse memberUpdateWebResponse = new MemberUpdateWebResponse(updatedId);
+
+		return ApiResponse.success(memberUpdateWebResponse);
 	}
 }

@@ -49,4 +49,14 @@ public class PostService {
 		post.update(postUpdateRequest);
 		return PostUpdateResponse.from(post);
 	}
+
+	@Transactional
+	public UUID deletePost(UUID postId) {
+		Post post = postRepository.findById(postId)
+			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
+
+		post.softDelete();
+		return post.getId();
+	}
+
 }

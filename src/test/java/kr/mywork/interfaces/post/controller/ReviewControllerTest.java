@@ -1,6 +1,6 @@
 package kr.mywork.interfaces.post.controller;
 
-import static org.junit.jupiter.params.provider.Arguments.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -18,8 +18,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+
+import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -33,7 +38,9 @@ import kr.mywork.domain.post.service.dto.response.ReviewModifyResponse;
 import kr.mywork.interfaces.post.controller.dto.request.ReviewCreateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.ReviewModifyWebRequest;
 
-@WebMvcTest(ReviewController.class)
+@WebMvcTest(value = ReviewController.class,
+	excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebSecurityConfigurer.class)}, //security 설정을 종료하기 위한 설정
+	excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class ReviewControllerTest {
 
 	@Autowired
@@ -47,6 +54,7 @@ class ReviewControllerTest {
 
 	@Test
 	@DisplayName("리뷰 생성 요청 성공")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 리뷰_생성_요청_성공() throws Exception {
 		// given
 		final UUID postId = UUID.fromString("01972f9b-232a-7dbe-aad2-3bffc0b78ced");
@@ -75,6 +83,7 @@ class ReviewControllerTest {
 
 	@Test
 	@DisplayName("리뷰 생성 요청 입력 값 실패 (빈 코멘트)")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 리뷰_생성_요청_입력_값_실패() throws Exception {
 		// given
 		final UUID postId = UUID.fromString("01972f9b-232a-7dbe-aad2-3bffc0b78ced");
