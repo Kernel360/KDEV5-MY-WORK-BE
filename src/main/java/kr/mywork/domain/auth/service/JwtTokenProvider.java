@@ -55,6 +55,7 @@ public class JwtTokenProvider {
 	}
 
 	public String createAccessToken(final UUID memberId, final String email, final String role, final String name) {
+
 		final Date now = new Date();
 		final Date expiry = new Date(now.getTime() + accessTokenExpirationMillis);
 

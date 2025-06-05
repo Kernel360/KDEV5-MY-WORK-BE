@@ -1,19 +1,24 @@
 package kr.mywork.docs;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.*;
-import static org.springframework.restdocs.cookies.CookieDocumentation.*;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -26,12 +31,9 @@ import com.jayway.jsonpath.JsonPath;
 
 import jakarta.servlet.http.Cookie;
 import kr.mywork.common.api.support.response.ResultType;
-import kr.mywork.domain.auth.service.JwtTokenProvider;
 
-public class AuthDocumentationTest extends RestDocsDocumentation{
 
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
+public class AuthDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("로그인 성공")
@@ -120,7 +122,4 @@ public class AuthDocumentationTest extends RestDocsDocumentation{
 				)
 			));
 	}
-
-
-
 }

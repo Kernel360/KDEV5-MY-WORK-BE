@@ -60,6 +60,7 @@ public class TokenService {
 		LocalDateTime expiresAt = jwtTokenProvider.extractExpiration(refreshToken);
 
 		return new TokenResponse(newAccessToken, expiresAt, memberId, role, name);
+
 	}
 
 	private String resolveRefreshTokenFromCookie(HttpServletRequest request) {

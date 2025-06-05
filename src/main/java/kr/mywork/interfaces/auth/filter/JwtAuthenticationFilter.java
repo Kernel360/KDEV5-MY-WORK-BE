@@ -61,6 +61,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 
 		} catch (Exception e) {
+
+			// TODO PatternParseException 핸들링하기
+			// TODO 아이디, 비밀번호 에러 메시지 변경 (catch 범위가 너무 넓어서 예외 파악 어려움)
 			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);

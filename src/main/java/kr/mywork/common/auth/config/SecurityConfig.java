@@ -13,9 +13,12 @@ import kr.mywork.interfaces.auth.handler.error.LoginFailureHandler;
 import kr.mywork.interfaces.auth.handler.success.LoginSuccessHandler;
 import kr.mywork.domain.member.model.MemberRole;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -40,19 +43,42 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-			.cors(cors -> {})
 			.csrf(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)
-			.sessionManagement(session ->
-				session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			);
+			.sessionManagement(sessionManagementConfigurer ->
+				sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 		http.authorizeHttpRequests(authorize -> {
 				authorize
-					.requestMatchers("/api/login", "/api/reissue", "/swagger-ui/**",  "/v3/api-docs/**",
-						"/swagger-ui.html",  "/swagger/**"
-					).permitAll()
-					.requestMatchers("/api/company/**").hasAuthority(MemberRole.SYSTEM_ADMIN.getRoleName())
+					.requestMatchers("/api/login", "/api/reissue", "/swagger-ui/**", "/v3/api-docs/**",
+						"/swagger-ui.html", "/swagger/**").permitAll()
+					.requestMatchers("/api/reviews/**").hasAnyRole(
+						MemberRole.SYSTEM_ADMIN.name(),
+						MemberRole.USER.name(),
+						MemberRole.DEV_ADMIN.name(),
+						MemberRole.CLIENT_ADMIN.name())
+					.requestMatchers(HttpMethod.POST, "/api/projects/steps").hasAnyRole(MemberRole.DEV_ADMIN.name())
+					.requestMatchers(HttpMethod.PUT, "/api/projects/*/steps").hasAnyRole(MemberRole.DEV_ADMIN.name())
+					.requestMatchers(HttpMethod.PUT, "/api/projects/*/steps").hasAnyRole(MemberRole.DEV_ADMIN.name())
+					.requestMatchers("/api/member/**").hasAnyRole(
+						MemberRole.DEV_ADMIN.name(),
+						MemberRole.CLIENT_ADMIN.name(),
+						MemberRole.SYSTEM_ADMIN.name())
+					.requestMatchers("/api/member/company/**").hasAnyRole(
+						MemberRole.DEV_ADMIN.name(),
+						MemberRole.CLIENT_ADMIN.name(),
+						MemberRole.SYSTEM_ADMIN.name())
+					.requestMatchers(HttpMethod.POST, "/api/company/**").hasRole(MemberRole.SYSTEM_ADMIN.name())
+					.requestMatchers(HttpMethod.DELETE, "/api/company/**").hasRole(MemberRole.SYSTEM_ADMIN.name())
+					.requestMatchers(HttpMethod.PUT, "/api/company/**").hasAnyRole(
+						MemberRole.SYSTEM_ADMIN.name(),
+						MemberRole.DEV_ADMIN.name(),
+						MemberRole.CLIENT_ADMIN.name())
+					.requestMatchers(HttpMethod.GET, "/api/company/**")
+					.hasAnyRole(
+						MemberRole.SYSTEM_ADMIN.name(),
+						MemberRole.DEV_ADMIN.name(),
+						MemberRole.CLIENT_ADMIN.name())
 					.anyRequest().authenticated();
 			})
 			.addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class)

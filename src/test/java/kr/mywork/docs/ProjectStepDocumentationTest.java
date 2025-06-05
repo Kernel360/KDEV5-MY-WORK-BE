@@ -38,6 +38,8 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 	void 프로젝트_단계_생성_성공() throws Exception {
 		// given
 		// TODO Project 생성 API 개발 후, ProjectId 생성 및 검증 샘플 데이터 추가 필요
+		final String accessToken = createDevAdminAccessToken();
+
 		final UUID projectId = UUID.fromString("0197207e-7331-7000-946b-a29a79a82424");
 
 		final List<ProjectStepCreateWebRequest> projectStepCreateWebRequests = List.of(
@@ -54,6 +56,7 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 		// when
 		final ResultActions result = mockMvc.perform(post("/api/projects/steps")
 			.content(requestBody)
+			.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 			.contentType(MediaType.APPLICATION_JSON));
 
 		// then
@@ -72,7 +75,8 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 				.summary("프로젝트 단계 생성 API")
 				.description("프로젝트 단계를 생성한다")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.createdStepCount").type(JsonFieldType.NUMBER).description("생성한 프로젝트 단계 갯수"),
@@ -87,6 +91,7 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 	void 프로젝트_단계_수정_성공() throws Exception {
 		// given
 		// TODO Project 생성 API 개발 후, ProjectId 생성 및 검증 샘플 데이터 추가 필요
+		final String accessToken = createDevAdminAccessToken();
 
 		final List<ProjectStepUpdateWebRequest> projectStepCreateWebRequests = List.of(
 			new ProjectStepUpdateWebRequest(UUID.fromString("01972ea5-0bc1-7b72-87d8-bdc93b2049c4"), "기획_수정", 1),
@@ -100,9 +105,11 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 		final String requestBody = objectMapper.writeValueAsString(projectStepsUpdateWebRequest);
 
 		// when
-		final ResultActions result = mockMvc.perform(put("/api/projects/{projectId}/steps", "0197207e-7331-7000-946b-a29a79a82424")
-			.content(requestBody)
-			.contentType(MediaType.APPLICATION_JSON));
+		final ResultActions result = mockMvc.perform(
+			put("/api/projects/{projectId}/steps", "0197207e-7331-7000-946b-a29a79a82424")
+				.content(requestBody)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.contentType(MediaType.APPLICATION_JSON));
 
 		// then
 		result.andExpectAll(
@@ -120,12 +127,15 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 				.summary("프로젝트 단계 일괄 수정 API")
 				.description("프로젝트 단계를 일괄 수정한다")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-					fieldWithPath("data.projectSteps.[].projectStepId").type(JsonFieldType.STRING).description("프로젝트 단계 아이디"),
+					fieldWithPath("data.projectSteps.[].projectStepId").type(JsonFieldType.STRING)
+						.description("프로젝트 단계 아이디"),
 					fieldWithPath("data.projectSteps.[].title").type(JsonFieldType.STRING).description("프로젝트 단계 이름"),
-					fieldWithPath("data.projectSteps.[].orderNumber").type(JsonFieldType.NUMBER).description("프로젝트 단계 순서"),
+					fieldWithPath("data.projectSteps.[].orderNumber").type(JsonFieldType.NUMBER)
+						.description("프로젝트 단계 순서"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}

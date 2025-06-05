@@ -24,6 +24,7 @@ public class TokenAuthenticationService {
 		String role = claims.get("role", String.class);
 		String name = claims.get("name", String.class);
 
+
 		MemberRole memberRole = MemberRole.of(role);
 
 		return new MemberDetails(

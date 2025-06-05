@@ -19,9 +19,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+
+import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -36,7 +40,9 @@ import kr.mywork.interfaces.project_step.dto.request.ProjectStepUpdateWebRequest
 import kr.mywork.interfaces.project_step.dto.request.ProjectStepsCreateWebRequest;
 import kr.mywork.interfaces.project_step.dto.request.ProjectStepsUpdateWebRequest;
 
-@WebMvcTest(ProjectStepController.class)
+@WebMvcTest(value = ProjectStepController.class,
+	excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebSecurityConfigurer.class)}, //security 설정을 종료하기 위한 설정
+	excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class ProjectStepControllerTest {
 
 	@Autowired

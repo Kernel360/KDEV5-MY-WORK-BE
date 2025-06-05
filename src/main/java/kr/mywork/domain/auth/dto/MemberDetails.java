@@ -15,6 +15,7 @@ public class MemberDetails implements UserDetails {
 
     private final UUID id;
     private final String name;
+
     private final String email;
     private final String password;
     private final GrantedAuthority authority;
