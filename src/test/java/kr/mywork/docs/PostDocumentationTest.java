@@ -2,7 +2,10 @@ package kr.mywork.docs;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -16,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -71,7 +73,6 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("게시글 생성 성공")
 	@Sql("classpath:sql/post-id.sql")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 게시글_생성_성공() throws Exception {
 		// given
 		final String accessToken = createUserAccessToken();
