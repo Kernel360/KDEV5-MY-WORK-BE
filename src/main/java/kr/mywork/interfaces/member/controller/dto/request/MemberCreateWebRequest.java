@@ -6,7 +6,6 @@ import java.util.UUID;
 import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
 
 public record MemberCreateWebRequest(
-	UUID id,
 	UUID companyId,
 	String name,
 	String department,
@@ -18,7 +17,7 @@ public record MemberCreateWebRequest(
 ) {
 	public MemberCreateRequest toServiceDto() {
 		return new MemberCreateRequest(
-			id, companyId, name, department, position, role,
+			companyId, name, department, position, role,
 			phoneNumber, email, birthDate
 		);
 	}

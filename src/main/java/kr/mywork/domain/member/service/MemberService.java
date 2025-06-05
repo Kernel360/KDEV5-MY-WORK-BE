@@ -50,15 +50,13 @@ public class MemberService {
 			throw new EmailAlreadyExistsException(MemberErrorType.EMAIL_ALREADY_EXISTS);
 		}
 
-		String encPassword = request.getBirthDate().toLocalDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		String encodedPassword = request.getBirthDate().toLocalDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-		MemberCreateRequest memberCreateRequest = new MemberCreateRequest(request.getId(), request.getCompanyId(),
-			request.getName(), request.getDepartment(), request.getPosition(), request.getRole(),
-			request.getPhoneNumber(), request.getEmail(), request.getBirthDate()
+		Member member = new Member(request.getCompanyId(), request.getName(), request.getDepartment(),
+			request.getPosition(), request.getRole(), request.getPhoneNumber(), request.getEmail(), encodedPassword,
+			request.getBirthDate());
 
-		);
-
-		final Member savedMember = memberRepository.save(memberCreateRequest,encPassword);
+		final Member savedMember = memberRepository.save(member);
 
 		return savedMember.getId();
 	}

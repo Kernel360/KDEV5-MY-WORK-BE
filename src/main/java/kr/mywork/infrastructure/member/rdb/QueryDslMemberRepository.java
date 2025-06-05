@@ -12,7 +12,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
-import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -48,8 +47,8 @@ public class QueryDslMemberRepository implements MemberRepository {
 	}
 
 	@Override
-	public Member save(final MemberCreateRequest memberCreateRequest,String encPassword) {
-		return memberRepository.save(memberCreateRequest.toEntity(encPassword));
+	public Member save(final Member member) {
+		return memberRepository.save(member);
 	}
 
 	@Override

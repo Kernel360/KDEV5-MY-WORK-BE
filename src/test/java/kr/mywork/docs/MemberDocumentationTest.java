@@ -10,6 +10,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -122,12 +123,9 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
 		LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");
 
-		final MemberCreateWebRequest memberCreateWebRequest =
-			new MemberCreateWebRequest(
-				null, companyId, "김두만", "개발",
-				"부장", "USER", "010-4040-5050",
-				"eme@naver.com", birthDate
-			);
+		final MemberCreateWebRequest memberCreateWebRequest = new MemberCreateWebRequest(companyId, "김두만", "개발", "부장",
+			"USER", "010-4040-5050", "eme@naver.com", birthDate);
+
 		final String requestBody = objectMapper.writeValueAsString(memberCreateWebRequest);
 
 		//when
@@ -143,7 +141,6 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				jsonPath("$.data").exists(),
 				jsonPath("$.error").doesNotExist())
 			.andDo(MockMvcRestDocumentationWrapper.document("member-create-success", memberCreateSuccessResource()));
-
 	}
 
 	private ResourceSnippet memberCreateSuccessResource() {
@@ -200,6 +197,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				.build()
 		);
 	}
+
 	@Test
 	@DisplayName("멤버 정보 업데이트 성공")
 	@Sql("classpath:sql/member-update.sql")
