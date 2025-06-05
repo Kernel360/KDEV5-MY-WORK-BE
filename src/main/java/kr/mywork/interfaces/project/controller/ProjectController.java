@@ -13,6 +13,7 @@ import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.project.service.ProjectService;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
+import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
@@ -25,6 +26,7 @@ import kr.mywork.interfaces.project.controller.dto.response.ProjectDetailWebResp
 import kr.mywork.interfaces.project.controller.dto.response.ProjectListWebResponse;
 import kr.mywork.interfaces.project.controller.dto.response.ProjectSelectWebResponse;
 import kr.mywork.interfaces.project.controller.dto.response.ProjectUpdateWebResponse;
+import kr.mywork.interfaces.project.dto.response.ProjectMemberListWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -104,5 +106,18 @@ public class ProjectController {
 		long totalCount = projectService.countTotalProjectsByCondition(memberId, nameKeyword, deleted);
 
 		return ApiResponse.success(new ProjectListWebResponse(webList, totalCount));
+	}
+
+	@GetMapping("/members")
+	public ApiResponse<ProjectMemberListWebResponse> projectMemberListWebResponseApiResponse(
+		@RequestParam(name = "companyId") UUID companyId,
+		@RequestParam(name = "projectId") UUID projectId
+	) {
+		List<ProjectMemberResponse> projectMemberResponses = projectService.findMemberByCompanyId(companyId, projectId);
+
+		ProjectMemberListWebResponse projectMemberListWebResponse = ProjectMemberListWebResponse.from(
+			projectMemberResponses);
+
+		return ApiResponse.success(projectMemberListWebResponse);
 	}
 }
