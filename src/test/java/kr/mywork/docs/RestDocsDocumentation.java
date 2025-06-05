@@ -70,28 +70,28 @@ abstract class RestDocsDocumentation {
 		return this.jwtTokenProvider.createAccessToken(
 			UUID.fromString("019739ed-f977-7c85-9138-7c8c0e2721d6"),
 			"user01@example.com",
-			MemberRole.USER.getRoleName());
+			MemberRole.USER.getRoleName(), "유저 이름");
 	}
 
 	public String createClientAdminAccessToken() {
 		return this.jwtTokenProvider.createAccessToken(
 			UUID.fromString("019739ec-b50a-7f17-b375-3740a1bffcf1"),
 			"client_admin@example.com",
-			MemberRole.CLIENT_ADMIN.getRoleName());
+			MemberRole.CLIENT_ADMIN.getRoleName(), "클라이언트 어드민 이름");
 	}
 
 	public String createDevAdminAccessToken() {
 		return this.jwtTokenProvider.createAccessToken(
 			UUID.fromString("019739ea-e7eb-76b7-b5e1-b9dc3ea1e9c2"),
 			"dev_admin@example.com",
-			MemberRole.DEV_ADMIN.getRoleName());
+			MemberRole.DEV_ADMIN.getRoleName(), "개발사 어드민 이름");
 	}
 
 	public String createSystemAccessToken() {
 		return this.jwtTokenProvider.createAccessToken(
 			UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"),
 			"system_admin@example.com",
-			MemberRole.SYSTEM_ADMIN.getRoleName());
+			MemberRole.SYSTEM_ADMIN.getRoleName(), "시스템 어드민 이름");
 	}
 
 	public String toBearerAuthorizationHeader(final String accessToken) {
