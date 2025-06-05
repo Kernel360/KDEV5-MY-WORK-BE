@@ -8,7 +8,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -37,7 +35,6 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("회사 직원 목록 조회 테스트 성공")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	@Sql("classpath:sql/company-member-get.sql")
 	void 회사직원_조회_테스트_성공() throws Exception {
 		//given
@@ -85,7 +82,6 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("멤버 삭제 테스트 성공")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	@Sql("classpath:sql/member-delete.sql")
 	void 멤버_삭제_테스트_성공() throws Exception {
 		//given
@@ -128,7 +124,6 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("멤버 생성 성공")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 멤버_생성_성공() throws Exception {
 		//given
 		final String accessToken = createSystemAccessToken();
@@ -175,7 +170,6 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("회사 직원 조회 샐패 (page 검증)")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_직원_조회_실패_페이징() throws Exception {
 		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
