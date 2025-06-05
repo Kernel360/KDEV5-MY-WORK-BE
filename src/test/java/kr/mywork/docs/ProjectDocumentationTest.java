@@ -30,15 +30,18 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 	@Sql("classpath:sql/project-for-member-list.sql")
 	void 프로젝트_할당_멤버_조회_성공() throws Exception {
 		//given
+		final String accessToken = createDevAdminAccessToken();
+
 		final UUID projectId = UUID.fromString("d73b1f10-47e2-7a2d-c1e5-f17125d62999");
-		final UUID compnayId = UUID.fromString("a62a0c20-91e2-7c2d-b0e5-e16115c61888");
+		final UUID companyId = UUID.fromString("a62a0c20-91e2-7c2d-b0e5-e16115c61888");
 
 		//when
 		final ResultActions result = mockMvc.perform(
 			get("/api/projects/members")
 				.param("projectId", projectId.toString())
-				.param("companyId", compnayId.toString())
-				.contentType(MediaType.APPLICATION_JSON));
+				.param("companyId", companyId.toString())
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
 		//then
 		result.andExpectAll(
@@ -56,7 +59,8 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 				.summary("프로젝트 할당할 멤버 조회 API")
 				.description("프로젝트 멤버를 조회한다")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.members[].memberId").type(JsonFieldType.STRING)

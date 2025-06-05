@@ -143,12 +143,15 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 	@Sql("classpath:sql/project-step-get.sql")
 	void 프로젝트_단계_조회_성공() throws Exception {
 		//given
+		final String accessToken = createUserAccessToken();
+
 		UUID projectId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
 		// when
 		final ResultActions result = mockMvc.perform(
 			get("/api/projects/{projectId}/steps", projectId)
-				.contentType(MediaType.APPLICATION_JSON));
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
 		//then
 		result.andExpectAll(
@@ -166,7 +169,8 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 				.summary("프로젝트 단계 조회 API")
 				.description("프로젝트 단계를 조회한다")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.steps[].projectStepId").type(JsonFieldType.STRING)

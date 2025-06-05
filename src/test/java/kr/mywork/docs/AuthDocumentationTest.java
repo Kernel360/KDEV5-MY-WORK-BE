@@ -75,8 +75,10 @@ public class AuthDocumentationTest extends RestDocsDocumentation {
 							fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 							fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
 							fieldWithPath("data.expiresAt").type(JsonFieldType.STRING).description("액세스 토큰 만료 시각"),
-							fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보")
-						)
+							fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("사용자 아이디"),
+							fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("사용자 이름"),
+							fieldWithPath("data.memberRole").type(JsonFieldType.STRING).description("사용자 역할"),
+							fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 						.build()
 				)
 			));
