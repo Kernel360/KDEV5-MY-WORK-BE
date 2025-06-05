@@ -11,10 +11,12 @@ import jakarta.persistence.Id;
 
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class ProjectMember {
 
 	@Id
@@ -24,6 +26,7 @@ public class ProjectMember {
 	@Column(name = "project_id", nullable = false, columnDefinition = "BINARY(16)")
 	private UUID projectId;
 
+	@Getter
 	@Column(name = "member_id", nullable = false, columnDefinition = "BINARY(16)")
 	private UUID memberId;
 
@@ -36,4 +39,13 @@ public class ProjectMember {
 	@Column(name = "created_at", nullable = false, columnDefinition = "timestamp")
 	@CreationTimestamp
 	private LocalDateTime createdAt;
+
+
+	public ProjectMember(UUID projectId, UUID memberId) {
+		this.projectId = projectId;
+		this.memberId = memberId;
+		this.manager = false;
+		this.deleted = false;
+		this.createdAt = LocalDateTime.now();
+	}
 }
