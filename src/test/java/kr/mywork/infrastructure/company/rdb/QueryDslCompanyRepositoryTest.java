@@ -12,7 +12,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 
 import kr.mywork.base.annotations.RdbRepositoryTest;
@@ -30,7 +29,6 @@ class QueryDslCompanyRepositoryTest {
 	@Test
 	@DisplayName("기본 회사 목록 조회 성공")
 	@Sql("classpath:sql/company-list.sql")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 기본_회사_목록_조회_성공() {
 		// given
 		int companyPageSize = 10;
@@ -50,7 +48,6 @@ class QueryDslCompanyRepositoryTest {
 	@Test
 	@DisplayName("회사 활성화 목록 조회 성공")
 	@Sql("classpath:sql/company-list.sql")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_활성화_목록_조회_성공() {
 		// given
 		String companyType = "DEV";
@@ -73,7 +70,6 @@ class QueryDslCompanyRepositoryTest {
 	@Test
 	@DisplayName("회사 검색어 목록 조회 성공 - 키워드 앞부분 일치")
 	@Sql("classpath:sql/company-list.sql")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_검색어_목록_조회_성공() {
 		// given
 		String companyType = "DEV";
@@ -94,7 +90,6 @@ class QueryDslCompanyRepositoryTest {
 	@ParameterizedTest
 	@MethodSource("companyListMethodSource")
 	@Sql("classpath:sql/company-list.sql")
-	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_검색어_목록_갯수_조회_성공(final String companyType, final String keyword, final Boolean deleted, final Long expected) {
 		// given, when
 		final Long totalCount = companyRepository.countTotalCompaniesByCondition(companyType, keyword, deleted);
