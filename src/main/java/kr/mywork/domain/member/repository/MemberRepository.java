@@ -18,4 +18,6 @@ public interface MemberRepository {
 	boolean existsByEmail(String email);
 
 	Optional<Member> findById(UUID memberId);
+
+	List<Member> findMemberListByCompanyId(UUID companyId, UUID projectId);
 }

@@ -12,6 +12,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
+import kr.mywork.domain.member.service.dto.resquest.MemberCreateRequest;
+import kr.mywork.domain.project.model.QProjectMember;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -59,5 +61,28 @@ public class QueryDslMemberRepository implements MemberRepository {
 	@Override
 	public Optional<Member> findById(UUID memberId) {
 		return memberRepository.findById(memberId);
+	}
+
+	@Override
+	public List<Member> findMemberListByCompanyId(UUID companyId,UUID projectId) {
+		QProjectMember projectMember = QProjectMember.projectMember;
+
+		return queryFactory
+			.selectFrom(member)
+			.where(
+				member.companyId.eq(companyId),
+				member.deleted.eq(false),
+				//서브쿼리 : 프로젝트 멤버 테이블에  없는 유저
+				queryFactory
+					.selectOne()
+					.from(projectMember)
+					.where(
+						projectMember.projectId.eq(projectId),
+						projectMember.memberId.eq(member.id),
+						projectMember.deleted.eq(false)
+					)
+					.notExists()
+			)
+			.fetch();
 	}
 }
