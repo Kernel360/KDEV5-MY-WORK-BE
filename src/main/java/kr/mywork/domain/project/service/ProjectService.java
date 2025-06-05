@@ -2,19 +2,23 @@ package kr.mywork.domain.project.service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.mywork.domain.member.model.Member;
+import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
+import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
+import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
-import kr.mywork.domain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,6 +29,7 @@ public class ProjectService {
 	private int projectPageSize;
 
 	private final ProjectRepository projectRepository;
+	private final MemberRepository memberRepository;
 
 	@Transactional
 	public UUID createProject(ProjectCreateRequest request) {
@@ -80,5 +85,17 @@ public class ProjectService {
 		final Boolean deleted
 	) {
 		return projectRepository.countTotalProjectsByCondition(memberId, nameKeyword, deleted);
+	}
+
+	@Transactional
+	public List<ProjectMemberResponse> findMemberByCompanyId(UUID companyId ,UUID projectId) {
+
+		List<Member> companyMembers = memberRepository.findMemberListByCompanyId(companyId,projectId);
+
+		return companyMembers.stream()
+			.map(member -> new ProjectMemberResponse(
+				member.getId(),
+				member.getName()
+			)).collect(Collectors.toList());
 	}
 }
