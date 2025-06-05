@@ -76,4 +76,12 @@ public class PostService {
 	public Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted) {
 		return postRepository.countTotalPostsByCondition(projectStepId, keyword, deleted);
 	}
+
+  public UUID deletePost(UUID postId) {
+		Post post = postRepository.findById(postId)
+			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
+
+		post.softDelete();
+		return post.getId();
+	}
 }

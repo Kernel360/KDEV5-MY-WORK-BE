@@ -19,8 +19,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+
+import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -35,7 +40,9 @@ import kr.mywork.interfaces.project_step.dto.request.ProjectStepUpdateWebRequest
 import kr.mywork.interfaces.project_step.dto.request.ProjectStepsCreateWebRequest;
 import kr.mywork.interfaces.project_step.dto.request.ProjectStepsUpdateWebRequest;
 
-@WebMvcTest(ProjectStepController.class)
+@WebMvcTest(value = ProjectStepController.class,
+	excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebSecurityConfigurer.class)}, //security 설정을 종료하기 위한 설정
+	excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class ProjectStepControllerTest {
 
 	@Autowired
@@ -49,6 +56,7 @@ class ProjectStepControllerTest {
 
 	@Test
 	@DisplayName("프로젝트 단계 목록 생성 성공")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 프로젝트_단계_목록_생성_성공() throws Exception {
 		// given
 		when(projectStepService.saveAll(any(), any())).thenReturn(7);
@@ -82,6 +90,7 @@ class ProjectStepControllerTest {
 	@ParameterizedTest
 	@MethodSource("projectStepFailMethodSource")
 	@DisplayName("프로젝트 단계 목록 유효하지 않은 입력값 실패")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 프로젝트_단계_목록_유효하지_않은_입력값_실패(
 		final UUID projectId, final List<ProjectStepCreateWebRequest> projectStepCreateWebRequests) throws Exception {
 		// given
@@ -126,6 +135,7 @@ class ProjectStepControllerTest {
 	@ParameterizedTest
 	@MethodSource("projectStepUpdateFileMethodSource")
 	@DisplayName("프로젝트 단계 수정 유효하지 않은 입력값 실패")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 프로젝트_단계_수정_유효하지_않은_입력값_실패(
 		final UUID projectId, final List<ProjectStepUpdateWebRequest> projectStepUpdateWebRequests) throws Exception {
 		// given

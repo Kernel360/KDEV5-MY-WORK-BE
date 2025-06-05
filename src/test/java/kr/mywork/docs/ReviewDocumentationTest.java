@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
-
+import org.springframework.test.context.jdbc.Sql;
 import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
@@ -30,8 +30,11 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("리뷰 생성 테스트 성공")
+	// @Sql("classpath:sql/member-test-users.sql")
 	void 리뷰_생성_테스트_성공() throws Exception {
 		// given
+		final String accessToken = createUserAccessToken();
+
 		final UUID postId = UUID.fromString("01972f9b-232a-7dbe-aad2-3bffc0b78ced");
 
 		final ReviewCreateWebRequest reviewCreateWebRequest = new ReviewCreateWebRequest(
@@ -42,6 +45,7 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 		// when
 		final ResultActions result = mockMvc.perform(post("/api/reviews")
 			.contentType(MediaType.APPLICATION_JSON)
+			.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 			.content(requestBody));
 
 		// then
@@ -60,7 +64,8 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 				.summary("리뷰 생성 API")
 				.description("리뷰를 생성한다")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.reviewId").type(JsonFieldType.STRING).description("생성된 리뷰 아이디"),
@@ -77,7 +82,8 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 	@Sql("classpath:sql/review-modify.sql")
 	void 리뷰_수정_테스트_성공() throws Exception {
 		// given
-		final UUID memberId = UUID.fromString("01973844-b287-73d0-8f9d-f86fad4ac4c3"); // TODO 인증 로직 추가 시 변경
+		final String accessToken = createUserAccessToken();
+
 		final UUID reviewId = UUID.fromString("0197385a-eda5-7e17-a3ce-4252908f8d1f");
 
 		final ReviewModifyWebRequest reviewModifyWebRequest = new ReviewModifyWebRequest("코멘트01_수정");
@@ -87,6 +93,7 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 		// when
 		final ResultActions result = mockMvc.perform(put("/api/reviews/{reviewId}", reviewId)
 			.contentType(MediaType.APPLICATION_JSON)
+			.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 			.content(requestBody));
 
 		// then
@@ -105,7 +112,8 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 				.summary("리뷰 수정 API")
 				.description("리뷰를 수정한다")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.reviewId").type(JsonFieldType.STRING).description("수정된 리뷰 아이디"),

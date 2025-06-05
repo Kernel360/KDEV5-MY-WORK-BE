@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -29,15 +30,21 @@ import com.fasterxml.uuid.Generators;
 import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
+import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
 
 public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("회사 아이디 생성 테스트 성공")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_아이디_생성_테스트_성공() throws Exception {
-		// given, when
+		// given
+		final String accessToken = createSystemAccessToken();
+
+		// when
 		final ResultActions result = mockMvc.perform(
 			post("/api/company/id/generate")
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.contentType(MediaType.APPLICATION_JSON));
 
 		// then
@@ -56,7 +63,8 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.summary("회사 아이디 API")
 				.description("회사 아이디를 발급 받는다")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("발급받은 회사 생성 아이디"),
@@ -66,10 +74,13 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	}
 
 	@Test
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	@DisplayName("회사 생성 성공")
 	@Sql("classpath:sql/company-id.sql")
 	void 회사_생성_성공() throws Exception {
 		// given
+		final String accessToken = createSystemAccessToken();
+
 		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
 
 		final CompanyCreateWebRequest companyCreateWebRequest =
@@ -82,6 +93,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		final ResultActions result = mockMvc.perform(
 			post("/api/company") // HTTP method (URL)
 				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody));
 
 		// then
@@ -100,7 +112,9 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.summary("회사 생성 API")
 				.description("발급받은 회사 아이디를 통해 회사를 생성한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰")
+				)
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("생성한 회사 아이디"),
@@ -111,6 +125,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("회사 생성 실패 - 아이디가 존재하지 않는 경우")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_생성_실패_아이디_미존재() throws Exception {
 		// given
 		UUID companyId = Generators.timeBasedEpochGenerator().generate(); // UUID ver7
@@ -157,19 +172,22 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 정보 업데이트 성공")
 	@Sql("classpath:sql/company-for-update.sql")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_정보_업데이트_성공() throws Exception {
 		//given
+		final String accessToken = createSystemAccessToken();
 		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
-		final CompanyCreateWebRequest companyCreateWebRequest = new CompanyCreateWebRequest(id, "현대", "바뀐회사설명",
+		final CompanyUpdateWebRequest companyUpdateWebRequest = new CompanyUpdateWebRequest(id, "현대", "바뀐회사설명",
 			"010234034", "부산", "DEV", "010-9999-9999", "suha730@naver.com", "/image/url");
 
-		final String requestBody = objectMapper.writeValueAsString(companyCreateWebRequest);
+		final String requestBody = objectMapper.writeValueAsString(companyUpdateWebRequest);
 
 		//when
 		final ResultActions result = mockMvc.perform(
 			put("/api/company")
 				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody)
 		);
 
@@ -190,7 +208,9 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.summary("회사 업데이트 API")
 				.description("새로운 회사 정보로 업데이트한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰")
+				)
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("업데이트된 회사 아이디"),  // 수정
@@ -202,8 +222,11 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 정보 업데이트 실패 - 잘못되 요청값(존재하지 않는 회사 타입 요청)")
 	@Sql("classpath:sql/company-for-update.sql")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_정보_업데이트_실패() throws Exception {
 		//given
+		final String accessToken = createSystemAccessToken();
+
 		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
 		final CompanyCreateWebRequest companyCreateWebRequest = new CompanyCreateWebRequest(id, "삼성",
@@ -216,6 +239,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		final ResultActions result = mockMvc.perform(
 			put("/api/company")
 				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody)
 		);
 
@@ -235,7 +259,8 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.summary("회사 업데이트 API")
 				.description("새로운 회사 정보로 업데이트한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터"),
@@ -249,7 +274,10 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 삭제 성공")
 	@Sql("classpath:sql/company-delete.sql")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_삭제_성공() throws Exception {
+		final String accessToken = createSystemAccessToken();
+
 		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // company-id.sql과 동일한 값
 		CompanyDeleteWebRequest deleteReq = new CompanyDeleteWebRequest(companyId);
 
@@ -260,6 +288,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		ResultActions result = mockMvc.perform(
 			delete("/api/company", companyId)
 				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody)
 		);
 
@@ -279,7 +308,8 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.summary("회사 삭제 API")
 				.description("발급받은 회사 아이디를 통해 회사를 삭제한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("삭제한 회사 아이디"),
@@ -289,15 +319,18 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	}
 
 	@Test
-	@DisplayName("회사 상세조회 성공")
+	@DisplayName("회사 상세 조회 성공")
 	@Sql("classpath:sql/company-detail.sql")
-	void 회사_상세조회_성공() throws Exception {
+	void 회사_상세_조회_성공() throws Exception {
 		// given
+		final String accessToken = createSystemAccessToken();
+
 		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // company-id.sql과 동일한 값
 
 		// When
 		ResultActions result = mockMvc.perform(get("/api/company/{companyId}", companyId)
 			.contentType(MediaType.APPLICATION_JSON)
+			.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 			.accept(MediaType.APPLICATION_JSON));
 
 		// Then
@@ -316,7 +349,8 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.summary("회사 상세조회 API")
 				.description("회사 상세정보를 조회한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("회사 ID"),
@@ -336,14 +370,17 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 목록 기본 조회 성공")
 	@Sql("classpath:sql/company-list.sql")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_목록_기본_조회_성공() throws Exception {
 		// given
+		final String accessToken = createSystemAccessToken();
 
 		// when
 		final ResultActions result = mockMvc.perform(
 			get("/api/company?page={page}&type={type}&keyword={keyword}&deleted={deleted}",
 				1, "DEV", null, null)
-				.contentType(MediaType.APPLICATION_JSON));
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
 		// then
 		result.andExpectAll(
@@ -361,7 +398,8 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.summary("회사 목록 조회 API")
 				.description("회사 목록을 조회한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.queryParameters(
 					parameterWithName("page").description("페이지 번호"),
 					parameterWithName("type").description("회사 타입(DEV/CLIENT)"),
