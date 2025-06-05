@@ -212,6 +212,8 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 	@Sql("classpath:sql/member-update.sql")
 	void 멤버_정보_업데이트_성공() throws Exception {
 		//given
+		final String accessToken = createDevAdminAccessToken();
+
 		UUID memberId = UUID.fromString("6516f3fe-057b-efdc-9aa9-87bf7b33a1d0");
 		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 		LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");
@@ -223,7 +225,10 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 		//when
 		final ResultActions result = mockMvc.perform(
-			put("/api/member").contentType(MediaType.APPLICATION_JSON).content(requestBody));
+			put("/api/member")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(requestBody));
 		//then
 		result.andExpectAll(status().isOk(), jsonPath("$.result").value(ResultType.SUCCESS.name()),
 				jsonPath("$.data").exists(), jsonPath("$.error").doesNotExist())
@@ -247,13 +252,16 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 	@Sql("classpath:sql/member-search.sql")
 	void 멤버_조회_성공() throws Exception {
 		//given
+		final String accessToken = createDevAdminAccessToken();
+
 		//when
 		final ResultActions result = mockMvc.perform(
 			get("/api/member")
 				.param("page","1")
 				.param("keyword","기획팀")
 				.param("keywordType","DEPARTMENT")
-				.contentType(MediaType.APPLICATION_JSON));
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 		//then
 		result.andExpectAll(status().isOk(), jsonPath("$.result").value(ResultType.SUCCESS.name()),
 				jsonPath("$.data").exists(), jsonPath("$.error").doesNotExist())
