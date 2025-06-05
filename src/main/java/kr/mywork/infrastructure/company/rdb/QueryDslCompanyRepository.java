@@ -14,6 +14,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.mywork.domain.company.model.Company;
+import kr.mywork.domain.company.model.CompanyType;
 import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
@@ -35,6 +36,10 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 	@Override
 	public Optional<Company> findById(UUID companyId) {
 		return companyRepository.findById(companyId);
+	}
+
+	public Optional<Company> findByIdAndType(UUID companyId, CompanyType type) {
+		return companyRepository.findByIdAndType(companyId, type);
 	}
 
 	@Override
