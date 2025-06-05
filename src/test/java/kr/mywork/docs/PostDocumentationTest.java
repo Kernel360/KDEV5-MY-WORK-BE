@@ -108,8 +108,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 				.description("발급받은 게시글 아이디를 통해 게시글를 생성한다.")
 				.requestHeaders(
 					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
-					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰")
-					)
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.postId").type(JsonFieldType.STRING).description("생성한 게시글 아이디"),
@@ -218,59 +217,67 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 		);
 	}
 
-   @Test
-    @DisplayName("게시글 단건 조회 성공")
-    @Sql("classpath:sql/post-for-get.sql")
-    void 게시글_단건_조회_성공() throws Exception {
-        // given
-        UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
+	@Test
+	@DisplayName("게시글 단건 조회 성공")
+	@Sql("classpath:sql/post-for-get.sql")
+	void 게시글_단건_조회_성공() throws Exception {
+		// given
+		final String accessToken = createUserAccessToken();
 
-        // when
-        final ResultActions result = mockMvc.perform(
-            get("/api/posts/{postId}", postId) // HTTP method (URL)
-                .contentType(MediaType.APPLICATION_JSON));
+		UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
 
-        // then
-        result.andExpectAll(
-                status().isOk(),
-                jsonPath("$.result").value(ResultType.SUCCESS.name()),
-                jsonPath("$.data").exists(),
-                jsonPath("$.error").doesNotExist())
-            .andDo(document("post-get-success", postGetSuccessResource()));
-    }
+		// when
+		final ResultActions result = mockMvc.perform(
+			get("/api/posts/{postId}", postId) // HTTP method (URL)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
-    private ResourceSnippet postGetSuccessResource() {
-        return resource(
-            ResourceSnippetParameters.builder()
-                .tag("Post API")
-                .summary("게시글 단건 조회 API")
-                .description("게시글 ID로 조회를 한다.")
-                .requestHeaders(
-                    headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
-                .responseFields(
-                    fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-                    fieldWithPath("data.postId").type(JsonFieldType.STRING).description("게시글 아이디"),
-                    fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
-                    fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 내용"),
-                    fieldWithPath("data.companyName").type(JsonFieldType.STRING).description("회사 이름"),
-                    fieldWithPath("data.authorName").type(JsonFieldType.STRING).description("작성자"),
-                    fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
-                    fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
-                .build()
-        );
-    }    
-   
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("post-get-success", postGetSuccessResource()));
+	}
+
+	private ResourceSnippet postGetSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Post API")
+				.summary("게시글 단건 조회 API")
+				.description("게시글 ID로 조회를 한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰")
+				)
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.postId").type(JsonFieldType.STRING).description("게시글 아이디"),
+					fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
+					fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 내용"),
+					fieldWithPath("data.companyName").type(JsonFieldType.STRING).description("회사 이름"),
+					fieldWithPath("data.authorName").type(JsonFieldType.STRING).description("작성자"),
+					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
 	@Test
 	@DisplayName("게시글 삭제 성공")
 	@Sql("classpath:sql/post-for-delete.sql")
 	void 게시글_삭제_성공() throws Exception {
 		// given
+		final String accessToken = createUserAccessToken();
+
 		UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
 
 		// when
 		final ResultActions result = mockMvc.perform(
 			delete("/api/posts/{postId}", postId) // HTTP method (URL)
-				.contentType(MediaType.APPLICATION_JSON));
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
 		// then
 		result.andExpectAll(
@@ -288,7 +295,8 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 				.summary("게시글 삭제 API")
 				.description("게시글을 삭제한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.postId").type(JsonFieldType.STRING).description("수정한 게시글 아이디"),
@@ -296,19 +304,22 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 				.build()
 		);
 	}
-        
+
 	@Test
 	@DisplayName("게시글 목록 조회 성공")
 	@Sql("classpath:sql/post-for-get-list.sql")
 	void 게시글_목록_조회_성공() throws Exception {
 		// given
+		final String accessToken = createUserAccessToken();
+
 		UUID projectStepId = UUID.fromString("019739d2-2e80-709f-a9c5-7da758c956d1");
 
 		// when
 		final ResultActions result = mockMvc.perform(
 			get("/api/posts?page={page}&projectStepId={projectStepId}&keyword={keyword}&deleted={deleted}",
 				1, projectStepId, null, null) // HTTP method (URL)
-				.contentType(MediaType.APPLICATION_JSON));
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
 		// then
 		result.andExpectAll(
@@ -326,13 +337,13 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 				.summary("게시글 목록 조회 API")
 				.description("게시글 목록을 검색조건에 따라 조회를 한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.queryParameters(
 					parameterWithName("page").description("페이지 번호"),
 					parameterWithName("projectStepId").description("프로젝트 단계 ID").optional(),
 					parameterWithName("keyword").description("검색어").optional(),
-					parameterWithName("deleted").description("삭제 여부").optional()
-				)
+					parameterWithName("deleted").description("삭제 여부").optional())
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.posts.[].postId").type(JsonFieldType.STRING).description("게시글 아이디"),
