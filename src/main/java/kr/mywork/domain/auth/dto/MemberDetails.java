@@ -14,13 +14,15 @@ import java.util.UUID;
 public class MemberDetails implements UserDetails {
 
     private final UUID id;
+    private final String name;
+
     private final String email;
     private final String password;
     private final GrantedAuthority authority;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(authority); // 하나만 감싸서 전달
+        return List.of(authority);
     }
 
     @Override

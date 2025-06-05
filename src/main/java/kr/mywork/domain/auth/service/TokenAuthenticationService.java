@@ -22,11 +22,14 @@ public class TokenAuthenticationService {
 		UUID memberId = UUID.fromString(claims.get("memberId", String.class));
 		String email = claims.get("email", String.class);
 		String role = claims.get("role", String.class);
+		String name = claims.get("name", String.class);
+
 
 		MemberRole memberRole = MemberRole.of(role);
 
 		return new MemberDetails(
 			memberId,
+			name,
 			email,
 			null,
 			new SimpleGrantedAuthority(memberRole.getRoleName())

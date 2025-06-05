@@ -37,7 +37,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 		final String accessToken = jwtTokenProvider.createAccessToken(
 			memberDetails.getId(),
 			memberDetails.getEmail(),
-			memberDetails.getAuthorityAsStr()
+			memberDetails.getAuthorityAsStr(),
+			memberDetails.getName()
 		);
 
 		final String refreshToken = jwtTokenProvider.createRefreshToken(
@@ -56,7 +57,13 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 		cookie.setMaxAge(maxAge);
 		response.addCookie(cookie);
 
-		TokenWebResponse tokenWebResponse = new TokenWebResponse(accessToken, expiresAt);
+		TokenWebResponse tokenWebResponse = new TokenWebResponse(
+			accessToken,
+			expiresAt,
+			memberDetails.getId(),
+			memberDetails.getName(),
+			memberDetails.getAuthorityAsStr()
+		);
 
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 		response.setStatus(HttpServletResponse.SC_OK);

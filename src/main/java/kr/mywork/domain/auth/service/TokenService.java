@@ -54,11 +54,13 @@ public class TokenService {
 		UUID memberId = UUID.fromString(claims.getSubject());
 		String email = claims.get("email", String.class);
 		String role = claims.get("role", String.class);
+		String name = claims.get("name", String.class);
 
-		String newAccessToken = jwtTokenProvider.createAccessToken(memberId, email, role);
+		String newAccessToken = jwtTokenProvider.createAccessToken(memberId, email, role, name);
 		LocalDateTime expiresAt = jwtTokenProvider.extractExpiration(refreshToken);
 
-		return new TokenResponse(newAccessToken, expiresAt);
+		return new TokenResponse(newAccessToken, expiresAt, memberId, role, name);
+
 	}
 
 	private String resolveRefreshTokenFromCookie(HttpServletRequest request) {

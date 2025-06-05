@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -35,6 +36,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("회사 아이디 생성 테스트 성공")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_아이디_생성_테스트_성공() throws Exception {
 		// given
 		final String accessToken = createSystemAccessToken();
@@ -72,6 +74,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	}
 
 	@Test
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	@DisplayName("회사 생성 성공")
 	@Sql("classpath:sql/company-id.sql")
 	void 회사_생성_성공() throws Exception {
@@ -122,6 +125,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("회사 생성 실패 - 아이디가 존재하지 않는 경우")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_생성_실패_아이디_미존재() throws Exception {
 		// given
 		UUID companyId = Generators.timeBasedEpochGenerator().generate(); // UUID ver7
@@ -168,6 +172,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 정보 업데이트 성공")
 	@Sql("classpath:sql/company-for-update.sql")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_정보_업데이트_성공() throws Exception {
 		//given
 		final String accessToken = createSystemAccessToken();
@@ -217,6 +222,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 정보 업데이트 실패 - 잘못되 요청값(존재하지 않는 회사 타입 요청)")
 	@Sql("classpath:sql/company-for-update.sql")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_정보_업데이트_실패() throws Exception {
 		//given
 		final String accessToken = createSystemAccessToken();
@@ -268,6 +274,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 삭제 성공")
 	@Sql("classpath:sql/company-delete.sql")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_삭제_성공() throws Exception {
 		final String accessToken = createSystemAccessToken();
 
@@ -363,6 +370,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 목록 기본 조회 성공")
 	@Sql("classpath:sql/company-list.sql")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_목록_기본_조회_성공() throws Exception {
 		// given
 		final String accessToken = createSystemAccessToken();

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -33,6 +34,7 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("프로젝트 단계 생성 성공")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 프로젝트_단계_생성_성공() throws Exception {
 		// given
 		// TODO Project 생성 API 개발 후, ProjectId 생성 및 검증 샘플 데이터 추가 필요
@@ -85,6 +87,7 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("프로젝트 단계 수정 성공")
 	@Sql("classpath:sql/project-step-update.sql")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 프로젝트_단계_수정_성공() throws Exception {
 		// given
 		// TODO Project 생성 API 개발 후, ProjectId 생성 및 검증 샘플 데이터 추가 필요

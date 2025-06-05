@@ -54,7 +54,8 @@ public class JwtTokenProvider {
 		return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 	}
 
-	public String createAccessToken(final UUID memberId, final String email, final String role) {
+	public String createAccessToken(final UUID memberId, final String email, final String role, final String name) {
+
 		final Date now = new Date();
 		final Date expiry = new Date(now.getTime() + accessTokenExpirationMillis);
 
@@ -62,6 +63,7 @@ public class JwtTokenProvider {
 		claims.put("memberId", memberId);
 		claims.put("email", email);
 		claims.put("role", role);
+		claims.put("name", name);
 
 		return Jwts.builder()
 			.subject(String.valueOf(memberId))

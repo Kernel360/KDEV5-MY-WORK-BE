@@ -1,5 +1,6 @@
 package kr.mywork.docs;
 
+
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -29,6 +31,7 @@ import com.jayway.jsonpath.JsonPath;
 
 import jakarta.servlet.http.Cookie;
 import kr.mywork.common.api.support.response.ResultType;
+
 
 public class AuthDocumentationTest extends RestDocsDocumentation {
 
