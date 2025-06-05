@@ -8,6 +8,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -35,16 +37,20 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("회사 직원 목록 조회 테스트 성공")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	@Sql("classpath:sql/company-member-get.sql")
 	void 회사직원_조회_테스트_성공() throws Exception {
 		//given
+		final String accessToken = createDevAdminAccessToken();
+
 		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
 		//when
 		final ResultActions result = mockMvc.perform(
 			get("/api/member/company/{companyId}", id)
 				.param("page", "1")
-				.contentType(MediaType.APPLICATION_JSON));
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
 		//then
 		result.andExpectAll(
@@ -62,7 +68,8 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				.summary("회사 직원 조회 API")
 				.description("회사의 직원 목록을 조회한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.total").type(JsonFieldType.NUMBER).description("전체 멤버 수"),
@@ -78,17 +85,20 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("멤버 삭제 테스트 성공")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	@Sql("classpath:sql/member-delete.sql")
 	void 멤버_삭제_테스트_성공() throws Exception {
 		//given
-		UUID memberId = UUID.fromString("6516f3fe-057b-efdc-9aa9-87bf7b33a1d0");
+		final String accessToken = createDevAdminAccessToken();
 
+		final UUID memberId = UUID.fromString("6516f3fe-057b-efdc-9aa9-87bf7b33a1d0");
 		final MemberDeleteWebRequest memberDeleteWebRequest = new MemberDeleteWebRequest(memberId);
 
 		final String requestBody = objectMapper.writeValueAsString(memberDeleteWebRequest);
 
 		//when
 		final ResultActions result = mockMvc.perform(delete("/api/member")
+			.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(requestBody));
 		//then
@@ -107,22 +117,24 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				.summary("멤버 삭제 API")
 				.description("멤버를 소프트 딜리트 한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("삭제된 멤버 아이디"),  // 수정
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))  // 수정
-				.build()
-		);
+				.build());
 	}
 
 	@Test
 	@DisplayName("멤버 생성 성공")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 멤버_생성_성공() throws Exception {
 		//given
-		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
-		LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");
-
+		final String accessToken = createSystemAccessToken();
+		final UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
+		final LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");    
+    
 		final MemberCreateWebRequest memberCreateWebRequest = new MemberCreateWebRequest(companyId, "김두만", "개발", "부장",
 			"USER", "010-4040-5050", "eme@naver.com", birthDate);
 
@@ -132,6 +144,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 		final ResultActions result = mockMvc.perform(
 			post("/api/member")
 				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody));
 
 		//then
@@ -150,7 +163,8 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				.summary("멤버 생성 API")
 				.description("멤버 아이디를 생성한다.")
 				.requestHeaders(
-					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.id").type(JsonFieldType.STRING).description("생성한 멤버 아이디"),
@@ -161,6 +175,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("회사 직원 조회 샐패 (page 검증)")
+	@WithMockUser(roles = "SYSTEM_ADMIN")
 	void 회사_직원_조회_실패_페이징() throws Exception {
 		final UUID id = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e");
 
