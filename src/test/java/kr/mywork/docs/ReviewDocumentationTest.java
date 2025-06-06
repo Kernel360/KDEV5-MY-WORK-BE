@@ -3,6 +3,7 @@ package kr.mywork.docs;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -118,6 +119,45 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.reviewId").type(JsonFieldType.STRING).description("수정된 리뷰 아이디"),
 					fieldWithPath("data.comment").type(JsonFieldType.STRING).description("수정된 리뷰 글"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
+	}
+
+	@Test
+	@DisplayName("리뷰 삭제 테스트 성공")
+	@Sql("classpath:sql/review-delete.sql")
+	void 리뷰_삭제_테스트_성공() throws Exception {
+		// given
+		final String accessToken = createUserAccessToken();
+
+		final UUID memberId = UUID.fromString("01973844-b287-73d0-8f9d-f86fad4ac4c3");
+		final UUID reviewId = UUID.fromString("0197385a-eda5-7e17-a3ce-4252908f8d1f");
+
+		// when
+		final ResultActions result = mockMvc.perform(delete("/api/reviews/{reviewId}", reviewId)
+			.contentType(MediaType.APPLICATION_JSON)
+			.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("review-delete-success", reviewDeleteSuccessResource()));
+	}
+
+	private ResourceSnippet reviewDeleteSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Review API")
+				.summary("리뷰 삭제 API")
+				.description("리뷰를 삭제한다")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.reviewId").type(JsonFieldType.STRING).description("삭제된 리뷰 아이디"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
