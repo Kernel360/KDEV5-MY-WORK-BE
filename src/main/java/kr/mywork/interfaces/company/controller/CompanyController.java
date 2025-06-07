@@ -21,6 +21,7 @@ import kr.mywork.domain.company.service.CompanyService;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import kr.mywork.domain.company.service.dto.response.CompanyDetailResponse;
+import kr.mywork.domain.company.service.dto.response.CompanyListOnlyIdNameResponse;
 import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
@@ -29,6 +30,8 @@ import kr.mywork.interfaces.company.controller.dto.response.CompanyCreateWebResp
 import kr.mywork.interfaces.company.controller.dto.response.CompanyDeleteWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyDetailWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyIdCreateWebResponse;
+import kr.mywork.interfaces.company.controller.dto.response.CompanyListContainIdNameResponse;
+import kr.mywork.interfaces.company.controller.dto.response.CompanyListOnlyIdNameWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyListWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanySelectWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyUpdateWebResponse;
@@ -113,5 +116,16 @@ public class CompanyController {
 			companySelectResponses.stream().map(CompanySelectWebResponse::from).toList();
 
 		return ApiResponse.success(new CompanyListWebResponse(companySelectWebResponses, totalCount));
+	}
+	@GetMapping("/company-list")
+	public ApiResponse<CompanyListOnlyIdNameWebResponse> companyListOnlyIdNameWebResponseApiResponse(){
+		final List<CompanyListOnlyIdNameResponse> companyList = companyService.findByCompanyListOnlyIdName();
+
+		final List<CompanyListContainIdNameResponse> companyListContainIdNameResponse=
+			companyList.stream()
+				.map(CompanyListContainIdNameResponse::from)
+				.toList();
+
+		return ApiResponse.success(new CompanyListOnlyIdNameWebResponse(companyListContainIdNameResponse));
 	}
 }
