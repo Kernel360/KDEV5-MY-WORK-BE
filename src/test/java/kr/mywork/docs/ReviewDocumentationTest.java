@@ -4,6 +4,7 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.docume
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.context.jdbc.Sql;
 import com.epages.restdocs.apispec.ResourceSnippet;
@@ -158,6 +158,55 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.reviewId").type(JsonFieldType.STRING).description("삭제된 리뷰 아이디"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
+	}
+
+	@Test
+	@DisplayName("리뷰 목록 테스트 성공")
+	@Sql("classpath:sql/review-list-paging.sql")
+	void 리뷰_목록_테스트_성공() throws Exception {
+		// given
+		final String accessToken = createUserAccessToken();
+
+		final UUID postId = UUID.fromString("019748f3-9555-7056-8590-70dc155cc6fa");
+
+		// when
+		final ResultActions result = mockMvc.perform(get("/api/posts/{postId}/reviews?page={page}", postId, 1)
+			.contentType(MediaType.APPLICATION_JSON)
+			.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("review-select-success", reviewListSuccessResource()));
+	}
+
+	private ResourceSnippet reviewListSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Review API")
+				.summary("리뷰 목록 API")
+				.description("리뷰 목록을 조회한다")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.reviews.[].reviewId").type(JsonFieldType.STRING).description("리뷰 아이디"),
+					fieldWithPath("data.reviews.[].authorName").type(JsonFieldType.STRING).description("리뷰 작성자"),
+					fieldWithPath("data.reviews.[].comment").type(JsonFieldType.STRING).description("리뷰 코멘트"),
+					fieldWithPath("data.reviews.[].companyName").type(JsonFieldType.STRING).description("리뷰 작성자 회사"),
+					fieldWithPath("data.reviews.[].createdAt").type(JsonFieldType.STRING).description("리뷰 생성일자(yyyy-MM-dd)"),
+					fieldWithPath("data.reviews.[].childReviews").type(JsonFieldType.ARRAY).description("자식 리뷰 목록").optional(),
+					fieldWithPath("data.reviews.[].childReviews.[].reviewId").type(JsonFieldType.STRING).description("자식 리뷰 아이디"),
+					fieldWithPath("data.reviews.[].childReviews.[].authorName").type(JsonFieldType.STRING).description("자식 리뷰 작성자"),
+					fieldWithPath("data.reviews.[].childReviews.[].comment").type(JsonFieldType.STRING).description("자식 리뷰 코멘트"),
+					fieldWithPath("data.reviews.[].childReviews.[].createdAt").type(JsonFieldType.STRING).description("자식 리뷰 생성일자(yyyy-MM-dd)"),
+					fieldWithPath("data.reviews.[].childReviews.[].companyName").type(JsonFieldType.STRING).description("자식 리뷰 회사 이름"),
+					fieldWithPath("data.reviews.[].childReviews.[].childReviews").type(JsonFieldType.NULL).ignored(),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
