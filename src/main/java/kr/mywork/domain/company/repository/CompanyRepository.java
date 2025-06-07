@@ -14,10 +14,10 @@ public interface CompanyRepository {
 
 	Optional<Company> findById(UUID companyId);
 
-	List<CompanySelectResponse> findCompaniesBySearchConditionWithPaging(int page, int companySize, String companyType,
-		String keyword, Boolean deleted);
+	List<CompanySelectResponse> findCompaniesBySearchConditionWithPaging(int page, int companySize,
+		final String companyType, String keywordType, String keyword, Boolean deleted);
 
-	Long countTotalCompaniesByCondition(String companyType, String keyword, Boolean deleted);
+	Long countTotalCompaniesByCondition(String companyType, String keywordType, String keyword, Boolean deleted);
 
 	Optional<Company> findByIdAndType(UUID companyId, CompanyType type);
 }

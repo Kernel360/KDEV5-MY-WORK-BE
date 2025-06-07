@@ -74,14 +74,14 @@ public class CompanyService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<CompanySelectResponse> findCompaniesBySearchConditionWithPaging(final int page, String companyType,
-		String keyword, Boolean deleted) {
-		return companyRepository.findCompaniesBySearchConditionWithPaging(page, companyPageSize, companyType, keyword,
-			deleted);
+	public List<CompanySelectResponse> findCompaniesBySearchConditionWithPaging(final int page,
+		String companyType, String keywordType, String keyword, Boolean deleted) {
+		return companyRepository.findCompaniesBySearchConditionWithPaging(
+			page, companyPageSize, companyType, keywordType, keyword, deleted);
 	}
 
 	@Transactional(readOnly = true)
-	public Long countTotalCompaniesByCondition(String companyType, String keyword, Boolean deleted) {
-		return companyRepository.countTotalCompaniesByCondition(companyType, keyword, deleted);
+	public Long countTotalCompaniesByCondition(String companyType, String keywordType, String keyword, Boolean deleted) {
+		return companyRepository.countTotalCompaniesByCondition(companyType, keywordType, keyword, deleted);
 	}
 }
