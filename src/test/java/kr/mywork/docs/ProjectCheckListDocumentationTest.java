@@ -35,7 +35,7 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 		final UUID projectStepId = UUID.fromString("01991f58-8a6a-7a18-8cfe-1f2bfa6a5e01"); // UUID ver7
 
 		final ProjectCheckListCreateWebRequest projectCheckListCreateWebRequest = new ProjectCheckListCreateWebRequest(
-			"체크리스트 제목", devCompanyId, clientCompanyId, projectStepId, false);
+			"체크리스트 제목", devCompanyId, clientCompanyId, projectStepId, "대기");
 
 		final String requestBody = objectMapper.writeValueAsString(projectCheckListCreateWebRequest);
 
@@ -70,7 +70,47 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.devCompanyId").type(JsonFieldType.STRING).description("개발사 id"),
 					fieldWithPath("data.clientCompanyId").type(JsonFieldType.STRING).description("고객사 id"),
 					fieldWithPath("data.projectStepId").type(JsonFieldType.STRING).description("프로젝트 단계 id"),
-					fieldWithPath("data.approval").type(JsonFieldType.BOOLEAN).description("승인여부"),
+					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("체크리스트 상세 조회 성공")
+	@Sql("classpath:sql/project-check-list-for-get.sql")
+	void 체크리스트_상세_조회_성공() throws Exception {
+		//given
+		final String accessToken = createSystemAccessToken();
+		final UUID checkListId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
+		//when
+		final ResultActions result = mockMvc.perform(
+			get("/api/projects/check-lists/{checkListId}", checkListId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		//then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(MockMvcRestDocumentationWrapper.document("project-check-list-get-success", ProjectCheckListGetSuccessResource()));
+	}
+
+	private ResourceSnippet ProjectCheckListGetSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("ProjectCheckList API")
+				.summary("프로젝트 체크 리스트 상세 조회 API")
+				.description("프로젝트 상세 조회를 한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.title").type(JsonFieldType.STRING).description("체크리스트 제목"),
+					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);

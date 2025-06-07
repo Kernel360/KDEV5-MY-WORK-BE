@@ -1,5 +1,7 @@
 package kr.mywork.domain.project_checklist.service;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -7,10 +9,13 @@ import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.CompanyType;
 import kr.mywork.domain.company.repository.CompanyRepository;
+import kr.mywork.domain.project_checklist.errors.ProjectCheckListErrorType;
+import kr.mywork.domain.project_checklist.errors.ProjectCheckListNotFoundException;
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
 import kr.mywork.domain.project_checklist.repository.ProjectCheckListRepository;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListCreateRequest;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListCreateResponse;
+import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListDetailResponse;
 import kr.mywork.domain.project_step.repository.ProjectStepRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -40,4 +45,11 @@ public class ProjectCheckListService {
 
 	}
 
+	public ProjectCheckListDetailResponse getProjectCheckList(UUID checkListId) {
+		ProjectCheckList projectCheckList = projectCheckListRepository.findById(checkListId)
+			.orElseThrow(
+				() -> new ProjectCheckListNotFoundException(ProjectCheckListErrorType.PROJECT_CHECK_LIST_NOT_FOUND));
+
+		return new ProjectCheckListDetailResponse(projectCheckList);
+	}
 }

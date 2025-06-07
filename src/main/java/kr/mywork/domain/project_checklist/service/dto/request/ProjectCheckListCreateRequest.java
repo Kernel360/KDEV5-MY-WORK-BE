@@ -16,10 +16,10 @@ public class ProjectCheckListCreateRequest {
 
 	private UUID projectStepId;
 
-	private Boolean approval;
+	private String approval;
 
 	public ProjectCheckListCreateRequest(String title, UUID devCompanyId, UUID clientCompanyId, UUID projectStepId,
-		Boolean approval) {
+		String approval) {
 		this.title = title;
 		this.devCompanyId = devCompanyId;
 		this.clientCompanyId = clientCompanyId;

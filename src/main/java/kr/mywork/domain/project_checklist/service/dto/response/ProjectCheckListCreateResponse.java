@@ -4,7 +4,8 @@ import java.util.UUID;
 
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
 
-public record ProjectCheckListCreateResponse(String title, UUID devCompanyId, UUID clientCompanyId, UUID projectStepId, Boolean approval) {
+public record ProjectCheckListCreateResponse(String title, UUID devCompanyId, UUID clientCompanyId, UUID projectStepId,
+											 String approval) {
 
 	public static ProjectCheckListCreateResponse from(ProjectCheckList projectCheckList) {
 		return new ProjectCheckListCreateResponse(projectCheckList.getTitle(), projectCheckList.getDevCompanyId(),
