@@ -100,8 +100,8 @@ public class CompanyController {
 	public ApiResponse<CompanyListWebResponse> findCompaniesByOffset(
 		@RequestParam(name = "page") @Min(value = 1, message = "{invalid.page-size}") final int page,
 		@RequestParam(name = "companyType") @Pattern(regexp = COMPANY_TYPE_REGX, message = "{invalid.company-type}") final String companyType,
-		@RequestParam(name = "keyword", required = false) final String keyword, // TODO 회사 이름, 사업자 번호, 대표 번호, 주소
-		@RequestParam(name = "keywordType") @Pattern(regexp = COMPANY_KEYWORD_TYPE, message = "{invalid.company-search-type}") final String keywordType,
+		@RequestParam(name = "keyword", required = false) final String keyword,
+		@RequestParam(name = "keywordType", required = false) @Pattern(regexp = COMPANY_KEYWORD_TYPE, message = "{invalid.company-search-type}") final String keywordType,
 		@RequestParam(name = "deleted", required = false) final Boolean deleted
 	) {
 		final List<CompanySelectResponse> companySelectResponses =
