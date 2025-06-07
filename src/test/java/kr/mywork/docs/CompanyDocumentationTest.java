@@ -414,4 +414,43 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.build()
 		);
 	}
+	@Test
+	@DisplayName("전체 회사 목록 조회 테스트 성공")
+	@Sql("classpath:sql/all-company-list.sql")
+	void 전체_회사_목록_조회_테스트_성공() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			get("/api/companies/company-list")
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("find-all-company-list-success", findAllCompanyListSuccessResource()));
+	}
+
+	private ResourceSnippet findAllCompanyListSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Company API")
+				.summary("전체 회사 조회 API")
+				.description("전체 회사 목록을 조회한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.companies[].companyId").type(JsonFieldType.STRING).description("회사 아이디"),
+					fieldWithPath("data.companies[].companyName").type(JsonFieldType.STRING).description("회사 이름"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
 }
