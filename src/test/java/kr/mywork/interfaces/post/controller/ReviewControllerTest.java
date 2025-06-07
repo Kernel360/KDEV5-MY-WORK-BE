@@ -3,12 +3,14 @@ package kr.mywork.interfaces.post.controller;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Collections;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -38,7 +40,8 @@ import kr.mywork.interfaces.post.controller.dto.request.ReviewCreateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.ReviewModifyWebRequest;
 
 @WebMvcTest(value = ReviewController.class,
-	excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebSecurityConfigurer.class)}, //security 설정을 종료하기 위한 설정
+	excludeFilters = {
+		@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebSecurityConfigurer.class)}, //security 설정을 종료하기 위한 설정
 	excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class ReviewControllerTest {
 
@@ -171,5 +174,26 @@ class ReviewControllerTest {
 				"111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111")
 			// 길이 200 초과 값
 		);
+	}
+
+	@Test
+	@DisplayName("리뷰 수정 요청 입력 값 실패")
+	void 리뷰_목록_요청_입력_값_실패() throws Exception {
+		// given
+		final UUID postId = UUID.fromString("01973844-b287-73d0-8f9d-f86fad4ac4c3");
+
+		when(reviewService.findAllReviewsWithPaging(any(), any())).thenReturn(Collections.emptyList());
+
+		// when
+		final ResultActions result = mockMvc.perform(get("/api/posts/{postId}/reviews?page={page}", postId, 0)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isBadRequest(),
+				jsonPath("$.result").value(ResultType.ERROR.name()),
+				jsonPath("$.data").doesNotExist(),
+				jsonPath("$.error").exists())
+			.andDo(print());
 	}
 }
