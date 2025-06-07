@@ -17,6 +17,7 @@ import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.model.CompanyType;
 import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
+import kr.mywork.domain.company.service.dto.response.CompanyListOnlyIdNameResponse;
 import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -100,5 +101,17 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 		}
 
 		return company.deleted.eq(deleted);
+	}
+	@Override
+	public List<CompanyListOnlyIdNameResponse> findByCompanyListOnlyIdName() {
+		return queryFactory
+			.select(Projections.constructor(
+				CompanyListOnlyIdNameResponse.class,
+				company.id,
+				company.name
+			))
+			.from(company)
+			.where(company.deleted.isFalse())
+			.fetch();
 	}
 }
