@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListUpdateRequest;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,9 @@ public class ProjectCheckList {
 	@CreationTimestamp
 	private LocalDateTime createdAt;
 
+	@NotNull
+	private Boolean deleted;
+
 	public ProjectCheckList(String title, UUID devCompanyId, UUID clientCompanyId,
 		UUID projectStepId, String approval) {
 		this.title = title;
@@ -49,10 +53,15 @@ public class ProjectCheckList {
 		this.clientCompanyId = clientCompanyId;
 		this.projectStepId = projectStepId;
 		this.approval = approval;
+		this.deleted = false;
 	}
 
 	public void update(ProjectCheckListUpdateRequest projectCheckListUpdateRequest) {
 
 		this.title = projectCheckListUpdateRequest.getTitle();
+	}
+
+	public void softDelete() {
+		this.deleted = true;
 	}
 }
