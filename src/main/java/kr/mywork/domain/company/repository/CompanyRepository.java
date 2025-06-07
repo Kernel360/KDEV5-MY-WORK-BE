@@ -7,6 +7,7 @@ import java.util.UUID;
 import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.model.CompanyType;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
+import kr.mywork.domain.company.service.dto.response.CompanyListOnlyIdNameResponse;
 import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 
 public interface CompanyRepository {
@@ -20,4 +21,6 @@ public interface CompanyRepository {
 	Long countTotalCompaniesByCondition(String companyType, String keywordType, String keyword, Boolean deleted);
 
 	Optional<Company> findByIdAndType(UUID companyId, CompanyType type);
+
+	List<CompanyListOnlyIdNameResponse>findByCompanyListOnlyIdName();
 }
