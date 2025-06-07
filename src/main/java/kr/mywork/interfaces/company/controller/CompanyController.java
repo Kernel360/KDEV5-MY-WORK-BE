@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/company")
+@RequestMapping("/api/companies")
 @Validated
 public class CompanyController {
 

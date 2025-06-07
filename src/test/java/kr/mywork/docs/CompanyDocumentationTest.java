@@ -41,7 +41,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			post("/api/company/id/generate")
+			post("/api/companies/id/generate")
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.contentType(MediaType.APPLICATION_JSON));
 
@@ -88,7 +88,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			post("/api/company") // HTTP method (URL)
+			post("/api/companies") // HTTP method (URL)
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody));
@@ -134,7 +134,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			post("/api/company") // HTTP method (URL)
+			post("/api/companies")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody));
 
@@ -180,7 +180,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		//when
 		final ResultActions result = mockMvc.perform(
-			put("/api/company")
+			put("/api/companies")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody)
@@ -231,7 +231,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		//when
 		final ResultActions result = mockMvc.perform(
-			put("/api/company")
+			put("/api/companies")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody)
@@ -279,7 +279,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// When
 		ResultActions result = mockMvc.perform(
-			delete("/api/company", companyId)
+			delete("/api/companies", companyId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody)
@@ -321,7 +321,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // company-id.sql과 동일한 값
 
 		// When
-		ResultActions result = mockMvc.perform(get("/api/company/{companyId}", companyId)
+		ResultActions result = mockMvc.perform(get("/api/companies/{companyId}", companyId)
 			.contentType(MediaType.APPLICATION_JSON)
 			.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 			.accept(MediaType.APPLICATION_JSON));
@@ -369,7 +369,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			get("/api/company?page={page}&companyType={type}&keyword={keyword}&keywordType={keywordType}&deleted={deleted}",
+			get("/api/companies?page={page}&companyType={type}&keyword={keyword}&keywordType={keywordType}&deleted={deleted}",
 				1, "DEV", null, "NAME", null)
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
