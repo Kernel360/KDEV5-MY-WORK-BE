@@ -21,6 +21,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
 import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.project_checklist.controller.dto.request.ProjectCheckListCreateWebRequest;
+import kr.mywork.interfaces.project_checklist.controller.dto.request.ProjectCheckListUpdateWebRequest;
 
 public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 
@@ -52,7 +53,8 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 				jsonPath("$.result").value(ResultType.SUCCESS.name()),
 				jsonPath("$.data").exists(),
 				jsonPath("$.error").doesNotExist())
-			.andDo(MockMvcRestDocumentationWrapper.document("project-check-list-create-success", ProjectCheckListCreateSuccessResource()));
+			.andDo(MockMvcRestDocumentationWrapper.document("project-check-list-create-success",
+				ProjectCheckListCreateSuccessResource()));
 	}
 
 	private ResourceSnippet ProjectCheckListCreateSuccessResource() {
@@ -95,7 +97,8 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 				jsonPath("$.result").value(ResultType.SUCCESS.name()),
 				jsonPath("$.data").exists(),
 				jsonPath("$.error").doesNotExist())
-			.andDo(MockMvcRestDocumentationWrapper.document("project-check-list-get-success", ProjectCheckListGetSuccessResource()));
+			.andDo(MockMvcRestDocumentationWrapper.document("project-check-list-get-success",
+				ProjectCheckListGetSuccessResource()));
 	}
 
 	private ResourceSnippet ProjectCheckListGetSuccessResource() {
@@ -110,6 +113,56 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.title").type(JsonFieldType.STRING).description("체크리스트 제목"),
+					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("체크리스트 수정 성공")
+	@Sql("classpath:sql/project-check-list-for-update.sql")
+	void 체크리스트_수정_성공() throws Exception {
+		//given
+		final String accessToken = createSystemAccessToken();
+		final UUID checkListId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
+
+		final ProjectCheckListUpdateWebRequest projectCheckListUpdateWebRequest = new ProjectCheckListUpdateWebRequest(
+			checkListId, "체크리스트 제목");
+
+		final String requestBody = objectMapper.writeValueAsString(projectCheckListUpdateWebRequest);
+
+		//when
+		final ResultActions result = mockMvc.perform(
+			put("/api/projects/check-lists")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(requestBody));
+
+		//then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(MockMvcRestDocumentationWrapper.document("project-check-list-update-success",
+				ProjectCheckListUpdateSuccessResource()));
+	}
+
+	private ResourceSnippet ProjectCheckListUpdateSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("ProjectCheckList API")
+				.summary("프로젝트 체크 리스트 수정 API")
+				.description("프로젝트 체크 리스트를 수정한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("체크리스트 id"),
+					fieldWithPath("data.title").type(JsonFieldType.STRING).description("체크리스트 제목"),
+					fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일자"),
 					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
