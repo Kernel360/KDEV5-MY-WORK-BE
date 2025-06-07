@@ -18,7 +18,7 @@ public class ProjectCheckListCreateWebResponse {
 
 	private UUID projectStepId;
 
-	private Boolean approval;
+	private String approval;
 
 	public ProjectCheckListCreateWebResponse(ProjectCheckListCreateResponse projectCheckListCreateResponse) {
 		this.title = projectCheckListCreateResponse.title();

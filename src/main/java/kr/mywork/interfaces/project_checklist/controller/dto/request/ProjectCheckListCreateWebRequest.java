@@ -27,7 +27,7 @@ public class ProjectCheckListCreateWebRequest {
 	private UUID projectStepId;
 
 	@NotNull
-	private Boolean approval;
+	private String approval;
 
 	public ProjectCheckListCreateRequest toServiceDto() {
 		return new ProjectCheckListCreateRequest(this.title, this.devCompanyId, this.clientCompanyId,
