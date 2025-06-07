@@ -1,5 +1,12 @@
 package kr.mywork.domain.post.service;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -7,6 +14,7 @@ import kr.mywork.domain.post.errors.review.ReviewErrorType;
 import kr.mywork.domain.post.errors.review.ReviewNotFoundException;
 import kr.mywork.domain.post.model.Review;
 import kr.mywork.domain.post.repository.ReviewRepository;
+import kr.mywork.domain.post.service.dto.ReviewSelectResponse;
 import kr.mywork.domain.post.service.dto.request.ReviewCreateRequest;
 import kr.mywork.domain.post.service.dto.request.ReviewDeleteRequest;
 import kr.mywork.domain.post.service.dto.request.ReviewModifyRequest;
@@ -19,6 +27,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class ReviewService {
+
+	@Value("${review.page.size}")
+	private int reviewPageSize;
 
 	private final ReviewRepository reviewRepository;
 
@@ -51,5 +62,26 @@ public class ReviewService {
 		review.delete();
 
 		return new ReviewDeleteResponse(review.getId());
+	}
+
+	public List<ReviewSelectResponse> findAllReviewsWithPaging(final UUID postId, final Integer pageNumber) {
+		final List<ReviewSelectResponse> parentReviews = reviewRepository.findParentReviewsWithPaging(postId,
+			pageNumber,
+			reviewPageSize);
+
+		final List<UUID> parentIds = parentReviews.stream().map(ReviewSelectResponse::getReviewId).toList();
+
+		final Map<UUID, List<ReviewSelectResponse>> childReviewsMap = reviewRepository.findByIds(postId, parentIds)
+			.stream().collect(Collectors.groupingBy(ReviewSelectResponse::getParentId));
+
+		childReviewsMap.values()
+			.forEach(childReviews -> childReviews.sort(
+				Comparator.comparing(ReviewSelectResponse::getCreatedAt, Comparator.reverseOrder())));
+
+		for (ReviewSelectResponse parentReview : parentReviews) {
+			parentReview.setChildReviewSelectResponses(childReviewsMap.get(parentReview.getReviewId()));
+		}
+
+		return parentReviews;
 	}
 }
