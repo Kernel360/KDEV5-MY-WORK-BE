@@ -395,7 +395,8 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.queryParameters(
 					parameterWithName("page").description("페이지 번호"),
 					parameterWithName("companyType").description("회사 타입(DEV/CLIENT)"),
-					parameterWithName("keywordType").description("키워드 타입(NAME|BUSINESS_NUMBER|PHONE_NUMBER|ADDRESS)"),
+					parameterWithName("keywordType").description("키워드 타입(NAME|BUSINESS_NUMBER|PHONE_NUMBER|ADDRESS)")
+						.optional(),
 					parameterWithName("keyword").description("검색어").optional(),
 					parameterWithName("deleted").description("삭제 여부").optional()
 				)
