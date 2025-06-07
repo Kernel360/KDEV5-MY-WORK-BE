@@ -38,8 +38,8 @@ class QueryDslCompanyRepositoryTest {
 
 		// when
 		final List<CompanySelectResponse> companies =
-			companyRepository.findCompaniesBySearchConditionWithPaging(1, companyPageSize, companyType, keyword,
-				deleted);
+			companyRepository.findCompaniesBySearchConditionWithPaging(1, companyPageSize, companyType, companyType,
+				keyword, deleted);
 
 		// then
 		assertThat(companies).hasSize(10);
@@ -57,8 +57,8 @@ class QueryDslCompanyRepositoryTest {
 
 		// when
 		final List<CompanySelectResponse> companies =
-			companyRepository.findCompaniesBySearchConditionWithPaging(1, companyPageSize, companyType, keyword,
-				deleted);
+			companyRepository.findCompaniesBySearchConditionWithPaging(1, companyPageSize, companyType, companyType,
+				keyword, deleted);
 
 		// then
 		assertSoftly(softly -> {
@@ -68,19 +68,20 @@ class QueryDslCompanyRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("회사 검색어 목록 조회 성공 - 키워드 앞부분 일치")
+	@DisplayName("회사 검색어 목록 조회 성공 - 키워드 포함")
 	@Sql("classpath:sql/company-list.sql")
 	void 회사_검색어_목록_조회_성공() {
 		// given
 		String companyType = "DEV";
 		String keyword = "Company1";
+		final String keywordType = "NAME";
 		Boolean deleted = null;
 		int companyPageSize = 10;
 
 		// when
 		final List<CompanySelectResponse> companies =
-			companyRepository.findCompaniesBySearchConditionWithPaging(1, companyPageSize, companyType, keyword,
-				deleted);
+			companyRepository.findCompaniesBySearchConditionWithPaging(1, companyPageSize, companyType, keywordType,
+				keyword, deleted);
 
 		// then
 		assertThat(companies).hasSize(6);
@@ -90,9 +91,12 @@ class QueryDslCompanyRepositoryTest {
 	@ParameterizedTest
 	@MethodSource("companyListMethodSource")
 	@Sql("classpath:sql/company-list.sql")
-	void 회사_검색어_목록_갯수_조회_성공(final String companyType, final String keyword, final Boolean deleted, final Long expected) {
+	void 회사_검색어_목록_갯수_조회_성공(final String companyType, final String keywordType, final String keyword,
+		final Boolean deleted, final Long expected) {
+
 		// given, when
-		final Long totalCount = companyRepository.countTotalCompaniesByCondition(companyType, keyword, deleted);
+		final Long totalCount = companyRepository.countTotalCompaniesByCondition(companyType, keywordType, keyword,
+			deleted);
 
 		// then
 		assertThat(totalCount).isEqualTo(expected);
@@ -100,10 +104,10 @@ class QueryDslCompanyRepositoryTest {
 
 	private static Stream<Arguments> companyListMethodSource() {
 		return Stream.of(
-			Arguments.of("DEV", "Company1", null, 6L),
-			Arguments.of("DEV", null, true, 15L),
-			Arguments.of("CLIENT", null, true, 0L),
-			Arguments.of("DEV", null, null, 15L)
+			Arguments.of("DEV", "NAME", "Company1", null, 6L),
+			Arguments.of("DEV", null, null, true, 15L),
+			Arguments.of("CLIENT", null, null, true, 0L),
+			Arguments.of("DEV", null, null, null, 15L)
 		);
 	}
 }
