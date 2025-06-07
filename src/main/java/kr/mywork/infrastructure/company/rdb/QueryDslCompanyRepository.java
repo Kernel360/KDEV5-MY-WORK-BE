@@ -44,7 +44,7 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 
 	@Override
 	public List<CompanySelectResponse> findCompaniesBySearchConditionWithPaging(final int page, final int companyPageSize,
-		final String companyType, String keyword, Boolean deleted) {
+		final String companyType, final String keywordType, String keyword, Boolean deleted) {
 
 		final int offset = (page - 1) * companyPageSize;
 
@@ -59,20 +59,38 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 			.where(
 				company.type.stringValue().eq(companyType),
 				eqDeleted(deleted),
-				eqKeyword(keyword))
+				containsKeyword(keywordType, keyword))
 			.offset(offset)
 			.limit(companyPageSize)
 			.fetch();
 	}
 
+	private BooleanExpression containsKeyword(final String searchType, final String keyword) {
+		if (searchType == null) {
+			return null;
+		}
+
+		if (keyword == null || keyword.isEmpty()) {
+			return null;
+		}
+
+		return switch (searchType) {
+			case "NAME" -> company.name.containsIgnoreCase(keyword);
+			case "BUSINESS_NUMBER" -> company.businessNumber.containsIgnoreCase(keyword);
+			case "PHONE_NUMBER" -> company.contactPhoneNumber.containsIgnoreCase(keyword);
+			case "ADDRESS" -> company.address.containsIgnoreCase(keyword);
+			default -> null;
+		};
+	}
+
 	@Override
-	public Long countTotalCompaniesByCondition(final String companyType, final String keyword, final Boolean deleted) {
+	public Long countTotalCompaniesByCondition(final String companyType, String keywordType, final String keyword, final Boolean deleted) {
 		return queryFactory.select(company.id.count())
 			.from(company)
 			.where(
 				company.type.stringValue().eq(companyType),
 				eqDeleted(deleted),
-				eqKeyword(keyword))
+				containsKeyword(keywordType, keyword))
 			.fetchOne();
 	}
 
@@ -82,13 +100,5 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 		}
 
 		return company.deleted.eq(deleted);
-	}
-
-	private BooleanExpression eqKeyword(String keyword) {
-		if (keyword == null) {
-			return null;
-		}
-
-		return company.name.like(keyword + "%");
 	}
 }
