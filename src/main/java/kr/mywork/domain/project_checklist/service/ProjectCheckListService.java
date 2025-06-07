@@ -3,8 +3,8 @@ package kr.mywork.domain.project_checklist.service;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
+
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.CompanyType;
@@ -14,8 +14,10 @@ import kr.mywork.domain.project_checklist.errors.ProjectCheckListNotFoundExcepti
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
 import kr.mywork.domain.project_checklist.repository.ProjectCheckListRepository;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListCreateRequest;
+import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListUpdateRequest;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListCreateResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListDetailResponse;
+import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListUpdateResponse;
 import kr.mywork.domain.project_step.repository.ProjectStepRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -52,5 +54,16 @@ public class ProjectCheckListService {
 				() -> new ProjectCheckListNotFoundException(ProjectCheckListErrorType.PROJECT_CHECK_LIST_NOT_FOUND));
 
 		return new ProjectCheckListDetailResponse(projectCheckList);
+	}
+
+	@Transactional
+	public ProjectCheckListUpdateResponse updateProjectCheckList(
+		ProjectCheckListUpdateRequest projectCheckListUpdateRequest) {
+		ProjectCheckList projectCheckList = projectCheckListRepository.findById(projectCheckListUpdateRequest.getId())
+			.orElseThrow(
+				() -> new ProjectCheckListNotFoundException(ProjectCheckListErrorType.PROJECT_CHECK_LIST_NOT_FOUND));
+
+		projectCheckList.update(projectCheckListUpdateRequest);
+		return ProjectCheckListUpdateResponse.from(projectCheckList);
 	}
 }

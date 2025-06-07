@@ -9,6 +9,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
+import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListUpdateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,5 +49,10 @@ public class ProjectCheckList {
 		this.clientCompanyId = clientCompanyId;
 		this.projectStepId = projectStepId;
 		this.approval = approval;
+	}
+
+	public void update(ProjectCheckListUpdateRequest projectCheckListUpdateRequest) {
+
+		this.title = projectCheckListUpdateRequest.getTitle();
 	}
 }
