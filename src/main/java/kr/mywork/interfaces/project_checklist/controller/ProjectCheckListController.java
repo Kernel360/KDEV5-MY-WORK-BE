@@ -2,6 +2,7 @@ package kr.mywork.interfaces.project_checklist.controller;
 
 import java.util.UUID;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListU
 import kr.mywork.interfaces.project_checklist.controller.dto.request.ProjectCheckListCreateWebRequest;
 import kr.mywork.interfaces.project_checklist.controller.dto.request.ProjectCheckListUpdateWebRequest;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListCreateWebResponse;
+import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListDeleteWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListDetailWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListUpdateWebResponse;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +64,16 @@ public class ProjectCheckListController {
 			projectCheckListUpdateRequest);
 
 		return ApiResponse.success(new ProjectCheckListUpdateWebResponse(projectCheckListUpdateResponse));
+	}
+
+	@DeleteMapping("/api/projects/check-lists/{checkListId}")
+	public ApiResponse<ProjectCheckListDeleteWebResponse> deleteProjectCheckList(
+		@PathVariable final UUID checkListId) {
+
+		UUID deletedCheckListId  = projectCheckListService.deleteProjectCheckList(
+			checkListId);
+
+		return ApiResponse.success(new ProjectCheckListDeleteWebResponse(deletedCheckListId));
 	}
 
 }
