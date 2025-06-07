@@ -1,18 +1,23 @@
 package kr.mywork.interfaces.post.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.post.service.ReviewService;
+import kr.mywork.domain.post.service.dto.ReviewSelectResponse;
 import kr.mywork.domain.post.service.dto.request.ReviewCreateRequest;
 import kr.mywork.domain.post.service.dto.request.ReviewDeleteRequest;
 import kr.mywork.domain.post.service.dto.request.ReviewModifyRequest;
@@ -24,6 +29,8 @@ import kr.mywork.interfaces.post.controller.dto.request.ReviewModifyWebRequest;
 import kr.mywork.interfaces.post.controller.dto.response.ReviewCreateWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.ReviewDeleteWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.ReviewModifyWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.ReviewSelectWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.ReviewsSelectWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -76,5 +83,18 @@ public class ReviewController {
 		));
 
 		return ApiResponse.success(new ReviewDeleteWebResponse(reviewDeleteResponse.reviewId()));
+	}
+
+	@GetMapping("/api/posts/{postId}/reviews")
+	public ApiResponse<ReviewsSelectWebResponse> findAllReviewByPaging(
+		@PathVariable("postId") UUID postId,
+		@RequestParam("page") @Min(value = 1, message = "{invalid.page-size}") Integer page) {
+
+		final List<ReviewSelectResponse> reviewSelectResponses = reviewService.findAllReviewsWithPaging(postId, page);
+		final List<ReviewSelectWebResponse> reviewSelectWebResponses = reviewSelectResponses.stream()
+			.map(ReviewSelectWebResponse::fromServiceResponse)
+			.toList();
+
+		return ApiResponse.success(new ReviewsSelectWebResponse(reviewSelectWebResponses));
 	}
 }
