@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.CompanyType;
@@ -45,6 +45,7 @@ public class ProjectCheckListService {
 
 	}
 
+	@Transactional(readOnly = true)
 	public ProjectCheckListDetailResponse getProjectCheckList(UUID checkListId) {
 		ProjectCheckList projectCheckList = projectCheckListRepository.findById(checkListId)
 			.orElseThrow(
