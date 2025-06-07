@@ -76,7 +76,8 @@ INSERT INTO project_check_list (
     client_company_id,
     project_step_id,
     approval,
-    created_at
+    created_at,
+    deleted
 ) VALUES (
              UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
              '프로젝트 체크 리스트 타이틀',
@@ -84,5 +85,6 @@ INSERT INTO project_check_list (
              UNHEX(REPLACE('1234a9a9-90b6-9898-a9dc-92c9861aa98c', '-', '')),
              UNHEX(REPLACE('01991f58-8a6a-7a18-8cfe-1f2bfa6a5e01', '-', '')),
              '대기',
-             NOW()
+             NOW(),
+            false
 );

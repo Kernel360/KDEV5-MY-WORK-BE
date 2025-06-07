@@ -66,4 +66,14 @@ public class ProjectCheckListService {
 		projectCheckList.update(projectCheckListUpdateRequest);
 		return ProjectCheckListUpdateResponse.from(projectCheckList);
 	}
+
+	@Transactional
+	public UUID deleteProjectCheckList(UUID checkListId) {
+		ProjectCheckList projectCheckList = projectCheckListRepository.findById(checkListId)
+			.orElseThrow(
+				() -> new ProjectCheckListNotFoundException(ProjectCheckListErrorType.PROJECT_CHECK_LIST_NOT_FOUND));
+
+		projectCheckList.softDelete();
+		return projectCheckList.getId();
+	}
 }
