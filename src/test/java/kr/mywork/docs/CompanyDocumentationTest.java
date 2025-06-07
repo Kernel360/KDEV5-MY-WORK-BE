@@ -369,8 +369,8 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			get("/api/company?page={page}&type={type}&keyword={keyword}&deleted={deleted}",
-				1, "DEV", null, null)
+			get("/api/company?page={page}&companyType={type}&keyword={keyword}&keywordType={keywordType}&deleted={deleted}",
+				1, "DEV", null, "NAME", null)
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
@@ -394,7 +394,8 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.queryParameters(
 					parameterWithName("page").description("페이지 번호"),
-					parameterWithName("type").description("회사 타입(DEV/CLIENT)"),
+					parameterWithName("companyType").description("회사 타입(DEV/CLIENT)"),
+					parameterWithName("keywordType").description("키워드 타입(NAME|BUSINESS_NUMBER|PHONE_NUMBER|ADDRESS)"),
 					parameterWithName("keyword").description("검색어").optional(),
 					parameterWithName("deleted").description("삭제 여부").optional()
 				)
