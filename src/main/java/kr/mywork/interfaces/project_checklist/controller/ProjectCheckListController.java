@@ -13,13 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.project_checklist.service.ProjectCheckListService;
+import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListApprovalRequest;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListCreateRequest;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListUpdateRequest;
+import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListApprovalResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListCreateResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListDetailResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListUpdateResponse;
+import kr.mywork.interfaces.project_checklist.controller.dto.request.ProjectCheckListApprovalWebRequest;
 import kr.mywork.interfaces.project_checklist.controller.dto.request.ProjectCheckListCreateWebRequest;
 import kr.mywork.interfaces.project_checklist.controller.dto.request.ProjectCheckListUpdateWebRequest;
+import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListApprovalWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListCreateWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListDeleteWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListDetailWebResponse;
@@ -74,6 +78,17 @@ public class ProjectCheckListController {
 			checkListId);
 
 		return ApiResponse.success(new ProjectCheckListDeleteWebResponse(deletedCheckListId));
+	}
+
+	@PutMapping("/api/projects/check-lists/{checklistId}/approval")
+	public ApiResponse<ProjectCheckListApprovalWebResponse> approvalProjectCheckList(
+		@RequestBody @Valid ProjectCheckListApprovalWebRequest projectCheckListApprovalWebRequest) {
+		ProjectCheckListApprovalRequest projectCheckListApprovalRequest = projectCheckListApprovalWebRequest.toServiceDto();
+
+		ProjectCheckListApprovalResponse projectCheckListApprovalResponse = projectCheckListService.approvalProjectCheckList(
+			projectCheckListApprovalRequest);
+
+		return ApiResponse.success(new ProjectCheckListApprovalWebResponse(projectCheckListApprovalResponse));
 	}
 
 }
