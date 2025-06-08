@@ -24,7 +24,7 @@ VALUES (
            UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
            '관리자',
            'admin@example.com',
-           '$2a$12$0Q8Lv6HuY2k3/uP7.dfr1eTl0nMpEqD2kkJ7OJDDK2F4KrwKky1qm', --'1234'
+           '$2a$12$0Q8Lv6HuY2k3/uP7.dfr1eTl0nMpEqD2kkJ7OJDDK2F4KrwKky1qm',
            'SYSTEM_ADMIN',
            NOW(),
            '010-1234-5678',
