@@ -1,5 +1,6 @@
 package kr.mywork.domain.project_member.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
+import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,5 +25,11 @@ public class ProjectMemberService {
 		final ProjectMember savedMember = projectMemberRepository.save(projectMember);
 
 		return savedMember.getMemberId();
+	}
+
+	@Transactional
+	public List<CompanyMemberInProjectResponse> findCompanyMembersInProject (UUID projectId,UUID companyId) {
+
+		return projectMemberRepository.findCompanyMembersInProject(projectId,companyId);
 	}
 }
