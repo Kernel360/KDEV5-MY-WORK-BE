@@ -275,6 +275,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 			.description("전달 받은 정보로 멤버 조회한다.")
 			.requestHeaders(headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
 			.responseFields(fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+				fieldWithPath("data.members[].id").type(JsonFieldType.STRING).description("멤버 ID"),
 				fieldWithPath("data.members[].name").type(JsonFieldType.STRING).description("멤버 이름"),
 				fieldWithPath("data.members[].email").type(JsonFieldType.STRING).description("멤버 이메일"),
 				fieldWithPath("data.members[].position").type(JsonFieldType.STRING).description("멤버 직급"),
