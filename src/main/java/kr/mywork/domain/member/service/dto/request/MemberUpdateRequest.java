@@ -21,4 +21,19 @@ public class MemberUpdateRequest {
 	private final LocalDateTime birthday;
 	private final boolean deleted;
 
+	public static MemberUpdateRequest setPasswordEncode(MemberUpdateRequest memberUpdateRequest,String encodedPassword) {
+		return new MemberUpdateRequest(
+			memberUpdateRequest.id,
+			memberUpdateRequest.companyId,
+			memberUpdateRequest.name,
+			memberUpdateRequest.department,
+			memberUpdateRequest.position,
+			memberUpdateRequest.role,
+			memberUpdateRequest.phoneNumber,
+			memberUpdateRequest.email,
+			encodedPassword,
+			memberUpdateRequest.birthday,
+			memberUpdateRequest.deleted
+		);
+	}
 }
