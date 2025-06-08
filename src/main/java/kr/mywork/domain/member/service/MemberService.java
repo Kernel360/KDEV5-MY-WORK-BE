@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 import kr.mywork.domain.member.errors.EmailAlreadyExistsException;
 import kr.mywork.domain.member.errors.MemberErrorType;
 import kr.mywork.domain.member.errors.MemberIdNotFoundException;
@@ -101,4 +102,9 @@ public class MemberService {
 		return memberRepository.findMembersBySearchWithPaging(page, memberPageSize, keyword, keywordType,companyId);
 	}
 
+	@Transactional
+	public MemberDetailResponse findMemberDetailByMemberId(UUID memberId) {
+
+		return memberRepository.findMemberDetailByMemberId(memberId);
+	}
 }
