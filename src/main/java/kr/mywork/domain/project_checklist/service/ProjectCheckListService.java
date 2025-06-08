@@ -13,8 +13,10 @@ import kr.mywork.domain.project_checklist.errors.ProjectCheckListErrorType;
 import kr.mywork.domain.project_checklist.errors.ProjectCheckListNotFoundException;
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
 import kr.mywork.domain.project_checklist.repository.ProjectCheckListRepository;
+import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListApprovalRequest;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListCreateRequest;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListUpdateRequest;
+import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListApprovalResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListCreateResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListDetailResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListUpdateResponse;
@@ -75,5 +77,15 @@ public class ProjectCheckListService {
 
 		projectCheckList.softDelete();
 		return projectCheckList.getId();
+	}
+
+	@Transactional
+	public ProjectCheckListApprovalResponse approvalProjectCheckList(ProjectCheckListApprovalRequest projectCheckListApprovalRequest) {
+		ProjectCheckList projectCheckList = projectCheckListRepository.findById(projectCheckListApprovalRequest.getId())
+			.orElseThrow(
+				() -> new ProjectCheckListNotFoundException(ProjectCheckListErrorType.PROJECT_CHECK_LIST_NOT_FOUND));
+
+		projectCheckList.changeApproval(projectCheckListApprovalRequest);
+		return ProjectCheckListApprovalResponse.from(projectCheckList);
 	}
 }
