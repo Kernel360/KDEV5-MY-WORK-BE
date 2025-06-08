@@ -77,7 +77,28 @@ dependencies {
 }
 
 openapi3 {
-    server = 'http://localhost:8080'
+    servers = [{
+                   url = '{protocol}://{host}:{port}'
+                   variables = [
+                           host  : [
+                                   default    : 'localhost',
+                                   description: '요청 호스트',
+                                   enum       : ['localhost', '13.124.80.58']
+                           ],
+                           port  : [
+                                   default    : '8080',
+                                   description: '요청 포트',
+                                   enum       : ['8080']
+                           ],
+                           protocol: [
+                                   default    : 'http',
+                                   description: '요청 프로토콜',
+                                   enum       : ['http']
+                           ]
+                   ]
+               }
+    ]
+
     title = 'My Work API'
     description = 'My Work API description'
     // tagDescriptionsPropertiesFile = 'src/docs/tag-descriptions.yaml'
