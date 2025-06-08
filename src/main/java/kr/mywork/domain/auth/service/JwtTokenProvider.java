@@ -45,16 +45,15 @@ public class JwtTokenProvider {
 	}
 
 	private JwtParser createJwtParser(final SecretKey secretKey) {
-		return Jwts.parser()
-			.verifyWith(secretKey)
-			.build();
+		return Jwts.parser().verifyWith(secretKey).build();
 	}
 
 	private SecretKey transformSecretKey(final String secretKey) {
 		return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 	}
 
-	public String createAccessToken(final UUID memberId, final String email, final String role, final String name) {
+	public String createAccessToken(final UUID memberId, final String email, final String role, final String name,
+		final UUID companyId, final String companyName, final String companyType,final String logoImagePath) {
 
 		final Date now = new Date();
 		final Date expiry = new Date(now.getTime() + accessTokenExpirationMillis);
@@ -64,6 +63,11 @@ public class JwtTokenProvider {
 		claims.put("email", email);
 		claims.put("role", role);
 		claims.put("name", name);
+		claims.put("companyId", companyId);
+		claims.put("companyName", companyName);
+		claims.put("logoImagePath", logoImagePath);
+		claims.put("companyType", companyType);
+
 
 		return Jwts.builder()
 			.subject(String.valueOf(memberId))
@@ -74,7 +78,7 @@ public class JwtTokenProvider {
 			.compact();
 	}
 
-	public String createRefreshToken(final UUID memberId, final String email, final String role) {
+	public String createRefreshToken(final UUID memberId, final String email, final String role, final UUID companyId, final String companyName, final String companyType,final String logoImagePath) {
 		final Date now = new Date();
 		final Date expiry = new Date(now.getTime() + refreshTokenExpirationMillis);
 
@@ -82,6 +86,10 @@ public class JwtTokenProvider {
 		claims.put("memberId", memberId);
 		claims.put("email", email);
 		claims.put("role", role);
+		claims.put("companyId", companyId);
+		claims.put("companyName", companyName);
+		claims.put("logoImagePath", logoImagePath);
+		claims.put("companyType", companyType);
 
 		return Jwts.builder()
 			.subject(String.valueOf(memberId))

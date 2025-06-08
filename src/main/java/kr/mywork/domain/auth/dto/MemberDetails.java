@@ -1,5 +1,6 @@
 package kr.mywork.domain.auth.dto;
 
+import kr.mywork.domain.company.model.CompanyType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,6 +20,10 @@ public class MemberDetails implements UserDetails {
     private final String email;
     private final String password;
     private final GrantedAuthority authority;
+    private final UUID companyId;
+    private final String companyName;
+    private final String logoImagePath;
+    private final String companyType;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

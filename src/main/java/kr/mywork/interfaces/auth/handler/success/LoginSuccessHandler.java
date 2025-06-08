@@ -38,13 +38,21 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 			memberDetails.getId(),
 			memberDetails.getEmail(),
 			memberDetails.getAuthorityAsStr(),
-			memberDetails.getName()
+			memberDetails.getName(),
+			memberDetails.getCompanyId(),
+			memberDetails.getCompanyName(),
+			memberDetails.getLogoImagePath(),
+			memberDetails.getCompanyType()
 		);
 
 		final String refreshToken = jwtTokenProvider.createRefreshToken(
 			memberDetails.getId(),
 			memberDetails.getEmail(),
-			memberDetails.getAuthorityAsStr()
+			memberDetails.getAuthorityAsStr(),
+			memberDetails.getCompanyId(),
+			memberDetails.getCompanyName(),
+			memberDetails.getLogoImagePath(),
+			memberDetails.getCompanyType()
 		);
 
 		final LocalDateTime expiresAt = jwtTokenProvider.extractExpiration(refreshToken);
@@ -62,7 +70,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 			expiresAt,
 			memberDetails.getId(),
 			memberDetails.getName(),
-			memberDetails.getAuthorityAsStr()
+			memberDetails.getAuthorityAsStr(),
+			memberDetails.getCompanyId(),
+			memberDetails.getCompanyName(),
+			memberDetails.getLogoImagePath(),
+			memberDetails.getCompanyType()
 		);
 
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
