@@ -1,6 +1,7 @@
 package kr.mywork.infrastructure.member.rdb;
 
 import static kr.mywork.domain.member.model.QMember.member;
+import static kr.mywork.domain.company.model.QCompany.company;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -89,41 +91,49 @@ public class QueryDslMemberRepository implements MemberRepository {
 	}
 
 	@Override
-	public Long countTotalmembersByCondition(final String keyword, final String keywordType) {
+	public Long countTotalmembersByCondition(final String keyword, final String keywordType,final UUID companyId) {
+		BooleanBuilder builder = new BooleanBuilder();
 
-		BooleanExpression condition = null;
+		// companyId 조건 추가
+		if (companyId != null) {
+			builder.and(member.companyId.eq(companyId));
+		}
+
 		if (keyword != null && keywordType != null) {
-			condition = switch (keywordType) {
-				case "NAME" -> member.name.containsIgnoreCase(keyword);
-				case "EMAIL" -> member.email.containsIgnoreCase(keyword);
-				case "POSITION" -> member.position.containsIgnoreCase(keyword);
-				case "DEPARTMENT" -> member.department.containsIgnoreCase(keyword);
-				case "PHONENUMBER" -> member.phoneNumber.containsIgnoreCase(keyword);
-				default -> null;
+			switch (keywordType) {
+				case "NAME" -> builder.and(member.name.containsIgnoreCase(keyword));
+				case "EMAIL" -> builder.and(member.email.containsIgnoreCase(keyword));
+				case "POSITION" -> builder.and(member.position.containsIgnoreCase(keyword));
+				case "DEPARTMENT" -> builder.and(member.department.containsIgnoreCase(keyword));
+				case "PHONENUMBER" -> builder.and(member.phoneNumber.containsIgnoreCase(keyword));
 			};
 		}
 
 		return queryFactory.select(member.id.count())
 			.from(member)
-			.where(condition)
+			.leftJoin(company).on(member.companyId.eq(company.id))
+			.where(builder)
 			.fetchOne();
 	}
 
 	@Override
 	public List<MemberSelectResponse> findMembersBySearchWithPaging(int page, int memberPageSize, String keyword,
-		String keywordType) {
-
+		String keywordType,UUID companyId) {
+		BooleanBuilder builder = new BooleanBuilder();
 		final int offset = (page - 1) * memberPageSize;
 
-		BooleanExpression condition = null;
+		// companyId 조건 추가
+		if (companyId != null) {
+			builder.and(member.companyId.eq(companyId));
+		}
+
 		if (keyword != null && keywordType != null) {
-			condition = switch (keywordType) {
-				case "NAME" -> member.name.containsIgnoreCase(keyword);
-				case "EMAIL" -> member.email.containsIgnoreCase(keyword);
-				case "POSITION" -> member.position.containsIgnoreCase(keyword);
-				case "DEPARTMENT" -> member.department.containsIgnoreCase(keyword);
-				case "PHONENUMBER" -> member.phoneNumber.containsIgnoreCase(keyword);
-				default -> null;
+			switch (keywordType) {
+				case "NAME" -> builder.and(member.name.containsIgnoreCase(keyword));
+				case "EMAIL" -> builder.and(member.email.containsIgnoreCase(keyword));
+				case "POSITION" -> builder.and(member.position.containsIgnoreCase(keyword));
+				case "DEPARTMENT" -> builder.and(member.department.containsIgnoreCase(keyword));
+				case "PHONENUMBER" -> builder.and(member.phoneNumber.containsIgnoreCase(keyword));
 			};
 		}
 
@@ -135,10 +145,13 @@ public class QueryDslMemberRepository implements MemberRepository {
 				member.department,
 				member.phoneNumber,
 				member.deleted,
-				member.createdAt
+				member.createdAt,
+				member.companyId,
+				company.name
 			))
 			.from(member)
-			.where(condition)
+			.leftJoin(company).on(member.companyId.eq(company.id))
+			.where(builder)
 			.offset(offset)
 			.limit(memberPageSize)
 			.fetch();
