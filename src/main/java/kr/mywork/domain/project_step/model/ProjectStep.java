@@ -8,11 +8,17 @@ import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Table(
+	name = "project_step",
+	uniqueConstraints = @UniqueConstraint(columnNames = {"project_id", "order_num"})
+)
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -33,12 +39,13 @@ public class ProjectStep {
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
-    public ProjectStep(final String title, final Integer orderNum) {
+    public ProjectStep(final String title, final Integer orderNum, final UUID projectId) {
         this.title = title;
         this.orderNum = orderNum;
+		this.projectId = projectId;
     }
 
-    public boolean update(final String title, final Integer orderNum) {
+	public boolean update(final String title, final Integer orderNum) {
         this.title = title;
         this.orderNum = orderNum;
         return true;

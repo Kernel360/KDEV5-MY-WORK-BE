@@ -29,7 +29,7 @@ public class ProjectStepService {
 		// TODO projectId 를 기반으로 Project 존재 유무 검증 필요
 
 		final List<ProjectStep> projectSteps = projectStepCreateRequests.stream()
-			.map(ProjectStepCreateRequest::toEntity)
+			.map(request -> request.toEntity(projectId))
 			.toList();
 
 		final List<ProjectStep> savedProjectSteps = projectStepRepository.saveAll(projectSteps);
