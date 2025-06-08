@@ -128,6 +128,7 @@ public class QueryDslMemberRepository implements MemberRepository {
 		}
 
 		return queryFactory.select(Projections.constructor(MemberSelectResponse.class,
+				member.id,
 				member.name,
 				member.email,
 				member.position,
