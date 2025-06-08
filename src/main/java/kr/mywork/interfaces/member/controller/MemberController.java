@@ -96,11 +96,12 @@ public class MemberController {
 	public ApiResponse<MemberListWebResponse> findMembersByOffset(
 		@RequestParam(name = "page") @Min(value = 1, message = "{invalid.page-size}") final int page,
 		@RequestParam(name = "keyword", required = false) final String keyword,
-		@RequestParam(name = "keywordType", required = false) @Pattern(regexp = MEMBER_SEARCH_TYPE, message = "{member-search-type}") final String keywordType
+		@RequestParam(name = "keywordType", required = false) @Pattern(regexp = MEMBER_SEARCH_TYPE, message = "{member-search-type}") final String keywordType,
+	 	@RequestParam(name = "companyId", required = false) final UUID companyId
 	) {
 		final List<MemberSelectResponse> memberSelectResponses = memberService.findMembersBySearchWithPaging(page,
-			keyword, keywordType);
-		final long totalCount = memberService.countTotalmembersByCondition(keyword, keywordType);
+			keyword, keywordType,companyId);
+		final long totalCount = memberService.countTotalmembersByCondition(keyword, keywordType,companyId);
 
 		List<MemberSelectWebResponse> memberSelectWebResponses = memberSelectResponses.stream()
 			.map(MemberSelectWebResponse::from)
