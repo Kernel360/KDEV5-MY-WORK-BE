@@ -15,10 +15,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(
-	name = "project_step",
-	uniqueConstraints = @UniqueConstraint(columnNames = {"project_id", "order_num"})
-)
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
