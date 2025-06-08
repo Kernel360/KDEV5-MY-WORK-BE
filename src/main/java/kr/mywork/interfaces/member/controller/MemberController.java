@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 import kr.mywork.domain.member.service.MemberService;
 import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
 import kr.mywork.domain.member.service.dto.request.MemberUpdateRequest;
@@ -29,6 +30,7 @@ import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberListWebR
 import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberCreateWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberDeleteWebResponse;
+import kr.mywork.interfaces.member.controller.dto.response.MemberDetailsWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberListWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberSelectWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberUpdateWebResponse;
@@ -108,6 +110,16 @@ public class MemberController {
 			.toList();
 
 		return ApiResponse.success(new MemberListWebResponse(memberSelectWebResponses, totalCount));
+	}
+
+	@GetMapping("/{memberId}")
+	public ApiResponse<MemberDetailsWebResponse> getMemberDetail(@PathVariable("memberId") final UUID memberId){
+
+		MemberDetailResponse memberDetailResponse = memberService.findMemberDetailByMemberId(memberId);
+
+		MemberDetailsWebResponse memberDetailsWebResponse = MemberDetailsWebResponse.from(memberDetailResponse);
+
+		return ApiResponse.success(memberDetailsWebResponse);
 	}
 
 }

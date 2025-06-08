@@ -8,11 +8,17 @@ import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Table(
+	name = "project_step",
+	uniqueConstraints = @UniqueConstraint(columnNames = {"project_id", "order_num"})
+)
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter

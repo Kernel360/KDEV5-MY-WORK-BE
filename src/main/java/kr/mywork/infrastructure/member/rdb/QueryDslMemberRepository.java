@@ -14,6 +14,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
@@ -118,7 +119,7 @@ public class QueryDslMemberRepository implements MemberRepository {
 
 	@Override
 	public List<MemberSelectResponse> findMembersBySearchWithPaging(int page, int memberPageSize, String keyword,
-		String keywordType,UUID companyId) {
+		String keywordType, UUID companyId) {
 		BooleanBuilder builder = new BooleanBuilder();
 		final int offset = (page - 1) * memberPageSize;
 
@@ -134,7 +135,8 @@ public class QueryDslMemberRepository implements MemberRepository {
 				case "POSITION" -> builder.and(member.position.containsIgnoreCase(keyword));
 				case "DEPARTMENT" -> builder.and(member.department.containsIgnoreCase(keyword));
 				case "PHONENUMBER" -> builder.and(member.phoneNumber.containsIgnoreCase(keyword));
-			};
+			}
+			;
 		}
 
 		return queryFactory.select(Projections.constructor(MemberSelectResponse.class,
@@ -155,5 +157,29 @@ public class QueryDslMemberRepository implements MemberRepository {
 			.offset(offset)
 			.limit(memberPageSize)
 			.fetch();
+	}
+
+	@Override
+	public MemberDetailResponse findMemberDetailByMemberId(UUID memberId) {
+		return queryFactory.select(Projections.constructor(
+			MemberDetailResponse.class,
+			member.companyId,
+			company.name,
+			member.name,
+			member.department,
+			member.position,
+			member.role.stringValue(),
+			member.phoneNumber,
+			member.email,
+			member.deleted
+			))
+			.from(member)
+			.join(company).on(member.companyId.eq(company.id))
+			.where(
+				member.id.eq(memberId),
+				member.deleted.eq(false),
+				company.deleted.eq(false)
+			)
+			.fetchOne();
 	}
 }

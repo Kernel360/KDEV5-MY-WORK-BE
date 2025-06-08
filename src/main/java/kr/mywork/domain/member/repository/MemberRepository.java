@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
 
@@ -25,4 +26,6 @@ public interface MemberRepository {
 	List<MemberSelectResponse> findMembersBySearchWithPaging(int page,int memberPageSize, String keyword,String keywordTyp,UUID companyId);
 
 	List<Member> findMemberListByCompanyId(UUID companyId, UUID projectId);
+
+	MemberDetailResponse findMemberDetailByMemberId(UUID memberId);
 }

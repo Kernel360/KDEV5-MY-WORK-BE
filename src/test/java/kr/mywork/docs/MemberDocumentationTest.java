@@ -289,4 +289,43 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 			.build());
 	}
+
+	@Test
+	@DisplayName("멤버 상세 조회 성공")
+	@Sql("classpath:sql/member-get-detail.sql")
+	void 멤버_상세_조회_성공() throws Exception {
+		//given
+		final String accessToken = createDevAdminAccessToken();
+		UUID memberId = UUID.fromString("60828da5-dc7c-4b8f-ace4-2833e5f74c24");
+
+		//when
+		final ResultActions result = mockMvc.perform(
+			get("/api/member/{meberId}", memberId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+		//then
+		result.andExpectAll(status().isOk(), jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(), jsonPath("$.error").doesNotExist())
+			.andDo(document("member-get-detail-success", memberDetailSuccessResource()));
+	}
+
+	private ResourceSnippet memberDetailSuccessResource() {
+		return resource(ResourceSnippetParameters.builder()
+			.tag("Member API")
+			.summary("멤버 상세 조회 API")
+			.description("멤버 상세정보를 조회한다.")
+			.requestHeaders(headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+			.responseFields(fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+				fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("멤버 회사ID"),
+				fieldWithPath("data.companyName").type(JsonFieldType.STRING).description("멤버 회사이름"),
+				fieldWithPath("data.name").type(JsonFieldType.STRING).description("멤버 이름"),
+				fieldWithPath("data.department").type(JsonFieldType.STRING).description("멤버 부서"),
+				fieldWithPath("data.position").type(JsonFieldType.STRING).description("멤버 지급"),
+				fieldWithPath("data.role").type(JsonFieldType.STRING).description("멤버 권한"),
+				fieldWithPath("data.phoneNumber").type(JsonFieldType.STRING).description("멤버 전화번호"),
+				fieldWithPath("data.email").type(JsonFieldType.STRING).description("멤버 이메일"),
+				fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN).description("멤버 삭제여부"),
+				fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+			.build());
+	}
 }
