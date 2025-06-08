@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class MemberService {
 	private int memberPageSize;
 
 	private final MemberRepository memberRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
 	public List<CompanyMemberResponse> findMemberByCompanyId(UUID companyId, int page) {
@@ -51,7 +53,8 @@ public class MemberService {
 			throw new EmailAlreadyExistsException(MemberErrorType.EMAIL_ALREADY_EXISTS);
 		}
 
-		String encodedPassword = request.getBirthDate().toLocalDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		String encodedPassword =passwordEncoder.encode(
+			request.getBirthDate().toLocalDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
 
 		Member member = new Member(request.getCompanyId(), request.getName(), request.getDepartment(),
 			request.getPosition(), request.getRole(), request.getPhoneNumber(), request.getEmail(), encodedPassword,
@@ -78,8 +81,10 @@ public class MemberService {
 		Member member = memberRepository.findById(memberUpdateRequest.getId())
 			.orElseThrow(() -> new MemberIdNotFoundException(MemberErrorType.ID_NOT_FOUND));
 
-		//TODO 서비스단 비밀번호 암호화 추가
-		member.updateFrom(memberUpdateRequest);
+		String encodedPassword =passwordEncoder.encode(memberUpdateRequest.getPassword());
+		MemberUpdateRequest memberUpdateWithEncodedPassword = MemberUpdateRequest.setPasswordEncode(memberUpdateRequest,encodedPassword);
+
+		member.updateFrom(memberUpdateWithEncodedPassword);
 
 		return member.getId();
 	}
