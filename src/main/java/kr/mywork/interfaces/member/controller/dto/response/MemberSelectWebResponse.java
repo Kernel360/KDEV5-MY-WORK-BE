@@ -9,7 +9,7 @@ import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
 
 public record MemberSelectWebResponse(UUID id, String name, String email, String position, String department,
 									  String phoneNumber,
-									  Boolean deleted, @JsonFormat(pattern = "yyyy-MM-dd") LocalDateTime createdAt) {
+									  Boolean deleted, @JsonFormat(pattern = "yyyy-MM-dd") LocalDateTime createdAt,UUID companyId,String companyName) {
 
 	public static MemberSelectWebResponse from(MemberSelectResponse memberSelectResponse) {
 		return new MemberSelectWebResponse(
@@ -20,7 +20,9 @@ public record MemberSelectWebResponse(UUID id, String name, String email, String
 			memberSelectResponse.department(),
 			memberSelectResponse.phoneNumber(),
 			memberSelectResponse.deleted(),
-			memberSelectResponse.createdAt()
+			memberSelectResponse.createdAt(),
+			memberSelectResponse.companyId(),
+			memberSelectResponse.companyName()
 		);
 	}
 }
