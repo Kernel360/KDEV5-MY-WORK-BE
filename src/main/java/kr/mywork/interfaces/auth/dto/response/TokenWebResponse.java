@@ -5,6 +5,7 @@ import java.util.UUID;
 
 
 import kr.mywork.domain.auth.dto.response.TokenResponse;
+import kr.mywork.domain.company.model.CompanyType;
 import lombok.Getter;
 
 @Getter
@@ -17,19 +18,31 @@ public class TokenWebResponse {
 	private final UUID memberId;
 	private final String memberName;
 	private final String memberRole;
+	private final UUID companyId;               // 추가
+	private final String companyName;
+	private final String logoImagePath;
+	private final String companyType;
 
 	public TokenWebResponse(
 		String accessToken,
 		LocalDateTime expiresAt,
 		UUID memberId,
 		String memberName,
-		String memberRole
+		String memberRole,
+		UUID companyId,
+		String companyName,
+		String logoImagePath,
+		String companyType
 	) {
 		this.accessToken = accessToken;
 		this.expiresAt = expiresAt;
 		this.memberId = memberId;
 		this.memberName = memberName;
 		this.memberRole = memberRole;
+		this.companyId = companyId;
+		this.companyName = companyName;
+		this.logoImagePath = logoImagePath;
+		this.companyType = companyType;
 	}
 
 	public static TokenWebResponse from(TokenResponse tokenResponse) {
@@ -38,7 +51,11 @@ public class TokenWebResponse {
 			tokenResponse.getExpiresAt(),
 			tokenResponse.getMemberId(),
 			tokenResponse.getMemberName(),
-			tokenResponse.getMemberRole()
+			tokenResponse.getMemberRole(),
+			tokenResponse.getCompanyId(),
+			tokenResponse.getCompanyName(),
+			tokenResponse.getLogoImagePath(),
+			tokenResponse.getCompanyType()
 		);
 	}
 }

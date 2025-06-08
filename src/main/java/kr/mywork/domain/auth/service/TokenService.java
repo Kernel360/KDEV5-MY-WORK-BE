@@ -55,11 +55,16 @@ public class TokenService {
 		String email = claims.get("email", String.class);
 		String role = claims.get("role", String.class);
 		String name = claims.get("name", String.class);
+		UUID companyId = UUID.fromString(claims.get("companyId", String.class));
+		String companyName = claims.get("companyName", String.class);
+		String logoImagePath = claims.get("logoImagePath", String.class);
+		String companyType = claims.get("companyType", String.class);
 
-		String newAccessToken = jwtTokenProvider.createAccessToken(memberId, email, role, name);
+
+		String newAccessToken = jwtTokenProvider.createAccessToken(memberId, email, role, name,companyId,companyName,logoImagePath,companyType);
 		LocalDateTime expiresAt = jwtTokenProvider.extractExpiration(refreshToken);
 
-		return new TokenResponse(newAccessToken, expiresAt, memberId, role, name);
+		return new TokenResponse(newAccessToken, expiresAt, memberId, role, name,companyId,companyName,logoImagePath,companyType);
 
 	}
 

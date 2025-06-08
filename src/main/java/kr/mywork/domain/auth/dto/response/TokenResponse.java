@@ -17,6 +17,10 @@ public class TokenResponse {
 	private final UUID memberId;
 	private final String memberName;
 	private final String memberRole;
+	private final UUID companyId;
+	private final String companyName;
+	private final String logoImagePath;
+	private final String companyType;
 
 
 }
