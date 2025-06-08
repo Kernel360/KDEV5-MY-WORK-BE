@@ -78,6 +78,10 @@ public class AuthDocumentationTest extends RestDocsDocumentation {
 							fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("사용자 아이디"),
 							fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("사용자 이름"),
 							fieldWithPath("data.memberRole").type(JsonFieldType.STRING).description("사용자 역할"),
+							fieldWithPath("data.companyId").type(JsonFieldType.STRING).description("사용자 회사ID"),
+							fieldWithPath("data.companyName").type(JsonFieldType.STRING).description("사용자 회사이름"),
+							fieldWithPath("data.logoImagePath").type(JsonFieldType.STRING).description("사용자 회사로고"),
+							fieldWithPath("data.companyType").type(JsonFieldType.STRING).description("사용자 회사타입"),
 							fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 						.build()
 				)
