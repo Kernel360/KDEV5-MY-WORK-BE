@@ -283,6 +283,8 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				fieldWithPath("data.members[].phoneNumber").type(JsonFieldType.STRING).description("멤버 전화번호"),
 				fieldWithPath("data.members[].deleted").type(JsonFieldType.BOOLEAN).description("멤버 삭제여부"),
 				fieldWithPath("data.members[].createdAt").type(JsonFieldType.STRING).description("멤버 생성일"),
+				fieldWithPath("data.members[].companyId").type(JsonFieldType.STRING).description("멤버 회사아이디"),
+				fieldWithPath("data.members[].companyName").type(JsonFieldType.STRING).description("멤버 회사이름"),
 				fieldWithPath("data.totalCount").type(JsonFieldType.NUMBER).description("조회된 멤버 총 갯수"),
 				fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 			.build());
