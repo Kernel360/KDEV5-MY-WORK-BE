@@ -20,9 +20,9 @@ public interface MemberRepository {
 
 	Optional<Member> findById(UUID memberId);
 
-	Long countTotalmembersByCondition(String keyword, String keywordTyp);
+	Long countTotalmembersByCondition(String keyword, String keywordTyp,UUID companyId);
 
-	List<MemberSelectResponse> findMembersBySearchWithPaging(int page,int memberPageSize, String keyword,String keywordTyp);
+	List<MemberSelectResponse> findMembersBySearchWithPaging(int page,int memberPageSize, String keyword,String keywordTyp,UUID companyId);
 
 	List<Member> findMemberListByCompanyId(UUID companyId, UUID projectId);
 }

@@ -90,15 +90,15 @@ public class MemberService {
 	}
 
 	@Transactional
-	public long countTotalmembersByCondition(String keyword, String keywordType) {
-		return memberRepository.countTotalmembersByCondition(keyword, keywordType);
+	public long countTotalmembersByCondition(String keyword, String keywordType,UUID companyId) {
+		return memberRepository.countTotalmembersByCondition(keyword, keywordType,companyId);
 	}
 
 	@Transactional
 	public List<MemberSelectResponse> findMembersBySearchWithPaging(final int page, String keyword,
-		String keywordType) {
+		String keywordType,UUID companyId) {
 
-		return memberRepository.findMembersBySearchWithPaging(page, memberPageSize, keyword, keywordType);
+		return memberRepository.findMembersBySearchWithPaging(page, memberPageSize, keyword, keywordType,companyId);
 	}
 
 }
