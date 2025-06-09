@@ -1,6 +1,9 @@
 package kr.mywork.infrastructure.post.rdb;
 
+import static kr.mywork.domain.company.model.QCompany.*;
+import static kr.mywork.domain.company.model.QCompany.company;
 import static kr.mywork.domain.post.model.QPost.*;
+import static kr.mywork.domain.project_step.model.QProjectStep.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +39,7 @@ public class QueryDslPostRepository implements PostRepository {
 	}
 
 	public List<PostSelectResponse> findPostsBySearchConditionWithPaging(int page, int postPageSize,
-		UUID projectStepId, String keyword, Boolean deleted) {
+		UUID projectStepId, String keyword, Boolean deleted, UUID projectId, String keywordType, String approval) {
 
 		final int offset = (page - 1) * postPageSize;
 
@@ -45,26 +48,52 @@ public class QueryDslPostRepository implements PostRepository {
 				post.createdAt,
 				post.authorName,
 				post.title,
-				post.approval
+				post.approval,
+				projectStep.title
 			))
 			.from(post)
+			.join(projectStep)
+			.on(post.projectStepId.eq(projectStep.id))
 			.where(
-					eqProjectStepId(projectStepId),
-					eqDeleted(deleted),
-					eqKeyword(keyword))
+				eqProjectId(projectId),
+				eqProjectStepId(projectStepId),
+				eqDeleted(deleted),
+				containsKeyword(keywordType, keyword),
+				eqApproval(approval))
 			.offset(offset)
 			.limit(postPageSize)
 			.fetch();
 	}
 
+	private BooleanExpression containsKeyword(final String searchType, final String keyword) {
+		if (searchType == null) {
+			return null;
+		}
+
+		if (keyword == null || keyword.isEmpty()) {
+			return null;
+		}
+
+		return switch (searchType) {
+			case "AUTHORNAME" -> post.authorName.containsIgnoreCase(keyword);
+			case "TITLE" -> post.title.containsIgnoreCase(keyword);
+			default -> null;
+		};
+	}
+
 	@Override
-	public Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted) {
+	public Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted, UUID projectId,
+		String keywordType, String approval) {
 		return jpaQueryFactory.select(post.id.count())
 			.from(post)
+			.join(projectStep)
+			.on(post.projectStepId.eq(projectStep.id))
 			.where(
+				eqProjectId(projectId),
 				eqProjectStepId(projectStepId),
 				eqDeleted(deleted),
-				eqKeyword(keyword)
+				containsKeyword(keywordType, keyword),
+				eqApproval(approval)
 			)
 			.fetchOne();
 	}
@@ -75,6 +104,14 @@ public class QueryDslPostRepository implements PostRepository {
 		}
 
 		return post.projectStepId.eq(projectStepId);
+	}
+
+	private BooleanExpression eqProjectId(UUID projectId) {
+		if (projectId == null) {
+			return null;
+		}
+
+		return post.projectId.eq(projectId);
 	}
 
 	private BooleanExpression eqKeyword(String keyword) {
@@ -91,5 +128,13 @@ public class QueryDslPostRepository implements PostRepository {
 		}
 
 		return post.deleted.eq(deleted);
+	}
+
+	private BooleanExpression eqApproval(String approval) {
+		if (approval == null) {
+			return null;
+		}
+
+		return post.approval.eq(approval);
 	}
 }

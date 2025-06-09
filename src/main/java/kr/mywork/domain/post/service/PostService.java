@@ -66,15 +66,15 @@ public class PostService {
 
 	@Transactional
 	public List<PostSelectResponse> findPostsBySearchConditionWithPaging(final int page, final UUID projectStepId,
-		final String keyword, final Boolean deleted) {
+		final String keyword, final Boolean deleted, final UUID projectId, final String keywordType, final String approval) {
 
 		// TODO projectStepId가 null이 아니고, DB에도 존재 하지 않을때 에러 처리해아함.
 
-		return postRepository.findPostsBySearchConditionWithPaging(page, postPageSize, projectStepId, keyword, deleted);
+		return postRepository.findPostsBySearchConditionWithPaging(page, postPageSize, projectStepId, keyword, deleted, projectId, keywordType, approval);
 	}
 
-	public Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted) {
-		return postRepository.countTotalPostsByCondition(projectStepId, keyword, deleted);
+	public Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted, UUID projectId, String  keywordType, String approval) {
+		return postRepository.countTotalPostsByCondition(projectStepId, keyword, deleted, projectId, keywordType, approval);
 	}
 
   public UUID deletePost(UUID postId) {
