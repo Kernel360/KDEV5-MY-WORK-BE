@@ -7,6 +7,9 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
   datasource:
     url: jdbc:mysql://localhost:3306/mywork_db
     username: root
