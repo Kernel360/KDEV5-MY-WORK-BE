@@ -22,7 +22,9 @@ import kr.mywork.domain.member.service.MemberService;
 import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
 import kr.mywork.domain.member.service.dto.request.MemberUpdateRequest;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
+import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
+import kr.mywork.domain.project.service.ProjectService;
 import kr.mywork.interfaces.member.controller.dto.request.MemberCreateWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberUpdateWebRequest;
@@ -32,6 +34,7 @@ import kr.mywork.interfaces.member.controller.dto.response.MemberCreateWebRespon
 import kr.mywork.interfaces.member.controller.dto.response.MemberDeleteWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberDetailsWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberListWebResponse;
+import kr.mywork.interfaces.member.controller.dto.response.MemberProjectInfoWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberSelectWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberUpdateWebResponse;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +47,7 @@ public class MemberController {
 
 	private static final String MEMBER_SEARCH_TYPE = "^(NAME|EMAIL|POSITION|DEPARTMENT|PHONENUMBER|)$";
 	private final MemberService memberService;
+	private final ProjectService projectService;
 
 	@GetMapping("/company/{companyId}")
 	public ApiResponse<CompanyMemberWebResponse> getCompanyMember(@PathVariable(name = "companyId") UUID companyId,
@@ -99,11 +103,11 @@ public class MemberController {
 		@RequestParam(name = "page") @Min(value = 1, message = "{invalid.page-size}") final int page,
 		@RequestParam(name = "keyword", required = false) final String keyword,
 		@RequestParam(name = "keywordType", required = false) @Pattern(regexp = MEMBER_SEARCH_TYPE, message = "{member-search-type}") final String keywordType,
-	 	@RequestParam(name = "companyId", required = false) final UUID companyId
+		@RequestParam(name = "companyId", required = false) final UUID companyId
 	) {
 		final List<MemberSelectResponse> memberSelectResponses = memberService.findMembersBySearchWithPaging(page,
-			keyword, keywordType,companyId);
-		final long totalCount = memberService.countTotalmembersByCondition(keyword, keywordType,companyId);
+			keyword, keywordType, companyId);
+		final long totalCount = memberService.countTotalmembersByCondition(keyword, keywordType, companyId);
 
 		List<MemberSelectWebResponse> memberSelectWebResponses = memberSelectResponses.stream()
 			.map(MemberSelectWebResponse::from)
@@ -113,11 +117,17 @@ public class MemberController {
 	}
 
 	@GetMapping("/{memberId}")
-	public ApiResponse<MemberDetailsWebResponse> getMemberDetail(@PathVariable("memberId") final UUID memberId){
-
+	public ApiResponse<MemberDetailsWebResponse> getMemberDetail(@PathVariable("memberId") final UUID memberId) {
 		MemberDetailResponse memberDetailResponse = memberService.findMemberDetailByMemberId(memberId);
 
-		MemberDetailsWebResponse memberDetailsWebResponse = MemberDetailsWebResponse.from(memberDetailResponse);
+		List<MemberProjectInfoResponse> memberProjectInfoResponse = projectService.findProjectsAssignedMember(memberId);
+
+		List<MemberProjectInfoWebResponse> memberAssignProjectWebResponses = memberProjectInfoResponse.stream()
+			.map(MemberProjectInfoWebResponse::from)
+			.toList();
+
+		MemberDetailsWebResponse memberDetailsWebResponse = MemberDetailsWebResponse.from(memberDetailResponse,
+			memberAssignProjectWebResponses);
 
 		return ApiResponse.success(memberDetailsWebResponse);
 	}
