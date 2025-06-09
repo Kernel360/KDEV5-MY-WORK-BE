@@ -5,7 +5,15 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -13,8 +21,8 @@ import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.project.service.ProjectService;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
+import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
@@ -81,12 +89,12 @@ public class ProjectController {
 		@PathVariable("projectId") final UUID projectId
 	) {
 		// 1) 서비스에서 단건 조회
-		ProjectSelectResponse serviceDetail = projectService.findProjectById(projectId);
+		ProjectDetailResponse projectDetailResponse = projectService.findProjectDetailsById(projectId);
 
 		// 2) ServiceResponse → WebResponse
-		ProjectDetailWebResponse webDetail = ProjectDetailWebResponse.from(serviceDetail);
+		ProjectDetailWebResponse projectDetailWebResponse = ProjectDetailWebResponse.from(projectDetailResponse);
 
-		return ApiResponse.success(webDetail);
+		return ApiResponse.success(projectDetailWebResponse);
 	}
 
 	@GetMapping
