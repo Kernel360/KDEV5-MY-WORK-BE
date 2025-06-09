@@ -12,6 +12,8 @@ public class PostCreateRequest {
 
 	private final UUID id;
 
+	private final UUID projectId;
+
 	private final UUID projectStepId;
 
 	private final String title;
