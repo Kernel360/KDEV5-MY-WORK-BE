@@ -21,15 +21,12 @@ import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 import kr.mywork.domain.member.service.MemberService;
 import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
 import kr.mywork.domain.member.service.dto.request.MemberUpdateRequest;
-import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
 import kr.mywork.domain.project.service.ProjectService;
 import kr.mywork.interfaces.member.controller.dto.request.MemberCreateWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberUpdateWebRequest;
-import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberListWebResponse;
-import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberCreateWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberDeleteWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberDetailsWebResponse;
@@ -48,20 +45,6 @@ public class MemberController {
 	private static final String MEMBER_SEARCH_TYPE = "^(NAME|EMAIL|POSITION|DEPARTMENT|PHONENUMBER|)$";
 	private final MemberService memberService;
 	private final ProjectService projectService;
-
-	@GetMapping("/company/{companyId}")
-	public ApiResponse<CompanyMemberWebResponse> getCompanyMember(@PathVariable(name = "companyId") UUID companyId,
-		@RequestParam(defaultValue = "1") @Min(value = 1, message = "{invalid.page-size}") int page) {
-		List<CompanyMemberResponse> companyMemberResponses = memberService.findMemberByCompanyId(companyId, page);
-
-		long total = memberService.countMembersByCompanyId(companyId);
-
-		List<CompanyMemberListWebResponse> companyMemberWebResponses = companyMemberResponses.stream()
-			.map(CompanyMemberListWebResponse::fromService)
-			.toList();
-
-		return ApiResponse.success(new CompanyMemberWebResponse(total, companyMemberWebResponses));
-	}
 
 	@PostMapping
 	public ApiResponse<MemberCreateWebResponse> memberCreateWebResponseApiResponse(
