@@ -10,7 +10,8 @@ import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
 public record PostSelectWebResponse(UUID postId, String authorName,
 									String title,
 									@JsonFormat(pattern = "yyyy-MM-dd") LocalDateTime createdAt,
-									String approval) {
+									String approval,
+									String projectStepName) {
 
 	public static PostSelectWebResponse from(PostSelectResponse postSelectResponse) {
 		return new PostSelectWebResponse(
@@ -18,7 +19,8 @@ public record PostSelectWebResponse(UUID postId, String authorName,
 			postSelectResponse.authorName(),
 			postSelectResponse.title(),
 			postSelectResponse.createAt(),
-			postSelectResponse.approval()
+			postSelectResponse.approval(),
+			postSelectResponse.projectStepName()
 		);
 	}
 }
