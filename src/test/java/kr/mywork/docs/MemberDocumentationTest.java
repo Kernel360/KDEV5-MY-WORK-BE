@@ -296,11 +296,11 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 	void 멤버_상세_조회_성공() throws Exception {
 		//given
 		final String accessToken = createDevAdminAccessToken();
-		UUID memberId = UUID.fromString("60828da5-dc7c-4b8f-ace4-2833e5f74c24");
+		UUID memberId = UUID.fromString("51a58807-bf20-4160-b4e0-edabba6df8f9");
 
 		//when
 		final ResultActions result = mockMvc.perform(
-			get("/api/member/{meberId}", memberId)
+			get("/api/member/{memberId}", memberId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 		//then
@@ -325,6 +325,11 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				fieldWithPath("data.phoneNumber").type(JsonFieldType.STRING).description("멤버 전화번호"),
 				fieldWithPath("data.email").type(JsonFieldType.STRING).description("멤버 이메일"),
 				fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN).description("멤버 삭제여부"),
+				fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description("멤버 수정일"),
+				fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("멤버 생성일"),
+				fieldWithPath("data.contactPhoneNumber").type(JsonFieldType.STRING).description("멤버 회사 연락처"),
+				fieldWithPath("data.projects[].projectId").type(JsonFieldType.STRING).description("멤버 참여중인 프로젝트 아이디"),
+				fieldWithPath("data.projects[].projectName").type(JsonFieldType.STRING).description("멤버 참여중인 프로젝트 이름"),
 				fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 			.build());
 	}
