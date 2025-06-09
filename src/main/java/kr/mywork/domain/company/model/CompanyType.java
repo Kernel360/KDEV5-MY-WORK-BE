@@ -6,7 +6,7 @@ import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyTypeNotFoundException;
 
 public enum CompanyType {
-	DEV, CLIENT;
+	DEV, CLIENT, SYSTEM;
 
 	public static CompanyType from(String value) {
 		return Arrays.stream(CompanyType.values())
