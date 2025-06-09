@@ -2,23 +2,10 @@ package kr.mywork.common.auth.config;
 
 import java.util.List;
 
-import kr.mywork.domain.auth.service.TokenAuthenticationService;
-import kr.mywork.interfaces.auth.handler.error.JwtAccessDeniedHandler;
-import kr.mywork.interfaces.auth.handler.error.JwtAuthenticationEntryPoint;
-import kr.mywork.common.auth.JwtProperties;
-import kr.mywork.domain.auth.service.JwtTokenProvider;
-import kr.mywork.interfaces.auth.filter.JwtAuthenticationFilter;
-import kr.mywork.interfaces.auth.filter.JwtLoginFilter;
-import kr.mywork.interfaces.auth.handler.error.LoginFailureHandler;
-import kr.mywork.interfaces.auth.handler.success.LoginSuccessHandler;
-import kr.mywork.domain.member.model.MemberRole;
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -34,6 +21,18 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.mywork.common.auth.JwtProperties;
+import kr.mywork.domain.auth.service.JwtTokenProvider;
+import kr.mywork.domain.auth.service.TokenAuthenticationService;
+import kr.mywork.domain.member.model.MemberRole;
+import kr.mywork.interfaces.auth.filter.JwtAuthenticationFilter;
+import kr.mywork.interfaces.auth.filter.JwtLoginFilter;
+import kr.mywork.interfaces.auth.handler.error.JwtAccessDeniedHandler;
+import kr.mywork.interfaces.auth.handler.error.JwtAuthenticationEntryPoint;
+import kr.mywork.interfaces.auth.handler.error.LoginFailureHandler;
+import kr.mywork.interfaces.auth.handler.success.LoginSuccessHandler;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -74,9 +73,9 @@ public class SecurityConfig {
 						MemberRole.DEV_ADMIN.name(),
 						MemberRole.CLIENT_ADMIN.name(),
 						MemberRole.SYSTEM_ADMIN.name())
-					.requestMatchers(HttpMethod.POST, "/api/company/**").hasRole(MemberRole.SYSTEM_ADMIN.name())
-					.requestMatchers(HttpMethod.DELETE, "/api/company/**").hasRole(MemberRole.SYSTEM_ADMIN.name())
-					.requestMatchers(HttpMethod.PUT, "/api/company/**").hasAnyRole(
+					.requestMatchers(HttpMethod.POST, "/api/companies/**").hasRole(MemberRole.SYSTEM_ADMIN.name())
+					.requestMatchers(HttpMethod.DELETE, "/api/companies/**").hasRole(MemberRole.SYSTEM_ADMIN.name())
+					.requestMatchers(HttpMethod.PUT, "/api/companies/**").hasAnyRole(
 						MemberRole.SYSTEM_ADMIN.name(),
 						MemberRole.DEV_ADMIN.name(),
 						MemberRole.CLIENT_ADMIN.name())
