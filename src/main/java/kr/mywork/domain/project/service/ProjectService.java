@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
+import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
 import kr.mywork.domain.project.repository.ProjectRepository;
@@ -97,5 +98,13 @@ public class ProjectService {
 				member.getId(),
 				member.getName()
 			)).collect(Collectors.toList());
+	}
+
+	@Transactional
+	public List<MemberProjectInfoResponse> findProjectsAssignedMember(UUID memberId) {
+
+		List<MemberProjectInfoResponse> memberProjectList = projectRepository.findeMemberProjectList(memberId);
+
+		return memberProjectList;
 	}
 }
