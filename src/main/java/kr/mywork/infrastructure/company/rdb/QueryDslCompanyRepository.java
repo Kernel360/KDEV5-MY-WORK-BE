@@ -50,6 +50,7 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 		final int offset = (page - 1) * companyPageSize;
 
 		return queryFactory.select(Projections.constructor(CompanySelectResponse.class,
+				company.id,
 				company.name,
 				company.businessNumber,
 				company.address,
