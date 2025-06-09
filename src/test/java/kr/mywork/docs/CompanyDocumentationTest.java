@@ -402,6 +402,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				)
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.companies.[].companyId").type(JsonFieldType.STRING).description("회사 이름"),
 					fieldWithPath("data.companies.[].companyName").type(JsonFieldType.STRING).description("회사 이름"),
 					fieldWithPath("data.companies.[].businessNumber").type(JsonFieldType.STRING).description("사업자 번호"),
 					fieldWithPath("data.companies.[].address").type(JsonFieldType.STRING).description("사업자 주소"),
