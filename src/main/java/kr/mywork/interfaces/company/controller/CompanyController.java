@@ -21,7 +21,7 @@ import kr.mywork.domain.company.service.CompanyService;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import kr.mywork.domain.company.service.dto.response.CompanyDetailResponse;
-import kr.mywork.domain.company.service.dto.response.CompanyListOnlyIdNameResponse;
+import kr.mywork.domain.company.service.dto.response.CompanyNameResponse;
 import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 import kr.mywork.domain.member.service.MemberService;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
@@ -32,8 +32,8 @@ import kr.mywork.interfaces.company.controller.dto.response.CompanyCreateWebResp
 import kr.mywork.interfaces.company.controller.dto.response.CompanyDeleteWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyDetailWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyIdCreateWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyListContainIdNameResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyListOnlyIdNameWebResponse;
+import kr.mywork.interfaces.company.controller.dto.response.CompanyNameWebResponse;
+import kr.mywork.interfaces.company.controller.dto.response.CompanyNamesWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyListWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanySelectWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyUpdateWebResponse;
@@ -115,7 +115,8 @@ public class CompanyController {
 		final List<CompanySelectResponse> companySelectResponses =
 			companyService.findCompaniesBySearchConditionWithPaging(page, companyType, keywordType, keyword, deleted);
 
-		final Long totalCount = companyService.countTotalCompaniesByCondition(companyType, keywordType, keyword, deleted);
+		final Long totalCount = companyService.countTotalCompaniesByCondition(companyType, keywordType, keyword,
+			deleted);
 
 		List<CompanySelectWebResponse> companySelectWebResponses =
 			companySelectResponses.stream().map(CompanySelectWebResponse::from).toList();
@@ -123,16 +124,16 @@ public class CompanyController {
 		return ApiResponse.success(new CompanyListWebResponse(companySelectWebResponses, totalCount));
 	}
 
-	@GetMapping("/company-list")
-	public ApiResponse<CompanyListOnlyIdNameWebResponse> companyListOnlyIdNameWebResponseApiResponse(){
-		final List<CompanyListOnlyIdNameResponse> companyList = companyService.findByCompanyListOnlyIdName();
+	@GetMapping("/names")
+	public ApiResponse<CompanyNamesWebResponse> companyListOnlyIdNameWebResponseApiResponse(
+		@RequestParam(name = "companyType") @Pattern(regexp = COMPANY_TYPE_REGX, message = "{invalid.company-type}") final String companyType) {
+		final List<CompanyNameResponse> companyNames = companyService.findCompanyNamesByCompanyType(companyType);
 
-		final List<CompanyListContainIdNameResponse> companyListContainIdNameResponse=
-			companyList.stream()
-				.map(CompanyListContainIdNameResponse::from)
+		final List<CompanyNameWebResponse> companyNameWebResponses = companyNames.stream()
+				.map(CompanyNameWebResponse::from)
 				.toList();
 
-		return ApiResponse.success(new CompanyListOnlyIdNameWebResponse(companyListContainIdNameResponse));
+		return ApiResponse.success(new CompanyNamesWebResponse(companyNameWebResponses));
 	}
 
 	@GetMapping("/{companyId}/members")

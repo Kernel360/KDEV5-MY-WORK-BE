@@ -18,7 +18,7 @@ import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import kr.mywork.domain.company.service.dto.response.CompanyDetailResponse;
-import kr.mywork.domain.company.service.dto.response.CompanyListOnlyIdNameResponse;
+import kr.mywork.domain.company.service.dto.response.CompanyNameResponse;
 import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -86,8 +86,8 @@ public class CompanyService {
 		return companyRepository.countTotalCompaniesByCondition(companyType, keywordType, keyword, deleted);
 	}
 	@Transactional(readOnly = true)
-	public List<CompanyListOnlyIdNameResponse> findByCompanyListOnlyIdName(){
-		return companyRepository.findByCompanyListOnlyIdName();
+	public List<CompanyNameResponse> findCompanyNamesByCompanyType(final String companyType){
+		return companyRepository.findCompanyNamesByCompanyType(companyType);
 	}
 
 }

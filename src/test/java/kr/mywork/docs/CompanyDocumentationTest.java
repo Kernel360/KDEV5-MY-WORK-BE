@@ -425,7 +425,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			get("/api/companies/company-list")
+			get("/api/companies/names?companyType={companyType}", "CLIENT")
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.contentType(MediaType.APPLICATION_JSON));
 
