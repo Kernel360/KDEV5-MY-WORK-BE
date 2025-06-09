@@ -11,7 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.mywork.domain.auth.dto.response.TokenResponse;
 import kr.mywork.domain.auth.errors.AuthErrorType;
-import kr.mywork.domain.auth.errors.AuthException;
+import kr.mywork.domain.auth.errors.InvalidTokenException;
+import kr.mywork.domain.auth.errors.RefreshTokenNotFoundException;
 import kr.mywork.domain.auth.model.BlacklistedRefreshToken;
 import kr.mywork.domain.auth.repository.BlacklistedRefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,15 +39,15 @@ public class TokenService {
 		String refreshToken = resolveRefreshTokenFromCookie(request);
 
 		if (refreshToken == null) {
-			throw new AuthException(AuthErrorType.REFRESH_TOKEN_NOT_FOUND);
+			throw new RefreshTokenNotFoundException(AuthErrorType.REFRESH_TOKEN_NOT_FOUND);
 		}
 
 		if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
-			throw new AuthException(AuthErrorType.INVALID_TOKEN);
+			throw new InvalidTokenException(AuthErrorType.INVALID_ACCESS_TOKEN);
 		}
 
 		if (isRefreshTokenBlacklisted(refreshToken)) {
-			throw new AuthException(AuthErrorType.INVALID_TOKEN);
+			throw new InvalidTokenException(AuthErrorType.INVALID_ACCESS_TOKEN);
 		}
 
 		Claims claims = jwtTokenProvider.extractRefreshTokenPayload(refreshToken);

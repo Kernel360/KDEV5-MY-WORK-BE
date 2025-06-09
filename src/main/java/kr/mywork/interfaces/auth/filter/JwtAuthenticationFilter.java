@@ -1,6 +1,16 @@
 package kr.mywork.interfaces.auth.filter;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,17 +18,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.auth.dto.MemberDetails;
 import kr.mywork.domain.auth.errors.AuthErrorType;
+import kr.mywork.domain.auth.errors.AuthException;
 import kr.mywork.domain.auth.service.JwtTokenProvider;
 import kr.mywork.domain.auth.service.TokenAuthenticationService;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
@@ -60,19 +65,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			filterChain.doFilter(request, response);
 
-		} catch (Exception e) {
+		} catch (AuthException authException) {
+			log.warn("auth exception name : {}, error type: {}", authException.getClass().getName(),
+				authException.getErrorType());
 
-			// TODO PatternParseException 핸들링하기
-			// TODO 아이디, 비밀번호 에러 메시지 변경 (catch 범위가 너무 넓어서 예외 파악 어려움)
 			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-			var apiError = ApiResponse.error(
-				AuthErrorType.INVALID_LOGIN.getErrorCode().name(),
-				AuthErrorType.INVALID_LOGIN.getMessage()
-			);
-			objectMapper.writeValue(response.getWriter(), apiError);
+			var errorResponse = ApiResponse.error(
+				AuthErrorType.AUTHENTICATION_FAILED.getErrorCode().name(),
+				AuthErrorType.AUTHENTICATION_FAILED.getMessage());
+
+			objectMapper.writeValue(response.getWriter(), errorResponse);
 		}
 	}
 }

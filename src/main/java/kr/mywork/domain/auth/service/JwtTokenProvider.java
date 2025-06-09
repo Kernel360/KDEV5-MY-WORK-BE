@@ -9,8 +9,9 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.mywork.common.auth.JwtProperties;
+import kr.mywork.domain.auth.errors.InvalidTokenException;
+import kr.mywork.domain.auth.errors.TokenExpiredException;
 import kr.mywork.domain.auth.errors.AuthErrorType;
-import kr.mywork.domain.auth.errors.AuthException;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -105,9 +106,9 @@ public class JwtTokenProvider {
 			accessTokenParser.parseSignedClaims(token);
 			return true;
 		} catch (ExpiredJwtException e) {
-			throw new AuthException(AuthErrorType.EXPIRED_TOKEN);
+			throw new TokenExpiredException(AuthErrorType.ACCESS_TOKEN_EXPIRED);
 		} catch (JwtException | IllegalArgumentException e) {
-			throw new AuthException(AuthErrorType.INVALID_TOKEN);
+			throw new InvalidTokenException(AuthErrorType.INVALID_ACCESS_TOKEN);
 		}
 	}
 
@@ -116,9 +117,9 @@ public class JwtTokenProvider {
 			refreshTokenParser.parseSignedClaims(token);
 			return true;
 		} catch (ExpiredJwtException e) {
-			throw new AuthException(AuthErrorType.EXPIRED_TOKEN);
+			throw new TokenExpiredException(AuthErrorType.ACCESS_TOKEN_EXPIRED);
 		} catch (JwtException | IllegalArgumentException e) {
-			throw new AuthException(AuthErrorType.INVALID_TOKEN);
+			throw new InvalidTokenException(AuthErrorType.INVALID_ACCESS_TOKEN);
 		}
 	}
 
@@ -126,7 +127,7 @@ public class JwtTokenProvider {
 		try {
 			return accessTokenParser.parseSignedClaims(accessToken).getPayload();
 		} catch (JwtException | IllegalArgumentException e) {
-			throw new AuthException(AuthErrorType.INVALID_TOKEN);
+			throw new InvalidTokenException(AuthErrorType.INVALID_ACCESS_TOKEN);
 		}
 	}
 
@@ -134,7 +135,7 @@ public class JwtTokenProvider {
 		try {
 			return refreshTokenParser.parseSignedClaims(refreshToken).getPayload();
 		} catch (JwtException | IllegalArgumentException e) {
-			throw new AuthException(AuthErrorType.INVALID_TOKEN);
+			throw new InvalidTokenException(AuthErrorType.INVALID_REFRESH_TOKEN);
 		}
 	}
 	public String resolveAccessToken(String authorizationHeader) {

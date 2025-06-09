@@ -1,16 +1,15 @@
 package kr.mywork.domain.auth.service;
 
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import kr.mywork.domain.auth.dto.MemberDetails;
 import kr.mywork.domain.auth.dto.LoginSuccessAuthenticationToken;
 import kr.mywork.domain.auth.dto.LoginTrialAuthenticationToken;
+import kr.mywork.domain.auth.dto.MemberDetails;
 import kr.mywork.domain.auth.errors.AuthErrorType;
-import kr.mywork.domain.auth.errors.AuthException;
+import kr.mywork.domain.auth.errors.AuthenticationFailedException;
 
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
@@ -32,9 +31,8 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 		MemberDetails memberDetails = memberDetailService.loadUserByUsername(email);
 
 		if (!passwordEncoder.matches(rawPassword, memberDetails.getPassword())) {
-			throw new AuthException(AuthErrorType.AUTHENTICATION_FAILED);
+			throw new AuthenticationFailedException(AuthErrorType.INVALID_PASSWORD);
 		}
-
 
 		return LoginSuccessAuthenticationToken.create(memberDetails, memberDetails.getAuthorities());
 	}
