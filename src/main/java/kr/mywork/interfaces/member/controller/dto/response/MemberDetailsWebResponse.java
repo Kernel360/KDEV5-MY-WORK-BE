@@ -1,8 +1,9 @@
 package kr.mywork.interfaces.member.controller.dto.response;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
-import kr.mywork.domain.auth.dto.MemberDetails;
 import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 
 public record MemberDetailsWebResponse(
@@ -14,19 +15,29 @@ public record MemberDetailsWebResponse(
 	String role,
 	String phoneNumber,
 	String email,
-	Boolean deleted
+	Boolean deleted,
+	LocalDateTime modifiedAt,
+	LocalDateTime createdAt,
+	String contactPhoneNumber,
+	List<MemberProjectInfoWebResponse> projects
 ) {
-	public static MemberDetailsWebResponse from(MemberDetailResponse response) {
+
+	public static MemberDetailsWebResponse from(
+		MemberDetailResponse memberDetailResponse, List<MemberProjectInfoWebResponse> projects) {
 		return new MemberDetailsWebResponse(
-			response.companyId(),
-			response.companyName(),
-			response.name(),
-			response.department(),
-			response.position(),
-			response.role(),
-			response.phoneNumber(),
-			response.email(),
-			response.deleted()
+			memberDetailResponse.companyId(),
+			memberDetailResponse.companyName(),
+			memberDetailResponse.name(),
+			memberDetailResponse.department(),
+			memberDetailResponse.position(),
+			memberDetailResponse.role(),
+			memberDetailResponse.phoneNumber(),
+			memberDetailResponse.email(),
+			memberDetailResponse.deleted(),
+			memberDetailResponse.modifiedAt(),
+			memberDetailResponse.createdAt(),
+			memberDetailResponse.contactPhoneNumber(),
+			projects
 		);
 	}
 }
