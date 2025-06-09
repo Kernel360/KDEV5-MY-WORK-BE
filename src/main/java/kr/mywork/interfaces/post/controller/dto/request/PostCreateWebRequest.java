@@ -17,6 +17,9 @@ public class PostCreateWebRequest {
 	private final UUID id;
 
 	@NotNull
+	private final UUID projectId;
+
+	@NotNull
 	private final UUID projectStepId;
 
 	@Length(min = 1, max = 200, message = "{post-invalid-length-title}")
@@ -34,7 +37,7 @@ public class PostCreateWebRequest {
 	private final String content;
 
 	public PostCreateRequest toServiceDto() {
-		return new PostCreateRequest(this.id, this.projectStepId, this.title, this.companyName,
+		return new PostCreateRequest(this.id, this.projectId, this.projectStepId, this.title, this.companyName,
 			this.authorName, this.content, "PENDING", false);
 	}
 
