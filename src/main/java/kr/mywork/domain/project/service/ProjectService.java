@@ -8,16 +8,24 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.mywork.domain.company.errors.CompanyErrorType;
+import kr.mywork.domain.company.errors.CompanyNotFoundException;
+import kr.mywork.domain.company.model.Company;
+import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
+import kr.mywork.domain.project.errors.ProjectAssignNotFoundException;
 import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
+import kr.mywork.domain.project.model.Project;
+import kr.mywork.domain.project.model.ProjectAssign;
+import kr.mywork.domain.project.repository.ProjectAssignRepository;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
+import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +38,8 @@ public class ProjectService {
 	private int projectPageSize;
 
 	private final ProjectRepository projectRepository;
+	private final ProjectAssignRepository projectAssignRepository;
+	private final CompanyRepository companyRepository;
 	private final MemberRepository memberRepository;
 
 	@Transactional
@@ -60,11 +70,23 @@ public class ProjectService {
 	}
 
 	@Transactional(readOnly = true)
-	public ProjectSelectResponse findProjectById(UUID projectId) {
-		var project = projectRepository.findById(projectId)
+	public ProjectDetailResponse findProjectDetailsById(UUID projectId) {
+		final Project project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
 
-		return ProjectSelectResponse.fromEntity(project);
+		final ProjectAssign projectAssign = projectAssignRepository.findByProjectId(projectId)
+			.orElseThrow(() -> new ProjectAssignNotFoundException(ProjectErrorType.PROJECT_ASSIGN_NOT_FOUND));
+
+		final Company devCompany = companyRepository.findById(projectAssign.getDevCompanyId())
+			.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
+
+		final Company clientCompany = companyRepository.findById(projectAssign.getClientCompanyId())
+			.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
+
+		return new ProjectDetailResponse(project.getId(), project.getName(), project.getStartAt(), project.getEndAt(),
+			project.getStep(), project.getDetail(), project.getDeleted(), project.getCreatedAt(), devCompany.getId(),
+			devCompany.getName(), devCompany.getContactPhoneNumber(), clientCompany.getId(), clientCompany.getName(),
+			clientCompany.getContactPhoneNumber());
 	}
 
 	@Transactional(readOnly = true)
