@@ -23,6 +23,8 @@ import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import kr.mywork.domain.company.service.dto.response.CompanyDetailResponse;
 import kr.mywork.domain.company.service.dto.response.CompanyListOnlyIdNameResponse;
 import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
+import kr.mywork.domain.member.service.MemberService;
+import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
@@ -35,6 +37,8 @@ import kr.mywork.interfaces.company.controller.dto.response.CompanyListOnlyIdNam
 import kr.mywork.interfaces.company.controller.dto.response.CompanyListWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanySelectWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyUpdateWebResponse;
+import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberListWebResponse;
+import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -47,6 +51,7 @@ public class CompanyController {
 	private static final String COMPANY_KEYWORD_TYPE = "^(NAME|BUSINESS_NUMBER|PHONE_NUMBER|ADDRESS)$";
 
 	private final CompanyService companyService;
+	private final MemberService memberService;
 
 	@PostMapping("/id/generate")
 	public ApiResponse<CompanyIdCreateWebResponse> createCompanyId() {
@@ -117,6 +122,7 @@ public class CompanyController {
 
 		return ApiResponse.success(new CompanyListWebResponse(companySelectWebResponses, totalCount));
 	}
+
 	@GetMapping("/company-list")
 	public ApiResponse<CompanyListOnlyIdNameWebResponse> companyListOnlyIdNameWebResponseApiResponse(){
 		final List<CompanyListOnlyIdNameResponse> companyList = companyService.findByCompanyListOnlyIdName();
@@ -127,5 +133,19 @@ public class CompanyController {
 				.toList();
 
 		return ApiResponse.success(new CompanyListOnlyIdNameWebResponse(companyListContainIdNameResponse));
+	}
+
+	@GetMapping("/{companyId}/members")
+	public ApiResponse<CompanyMemberWebResponse> getCompanyMember(@PathVariable(name = "companyId") UUID companyId,
+		@RequestParam(defaultValue = "1") @Min(value = 1, message = "{invalid.page-size}") int page) {
+		List<CompanyMemberResponse> companyMemberResponses = memberService.findMemberByCompanyId(companyId, page);
+
+		long total = memberService.countMembersByCompanyId(companyId);
+
+		List<CompanyMemberListWebResponse> companyMemberWebResponses = companyMemberResponses.stream()
+			.map(CompanyMemberListWebResponse::fromService)
+			.toList();
+
+		return ApiResponse.success(new CompanyMemberWebResponse(total, companyMemberWebResponses));
 	}
 }
