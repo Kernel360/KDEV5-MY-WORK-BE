@@ -79,8 +79,10 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 		UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
 		UUID projectStepId = UUID.fromString("4321a2a2-00b2-0000-c2bb-81c0000aa00c"); // UUID ver7
+		UUID projectId = UUID.fromString("01975094-466b-7d09-81e1-f79b29d9b85d"); // UUID ver7
+
 		final PostCreateWebRequest postCreateWebRequest =
-			new PostCreateWebRequest(postId, projectStepId, "게시글 제목", "게시글 이름", "저자 이름", "게시글 내용");
+			new PostCreateWebRequest(postId, projectId, projectStepId, "게시글 제목", "게시글 이름", "저자 이름", "게시글 내용");
 
 		final String requestBody = objectMapper.writeValueAsString(postCreateWebRequest);
 
@@ -125,9 +127,10 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 		UUID postId = Generators.timeBasedEpochGenerator().generate(); // UUID ver7
 		UUID projectStepId = UUID.fromString("4321a2a2-00b2-0000-c2bb-81c0000aa00c"); // UUID ver7
+		UUID projectId = UUID.fromString("01975094-466b-7d09-81e1-f79b29d9b85d"); // UUID ver7
 
 		final PostCreateWebRequest postCreateWebRequest =
-			new PostCreateWebRequest(postId, projectStepId, "게시글 제목", "게시글 이름", "저자 이름", "게시글 내용");
+			new PostCreateWebRequest(postId, projectId, projectStepId, "게시글 제목", "게시글 이름", "저자 이름", "게시글 내용");
 
 		final String requestBody = objectMapper.writeValueAsString(postCreateWebRequest);
 
@@ -313,11 +316,14 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 		final String accessToken = createUserAccessToken();
 
 		UUID projectStepId = UUID.fromString("019739d2-2e80-709f-a9c5-7da758c956d1");
+		UUID projectId = UUID.fromString("01975454-e57b-7df5-acb8-598c64aaf54e");
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			get("/api/posts?page={page}&projectStepId={projectStepId}&keyword={keyword}&deleted={deleted}",
-				1, projectStepId, null, null) // HTTP method (URL)
+			get("/api/posts?page={page}&projectId={projectId}",
+			// get("/api/posts?page={page}&projectStepId={projectStepId}&projectId={projectId}&keyword={keyword}&deleted={deleted}&approval={approval}&keywordType={keywordType}",
+				1, projectId) // HTTP method (URL)
+				// 1, projectStepId, projectId, null, null, null, null) // HTTP method (URL)
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
@@ -342,8 +348,11 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 				.queryParameters(
 					parameterWithName("page").description("페이지 번호"),
 					parameterWithName("projectStepId").description("프로젝트 단계 ID").optional(),
+					parameterWithName("projectId").description("프로젝트 ID"),
 					parameterWithName("keyword").description("검색어").optional(),
-					parameterWithName("deleted").description("삭제 여부").optional())
+					parameterWithName("keywordType").description("검색조건").optional(),
+					parameterWithName("deleted").description("삭제 여부").optional(),
+					parameterWithName("approval").description("승인 여부").optional())
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.posts.[].postId").type(JsonFieldType.STRING).description("게시글 아이디"),
@@ -351,6 +360,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.posts.[].title").type(JsonFieldType.STRING).description("게시글 제목"),
 					fieldWithPath("data.posts.[].createdAt").type(JsonFieldType.STRING).description("생성 일자"),
 					fieldWithPath("data.posts.[].approval").type(JsonFieldType.STRING).description("승인여부"),
+					fieldWithPath("data.posts.[].projectStepName").type(JsonFieldType.STRING).description("프로젝트단계명"),
 					fieldWithPath("data.totalCount").type(JsonFieldType.NUMBER).description("총 갯수"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
