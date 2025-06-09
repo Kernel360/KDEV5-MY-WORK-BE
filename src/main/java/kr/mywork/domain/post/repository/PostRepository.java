@@ -14,7 +14,7 @@ public interface PostRepository {
 	Optional<Post> findById(UUID id);
 
 	List<PostSelectResponse> findPostsBySearchConditionWithPaging(int page, int postPageSize, UUID projectStepId,
-		String keyword, Boolean deleted);
+		String keyword, Boolean deleted, UUID projectId, String keywordType, String approval);
 
-	Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted);
+	Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted, UUID projectId, String keywordType, String approval);
 }

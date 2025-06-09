@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
@@ -36,6 +37,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostController {
+
+	private static final String POST_KEYWORD_TYPE = "^(AUTHORNAME|TITLE)?$";
+	private static final String POST_APPROVAL_TYPE = "^(APPROVED|PENDING)?$";
 
 	private final PostService postService;
 
@@ -87,14 +91,17 @@ public class PostController {
 	public ApiResponse<PostListSelectWebResponse> findPostsByOffset(
 		@RequestParam final int page,
 		@RequestParam(name = "keyword", required = false) final String keyword,
+		@RequestParam(name = "projectId", required = true) final UUID projectId,
+		@RequestParam(name = "keywordType", required = false) @Pattern(regexp = POST_KEYWORD_TYPE, message = "{invalid.post-search-type}") final String keywordType,
 		@RequestParam(name = "projectStepId", required = false) final UUID projectStepId,
-		@RequestParam(name = "deleted", required = false) final Boolean deleted
+		@RequestParam(name = "deleted", required = false) final Boolean deleted,
+		@RequestParam(name = "approval", required = false) @Pattern(regexp = POST_APPROVAL_TYPE, message = "{invalid.post-approval-type}") final String approval
 	) {
 
 		final List<PostSelectResponse> postSelectResponses = postService.findPostsBySearchConditionWithPaging(page,
-			projectStepId, keyword, deleted);
+			projectStepId, keyword, deleted, projectId, keywordType, approval);
 
-		final Long totalCount = postService.countTotalPostsByCondition(projectStepId, keyword, deleted);
+		final Long totalCount = postService.countTotalPostsByCondition(projectStepId, keyword, deleted, projectId, keywordType, approval);
 
 		final List<PostSelectWebResponse> postSelectWebResponses = postSelectResponses.stream()
 			.map(PostSelectWebResponse::from)
