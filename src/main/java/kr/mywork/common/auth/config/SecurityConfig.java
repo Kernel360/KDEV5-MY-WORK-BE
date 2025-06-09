@@ -62,9 +62,10 @@ public class SecurityConfig {
 						MemberRole.USER.name(),
 						MemberRole.DEV_ADMIN.name(),
 						MemberRole.CLIENT_ADMIN.name())
-					.requestMatchers(HttpMethod.POST, "/api/projects/steps").hasAnyRole(MemberRole.DEV_ADMIN.name())
-					.requestMatchers(HttpMethod.PUT, "/api/projects/*/steps").hasAnyRole(MemberRole.DEV_ADMIN.name())
-					.requestMatchers(HttpMethod.PUT, "/api/projects/*/steps").hasAnyRole(MemberRole.DEV_ADMIN.name())
+					.requestMatchers(HttpMethod.POST, "/api/projects/steps").hasAnyRole(
+						MemberRole.SYSTEM_ADMIN.name(), MemberRole.DEV_ADMIN.name())
+					.requestMatchers(HttpMethod.PUT, "/api/projects/*/steps").hasAnyRole(
+						MemberRole.SYSTEM_ADMIN.name(), MemberRole.DEV_ADMIN.name())
 					.requestMatchers("/api/member/**").hasAnyRole(
 						MemberRole.DEV_ADMIN.name(),
 						MemberRole.CLIENT_ADMIN.name(),
