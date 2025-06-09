@@ -7,7 +7,7 @@ import java.util.UUID;
 import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.model.CompanyType;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
-import kr.mywork.domain.company.service.dto.response.CompanyListOnlyIdNameResponse;
+import kr.mywork.domain.company.service.dto.response.CompanyNameResponse;
 import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 
 public interface CompanyRepository {
@@ -22,5 +22,5 @@ public interface CompanyRepository {
 
 	Optional<Company> findByIdAndType(UUID companyId, CompanyType type);
 
-	List<CompanyListOnlyIdNameResponse>findByCompanyListOnlyIdName();
+	List<CompanyNameResponse> findCompanyNamesByCompanyType(String companyType);
 }

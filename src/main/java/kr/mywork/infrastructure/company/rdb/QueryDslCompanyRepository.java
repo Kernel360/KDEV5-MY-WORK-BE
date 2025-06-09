@@ -17,7 +17,7 @@ import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.model.CompanyType;
 import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
-import kr.mywork.domain.company.service.dto.response.CompanyListOnlyIdNameResponse;
+import kr.mywork.domain.company.service.dto.response.CompanyNameResponse;
 import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -86,7 +86,8 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 	}
 
 	@Override
-	public Long countTotalCompaniesByCondition(final String companyType, String keywordType, final String keyword, final Boolean deleted) {
+	public Long countTotalCompaniesByCondition(final String companyType, String keywordType, final String keyword,
+		final Boolean deleted) {
 		return queryFactory.select(company.id.count())
 			.from(company)
 			.where(
@@ -103,16 +104,17 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 
 		return company.deleted.eq(deleted);
 	}
+
 	@Override
-	public List<CompanyListOnlyIdNameResponse> findByCompanyListOnlyIdName() {
+	public List<CompanyNameResponse> findCompanyNamesByCompanyType(final String companyType) {
 		return queryFactory
 			.select(Projections.constructor(
-				CompanyListOnlyIdNameResponse.class,
+				CompanyNameResponse.class,
 				company.id,
-				company.name
-			))
+				company.name))
 			.from(company)
-			.where(company.deleted.isFalse())
+			.where(company.deleted.isFalse(),
+				company.type.stringValue().eq(companyType))
 			.fetch();
 	}
 }
