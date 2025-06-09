@@ -29,6 +29,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,6 +48,8 @@ public class SecurityConfig {
 		http
 			.csrf(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)
+			.cors(httpSecurityCorsConfigurer ->
+				httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
 			.sessionManagement(sessionManagementConfigurer ->
 				sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -138,5 +143,20 @@ public class SecurityConfig {
 	@Bean
 	public JwtAccessDeniedHandler jwtAccessDeniedHandler() {
 		return new JwtAccessDeniedHandler(objectMapper);
+	}
+
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration config = new CorsConfiguration();
+
+		config.setAllowedOrigins(List.of("http://localhost:3000", "https://d16zykr4498a0c.cloudfront.net"));
+		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setAllowedHeaders(List.of("*"));
+		config.setAllowCredentials(true); // 쿠키, 인증 정보 포함 시 필수
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/api/**", config);
+
+		return source;
 	}
 }
