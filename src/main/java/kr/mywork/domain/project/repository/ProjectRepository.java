@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
 
 public interface ProjectRepository {
@@ -28,4 +28,6 @@ public interface ProjectRepository {
 		String nameKeyword,
 		Boolean deleted
 	);
+
+	List<MemberProjectInfoResponse> findeMemberProjectList(UUID memberId);
 }

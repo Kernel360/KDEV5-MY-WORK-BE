@@ -15,11 +15,11 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.model.ProjectAssign;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -28,9 +28,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class QueryDslProjectRepository implements ProjectRepository {
 
-	private final JpaProjectRepository       projectRepository;
+	private final JpaProjectRepository projectRepository;
 	private final JpaProjectAssignRepository projectAssignRepository;
-	private final JPAQueryFactory            queryFactory;
+	private final JPAQueryFactory queryFactory;
 
 	@Override
 	public Project save(ProjectCreateRequest request) {
@@ -108,6 +108,22 @@ public class QueryDslProjectRepository implements ProjectRepository {
 				eqDeleted(deleted)
 			)
 			.fetchOne();
+	}
+
+	@Override
+	public List<MemberProjectInfoResponse> findeMemberProjectList(UUID memberId) {
+		return queryFactory.select(Projections.constructor(
+				MemberProjectInfoResponse.class,
+				projectMember.projectId,
+				project.name
+			))
+			.from(projectMember)
+			.leftJoin(project).on(projectMember.projectId.eq(project.id))
+			.where(
+				eqMember(memberId),
+				eqDeleted(false)
+			)
+			.fetch();
 	}
 
 	private BooleanExpression eqMember(UUID memberId) {
