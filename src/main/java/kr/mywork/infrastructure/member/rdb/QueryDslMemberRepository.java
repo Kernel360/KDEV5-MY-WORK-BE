@@ -1,7 +1,7 @@
 package kr.mywork.infrastructure.member.rdb;
 
-import static kr.mywork.domain.member.model.QMember.member;
 import static kr.mywork.domain.company.model.QCompany.company;
+import static kr.mywork.domain.member.model.QMember.member;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
@@ -171,7 +170,10 @@ public class QueryDslMemberRepository implements MemberRepository {
 			member.role.stringValue(),
 			member.phoneNumber,
 			member.email,
-			member.deleted
+			member.deleted,
+			member.modifiedAt,
+			member.createdAt,
+			company.contactPhoneNumber
 			))
 			.from(member)
 			.join(company).on(member.companyId.eq(company.id))
