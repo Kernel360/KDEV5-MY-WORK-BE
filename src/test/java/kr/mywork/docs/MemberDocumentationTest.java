@@ -30,6 +30,7 @@ import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.member.controller.dto.request.MemberCreateWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberUpdateWebRequest;
+import kr.mywork.interfaces.member.controller.dto.request.ResetPasswordWebRequest;
 
 public class MemberDocumentationTest extends RestDocsDocumentation {
 
@@ -244,6 +245,37 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				fieldWithPath("data.contactPhoneNumber").type(JsonFieldType.STRING).description("멤버 회사 연락처"),
 				fieldWithPath("data.projects[].projectId").type(JsonFieldType.STRING).description("멤버 참여중인 프로젝트 아이디"),
 				fieldWithPath("data.projects[].projectName").type(JsonFieldType.STRING).description("멤버 참여중인 프로젝트 이름"),
+				fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+			.build());
+	}
+
+	@Test
+	@DisplayName("멤버 비밀 번호 변경 성공")
+	@Sql("classpath:sql/member-password-change.sql")
+	void 멤버_비밀번호_변경_성공() throws Exception {
+		//given
+		final String accessToken = createDevAdminAccessToken();
+		ResetPasswordWebRequest request = new ResetPasswordWebRequest("admin@example.com","password1234","1234");
+		final String requestBody = objectMapper.writeValueAsString(request);
+		//when
+		final ResultActions result = mockMvc.perform(
+			post("/api/member/reSetPassword")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(requestBody));
+		//then
+		result.andExpectAll(status().isOk(), jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(), jsonPath("$.error").doesNotExist())
+			.andDo(document("member-password-change-success", memberPasswordChangeSuccessResource()));
+	}
+	private ResourceSnippet memberPasswordChangeSuccessResource() {
+		return resource(ResourceSnippetParameters.builder()
+			.tag("Member API")
+			.summary("멤버 비밀번호 재설정 API")
+			.description("멤버 비밀번호를 재설정 한다.")
+			.requestHeaders(headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"))
+			.responseFields(fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+				fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("비밀번호 변경된 멤버 Id"),
 				fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 			.build());
 	}
