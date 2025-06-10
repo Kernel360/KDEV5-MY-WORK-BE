@@ -82,7 +82,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 		UUID projectId = UUID.fromString("01975094-466b-7d09-81e1-f79b29d9b85d"); // UUID ver7
 
 		final PostCreateWebRequest postCreateWebRequest =
-			new PostCreateWebRequest(postId, projectId, projectStepId, "게시글 제목", "게시글 이름", "저자 이름", "게시글 내용");
+			new PostCreateWebRequest(postId, projectStepId, "게시글 제목", "게시글 이름", "저자 이름", "게시글 내용");
 
 		final String requestBody = objectMapper.writeValueAsString(postCreateWebRequest);
 
@@ -130,7 +130,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 		UUID projectId = UUID.fromString("01975094-466b-7d09-81e1-f79b29d9b85d"); // UUID ver7
 
 		final PostCreateWebRequest postCreateWebRequest =
-			new PostCreateWebRequest(postId, projectId, projectStepId, "게시글 제목", "게시글 이름", "저자 이름", "게시글 내용");
+			new PostCreateWebRequest(postId, projectStepId, "게시글 제목", "게시글 이름", "저자 이름", "게시글 내용");
 
 		final String requestBody = objectMapper.writeValueAsString(postCreateWebRequest);
 

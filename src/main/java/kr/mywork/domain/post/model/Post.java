@@ -22,8 +22,6 @@ public class Post {
 	@Id
 	private UUID id;
 
-	private UUID projectId;
-
 	private UUID projectStepId;
 
 	@Column(length = 200)
