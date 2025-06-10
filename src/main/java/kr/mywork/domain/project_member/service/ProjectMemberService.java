@@ -37,7 +37,7 @@ public class ProjectMemberService {
 
 	@Transactional
 	public UUID deleteMemberById(UUID memberId,UUID projectId) {
-		ProjectMember projectMember = projectMemberRepository.findByMemberId(memberId,projectId)
+		ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(memberId,projectId)
 			.orElseThrow(()-> new ProjectMemberNotFoundException(ProjectMemberErrorType.PROJECT_MEMBER_NOT_FOUND));
 
 		projectMember.delete();

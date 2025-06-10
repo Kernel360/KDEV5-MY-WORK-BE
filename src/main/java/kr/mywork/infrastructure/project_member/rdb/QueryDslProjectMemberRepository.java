@@ -50,7 +50,7 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 	}
 
 	@Override
-	public Optional<ProjectMember> findByMemberId(UUID memberId,UUID projectId) {
+	public Optional<ProjectMember> findByMemberIdAndProjectId(UUID memberId,UUID projectId) {
 		return jpaProjectMemberRepository.findByMemberIdAndProjectId(memberId,projectId);
 	}
 

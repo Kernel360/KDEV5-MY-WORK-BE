@@ -10,5 +10,5 @@ import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProje
 public interface ProjectMemberRepository {
 	ProjectMember save(ProjectMember projectMember);
 	List<CompanyMemberInProjectResponse> findCompanyMembersInProject(UUID projectId,UUID companyId);
-	Optional<ProjectMember> findByMemberId(UUID memberId,UUID projectId);
+	Optional<ProjectMember> findByMemberIdAndProjectId(UUID memberId,UUID projectId);
 }
