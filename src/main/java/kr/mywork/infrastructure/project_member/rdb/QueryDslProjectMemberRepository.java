@@ -1,11 +1,14 @@
 package kr.mywork.infrastructure.project_member.rdb;
 
+import static kr.mywork.domain.member.model.QMember.member;
+import static kr.mywork.domain.project.model.QProjectMember.projectMember;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
-import static kr.mywork.domain.member.model.QMember.member;
-import static kr.mywork.domain.project.model.QProjectMember.projectMember;
+
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -46,5 +49,9 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 			.fetch();
 	}
 
+	@Override
+	public Optional<ProjectMember> findByMemberId(UUID memberId,UUID projectId) {
+		return jpaProjectMemberRepository.findByMemberIdAndProjectId(memberId,projectId);
+	}
 
 }
