@@ -220,7 +220,7 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 		final UUID checkListId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
 
 		final ProjectCheckListApprovalWebRequest projectCheckListApprovalWebRequest = new ProjectCheckListApprovalWebRequest(
-			checkListId, "승인");
+			checkListId, "APPROVED");
 
 		final String requestBody = objectMapper.writeValueAsString(projectCheckListApprovalWebRequest);
 
