@@ -47,15 +47,12 @@ public class ProjectController {
 
 	@PostMapping
 	public ApiResponse<ProjectCreateWebResponse> createProject(
-		@RequestBody @Valid final ProjectCreateWebRequest webRequest
-	) {
-		// 1) WebRequest → Service DTO
-		final ProjectCreateRequest dto = webRequest.toServiceDto();
+		@RequestBody @Valid final ProjectCreateWebRequest projectCreateWebRequest) {
 
-		// 2) 서비스 호출
-		final UUID createdId = projectService.createProject(dto);
+		final ProjectCreateRequest projectCreateRequest = projectCreateWebRequest.toServiceDto();
 
-		// 3) WebResponse 생성 후 반환
+		final UUID createdId = projectService.createProject(projectCreateRequest);
+
 		return ApiResponse.success(new ProjectCreateWebResponse(createdId));
 	}
 
