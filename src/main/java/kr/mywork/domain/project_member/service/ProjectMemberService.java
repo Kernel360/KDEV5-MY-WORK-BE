@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import kr.mywork.domain.project.model.ProjectMember;
+import kr.mywork.domain.project_member.error.ProjectMemberErrorType;
+import kr.mywork.domain.project_member.error.ProjectMemberNotFoundException;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +33,15 @@ public class ProjectMemberService {
 	public List<CompanyMemberInProjectResponse> findCompanyMembersInProject (UUID projectId,UUID companyId) {
 
 		return projectMemberRepository.findCompanyMembersInProject(projectId,companyId);
+	}
+
+	@Transactional
+	public UUID deleteMemberById(UUID memberId,UUID projectId) {
+		ProjectMember projectMember = projectMemberRepository.findByMemberId(memberId,projectId)
+			.orElseThrow(()-> new ProjectMemberNotFoundException(ProjectMemberErrorType.PROJECT_MEMBER_NOT_FOUND));
+
+		projectMember.delete();
+
+		return projectMember.getId();
 	}
 }
