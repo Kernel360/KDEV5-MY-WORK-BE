@@ -21,6 +21,7 @@ public record MemberDetailsWebResponse(
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime modifiedAt,
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime createdAt,
 	String contactPhoneNumber,
+	LocalDateTime birthday,
 	List<MemberProjectInfoWebResponse> projects
 ) {
 
@@ -39,6 +40,7 @@ public record MemberDetailsWebResponse(
 			memberDetailResponse.modifiedAt(),
 			memberDetailResponse.createdAt(),
 			memberDetailResponse.contactPhoneNumber(),
+			memberDetailResponse.birthDate(),
 			projects
 		);
 	}

@@ -171,7 +171,8 @@ public class QueryDslMemberRepository implements MemberRepository {
 			member.deleted,
 			member.modifiedAt,
 			member.createdAt,
-			company.contactPhoneNumber
+			company.contactPhoneNumber,
+			member.birthDate
 			))
 			.from(member)
 			.join(company).on(member.companyId.eq(company.id))
@@ -181,5 +182,9 @@ public class QueryDslMemberRepository implements MemberRepository {
 				company.deleted.eq(false)
 			)
 			.fetchOne();
+	}
+	@Override
+	public Optional<Member> findFirstByEmail(String email){
+		return memberRepository.findFirstByEmail(email);
 	}
 }
