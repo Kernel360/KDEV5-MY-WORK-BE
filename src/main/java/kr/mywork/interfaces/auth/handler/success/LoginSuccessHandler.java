@@ -67,7 +67,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 		TokenWebResponse tokenWebResponse = new TokenWebResponse(
 			accessToken,
-			expiresAt,
 			memberDetails.getId(),
 			memberDetails.getName(),
 			memberDetails.getAuthorityAsStr(),
