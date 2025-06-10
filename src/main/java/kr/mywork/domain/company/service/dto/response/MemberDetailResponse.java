@@ -15,6 +15,7 @@ public record MemberDetailResponse(
 	Boolean deleted,
 	LocalDateTime modifiedAt,
 	LocalDateTime createdAt,
-	String contactPhoneNumber
+	String contactPhoneNumber,
+	LocalDateTime birthDate
 ) {
 }

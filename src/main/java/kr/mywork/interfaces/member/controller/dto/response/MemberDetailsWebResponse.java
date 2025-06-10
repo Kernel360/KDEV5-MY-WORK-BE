@@ -19,6 +19,7 @@ public record MemberDetailsWebResponse(
 	LocalDateTime modifiedAt,
 	LocalDateTime createdAt,
 	String contactPhoneNumber,
+	LocalDateTime birthday,
 	List<MemberProjectInfoWebResponse> projects
 ) {
 
@@ -37,6 +38,7 @@ public record MemberDetailsWebResponse(
 			memberDetailResponse.modifiedAt(),
 			memberDetailResponse.createdAt(),
 			memberDetailResponse.contactPhoneNumber(),
+			memberDetailResponse.birthDate(),
 			projects
 		);
 	}
