@@ -64,8 +64,8 @@ public class ProjectService {
 	}
 
 	@Transactional
-	public ProjectUpdateResponse updateProject(ProjectUpdateRequest request) {
-		var project = projectRepository.findById(request.getId())
+	public ProjectUpdateResponse updateProject(UUID projectId, ProjectUpdateRequest request) {
+		var project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
 
 		project.updateFrom(request);

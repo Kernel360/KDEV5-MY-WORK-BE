@@ -59,11 +59,11 @@ public class ProjectController {
 	@PutMapping("/{projectId}")
 	public ApiResponse<ProjectUpdateWebResponse> updateProject(
 		@RequestBody @Valid final ProjectUpdateWebRequest webRequest,
-		@PathVariable final UUID projectId
-	) {
-		final ProjectUpdateRequest dto = webRequest.toServiceDto(projectId);
+		@PathVariable final UUID projectId) {
 
-		final ProjectUpdateResponse serviceResponse = projectService.updateProject(dto);
+		final ProjectUpdateRequest projectUpdateRequest = webRequest.toServiceDto();
+
+		final ProjectUpdateResponse serviceResponse = projectService.updateProject(projectId, projectUpdateRequest);
 
 		final ProjectUpdateWebResponse webResponse = ProjectUpdateWebResponse.from(serviceResponse);
 
