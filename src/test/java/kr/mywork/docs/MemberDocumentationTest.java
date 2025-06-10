@@ -260,7 +260,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 		final String requestBody = objectMapper.writeValueAsString(request);
 		//when
 		final ResultActions result = mockMvc.perform(
-			post("/api/member/reSetPassword")
+			post("/api/member/resetPassword")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody));

@@ -116,7 +116,7 @@ public class MemberController {
 
 		return ApiResponse.success(memberDetailsWebResponse);
 	}
-	@PostMapping("/reSetPassword")
+	@PostMapping("/resetPassword")
 	public ApiResponse<ResetPasswordWebResponse> resetMemberPassword(
 		@RequestBody ResetPasswordWebRequest resetPasswordWebRequest
 	){
