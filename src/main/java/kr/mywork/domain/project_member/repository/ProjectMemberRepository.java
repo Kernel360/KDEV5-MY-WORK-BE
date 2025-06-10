@@ -1,6 +1,7 @@
 package kr.mywork.domain.project_member.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import kr.mywork.domain.project.model.ProjectMember;
@@ -9,4 +10,5 @@ import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProje
 public interface ProjectMemberRepository {
 	ProjectMember save(ProjectMember projectMember);
 	List<CompanyMemberInProjectResponse> findCompanyMembersInProject(UUID projectId,UUID companyId);
+	Optional<ProjectMember> findByMemberId(UUID memberId,UUID projectId);
 }
