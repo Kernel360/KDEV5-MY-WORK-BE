@@ -5,10 +5,12 @@ import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +25,8 @@ import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
 import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
 
 public class ProjectDocumentationTest extends RestDocsDocumentation {
 
@@ -126,5 +130,59 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.clientContactPhoneNum").type(JsonFieldType.STRING).description("프로젝트 고객사 전화번호"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
+	}
+
+	@Test
+	@DisplayName("프로젝트 생성 성공")
+	void 프로젝트_생성_성공() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+
+		final ProjectCreateWebRequest request = new ProjectCreateWebRequest(
+			"고객사 개발 프로젝트",
+			LocalDateTime.of(2025, 1, 1, 10, 0),
+			LocalDateTime.of(2025, 12, 31, 18, 0),
+			"IN_PROGRESS",
+			"서비스 개발 프로젝트입니다.",
+			UUID.fromString("019759dd-378a-7590-9bd4-b204a064a120"),
+			UUID.fromString("019759de-4cdf-70e6-a0c9-3188cac11476")
+		);
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			post("/api/projects")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(objectMapper.writeValueAsString(request)));
+
+		// then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.result").value("SUCCESS"))
+			.andExpect(jsonPath("$.data").exists())
+			.andExpect(jsonPath("$.error").doesNotExist())
+			.andDo(document("project-create-success", projectCreateSuccessResource()));
+	}
+
+	private ResourceSnippet projectCreateSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project API")
+				.summary("프로젝트 생성 API")
+				.description("새로운 프로젝트를 등록하고 개발사, 고객사를 할당한다.")
+				.requestFields(
+					fieldWithPath("name").type(JsonFieldType.STRING).description("프로젝트 이름"),
+					fieldWithPath("startAt").type(JsonFieldType.STRING).description("시작 날짜"),
+					fieldWithPath("endAt").type(JsonFieldType.STRING).description("종료 날짜"),
+					fieldWithPath("step").type(JsonFieldType.STRING)
+						.description("프로젝트 단계 (NOT_STARTED, IN_PROGRESS, PAUSED, COMPLETED)"),
+					fieldWithPath("detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
+					fieldWithPath("devCompanyId").type(JsonFieldType.STRING).description("개발사 UUID"),
+					fieldWithPath("clientCompanyId").type(JsonFieldType.STRING).description("클라이언트 UUID"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("생성된 프로젝트 ID"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
 	}
 }
