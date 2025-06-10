@@ -44,10 +44,13 @@ public class ProjectService {
 
 	@Transactional
 	public UUID createProject(ProjectCreateRequest request) {
-		// ProjectRepository.save(request) 안에서,
-		//   1) Project 엔티티 저장
-		//   2) 새로운 ProjectAssign 엔티티 생성 후 저장
-		var savedProject = projectRepository.save(request);
+
+		final Project savedProject = projectRepository.save(
+			new Project(request.name(), request.startAt(), request.endAt(), request.step(), request.detail()));
+
+		projectAssignRepository.save(
+			new ProjectAssign(savedProject.getId(), request.devCompanyId(), request.clientCompanyId()));
+
 		return savedProject.getId();
 	}
 
