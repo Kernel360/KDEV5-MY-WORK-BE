@@ -27,6 +27,7 @@ import kr.mywork.domain.project.service.ProjectService;
 import kr.mywork.interfaces.member.controller.dto.request.MemberCreateWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberUpdateWebRequest;
+import kr.mywork.interfaces.member.controller.dto.request.ResetPasswordWebRequest;
 import kr.mywork.interfaces.member.controller.dto.response.MemberCreateWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberDeleteWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberDetailsWebResponse;
@@ -34,6 +35,7 @@ import kr.mywork.interfaces.member.controller.dto.response.MemberListWebResponse
 import kr.mywork.interfaces.member.controller.dto.response.MemberProjectInfoWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberSelectWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberUpdateWebResponse;
+import kr.mywork.interfaces.member.controller.dto.response.ResetPasswordWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -114,5 +116,14 @@ public class MemberController {
 
 		return ApiResponse.success(memberDetailsWebResponse);
 	}
+	@PostMapping("/reSetPassword")
+	public ApiResponse<ResetPasswordWebResponse> resetMemberPassword(
+		@RequestBody ResetPasswordWebRequest resetPasswordWebRequest
+	){
+		final UUID memberId = memberService.resetMemberPassword(resetPasswordWebRequest);
 
+		ResetPasswordWebResponse resetPasswordWebResponse = new ResetPasswordWebResponse(memberId);
+
+		return ApiResponse.success(resetPasswordWebResponse);
+	}
 }
