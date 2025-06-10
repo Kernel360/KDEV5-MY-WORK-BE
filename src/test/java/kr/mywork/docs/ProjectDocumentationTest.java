@@ -6,6 +6,7 @@ import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithNam
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,8 +26,8 @@ import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
 import kr.mywork.common.api.support.response.ResultType;
-import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectUpdateWebRequest;
 
 public class ProjectDocumentationTest extends RestDocsDocumentation {
 
@@ -184,5 +185,65 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
+	}
+
+	@Test
+	@DisplayName("프로젝트 수정 성공")
+	@Sql("classpath:sql/project-update.sql")
+	void 프로젝트_수정_성공() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+
+		final UUID projectId = UUID.fromString("01975a03-765d-7760-b82f-1bc8ba1b2ab6");
+
+		final ProjectUpdateWebRequest request = new ProjectUpdateWebRequest(
+			"고객사 프로젝트 이름 수정",
+			LocalDateTime.of(2025, 2, 1, 9, 0),
+			LocalDateTime.of(2025, 11, 30, 18, 0),
+			"COMPLETED",
+			"프로젝트가 완료되었습니다.",
+			false);
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			put("/api/projects/{projectId}", projectId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(objectMapper.writeValueAsString(request)));
+
+		// then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.result").value("SUCCESS"))
+			.andExpect(jsonPath("$.data").exists())
+			.andDo(document("project-update-success", projectUpdateSuccessResource()));
+	}
+
+	private ResourceSnippet projectUpdateSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project API")
+				.summary("프로젝트 수정 API")
+				.description("기존 프로젝트 정보를 수정한다.")
+				.pathParameters(
+					parameterWithName("projectId").description("수정할 프로젝트 ID"))
+				.requestFields(
+					fieldWithPath("name").type(JsonFieldType.STRING).description("프로젝트 이름"),
+					fieldWithPath("startAt").type(JsonFieldType.STRING).description("시작 날짜"),
+					fieldWithPath("endAt").type(JsonFieldType.STRING).description("종료 날짜"),
+					fieldWithPath("step").type(JsonFieldType.STRING)
+						.description("프로젝트 단계 (NOT_STARTED, IN_PROGRESS, PAUSED, COMPLETED)"),
+					fieldWithPath("detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
+					fieldWithPath("deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("프로젝트 ID"),
+					fieldWithPath("data.name").type(JsonFieldType.STRING).description("프로젝트 이름"),
+					fieldWithPath("data.startAt").type(JsonFieldType.STRING).description("프로젝트 시작일"),
+					fieldWithPath("data.endAt").type(JsonFieldType.STRING).description("프로젝트 종료일"),
+					fieldWithPath("data.step").type(JsonFieldType.STRING).description("진행 상태"),
+					fieldWithPath("data.detail").type(JsonFieldType.STRING).description("상세 설명"),
+					fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
 	}
 }
