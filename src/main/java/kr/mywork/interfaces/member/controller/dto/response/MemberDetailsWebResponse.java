@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 
 public record MemberDetailsWebResponse(
@@ -16,8 +18,8 @@ public record MemberDetailsWebResponse(
 	String phoneNumber,
 	String email,
 	Boolean deleted,
-	LocalDateTime modifiedAt,
-	LocalDateTime createdAt,
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime modifiedAt,
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime createdAt,
 	String contactPhoneNumber,
 	List<MemberProjectInfoWebResponse> projects
 ) {

@@ -1,54 +1,15 @@
 package kr.mywork.interfaces.auth.dto.response;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
-
 import kr.mywork.domain.auth.dto.response.TokenResponse;
-import kr.mywork.domain.company.model.CompanyType;
-import lombok.Getter;
 
-@Getter
-public class TokenWebResponse {
-
-
-	private final String accessToken;
-	private final LocalDateTime expiresAt;
-
-	private final UUID memberId;
-	private final String memberName;
-	private final String memberRole;
-	private final UUID companyId;               // 추가
-	private final String companyName;
-	private final String logoImagePath;
-	private final String companyType;
-
-	public TokenWebResponse(
-		String accessToken,
-		LocalDateTime expiresAt,
-		UUID memberId,
-		String memberName,
-		String memberRole,
-		UUID companyId,
-		String companyName,
-		String logoImagePath,
-		String companyType
-	) {
-		this.accessToken = accessToken;
-		this.expiresAt = expiresAt;
-		this.memberId = memberId;
-		this.memberName = memberName;
-		this.memberRole = memberRole;
-		this.companyId = companyId;
-		this.companyName = companyName;
-		this.logoImagePath = logoImagePath;
-		this.companyType = companyType;
-	}
+public record TokenWebResponse(String accessToken, UUID memberId, String memberName, String memberRole, UUID companyId,
+							   String companyName, String logoImagePath, String companyType) {
 
 	public static TokenWebResponse from(TokenResponse tokenResponse) {
 		return new TokenWebResponse(
 			tokenResponse.getAccessToken(),
-			tokenResponse.getExpiresAt(),
 			tokenResponse.getMemberId(),
 			tokenResponse.getMemberName(),
 			tokenResponse.getMemberRole(),

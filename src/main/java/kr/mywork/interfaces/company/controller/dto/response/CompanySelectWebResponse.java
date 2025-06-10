@@ -9,7 +9,7 @@ import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 
 public record CompanySelectWebResponse(UUID companyId, String companyName, String businessNumber, String address,
 									   String contactPhoneNumber, Boolean deleted,
-									   @JsonFormat(pattern = "yyyy-MM-dd") LocalDateTime createdAt
+									   @JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime createdAt
 ) {
 	public static CompanySelectWebResponse from(CompanySelectResponse companySelectResponse) {
 		return new CompanySelectWebResponse(
