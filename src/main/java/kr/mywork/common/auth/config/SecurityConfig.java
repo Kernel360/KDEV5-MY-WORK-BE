@@ -22,7 +22,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import kr.mywork.common.auth.JwtProperties;
 import kr.mywork.domain.auth.service.JwtTokenProvider;
 import kr.mywork.domain.auth.service.TokenAuthenticationService;
 import kr.mywork.domain.member.model.MemberRole;

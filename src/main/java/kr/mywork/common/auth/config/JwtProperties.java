@@ -1,4 +1,4 @@
-package kr.mywork.common.auth;
+package kr.mywork.common.auth.config;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.common.auth.components.annotation.LoginUser;
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.company.service.CompanyService;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
