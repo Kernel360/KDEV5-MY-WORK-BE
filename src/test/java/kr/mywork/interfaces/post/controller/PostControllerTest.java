@@ -63,7 +63,7 @@ class PostControllerTest {
 		final ProjectCreateWebRequest projectCreateWebRequest = new ProjectCreateWebRequest("프로젝트 이름",
 			LocalDateTime.of(2025, 6, 5, 12, 0),
 			LocalDateTime.of(2025, 7, 5, 12, 0),
-			"계약 단계", "프로젝트 설명입니다.", devCompanyId, clientCompanyId);
+			"COMPLETED", "프로젝트 설명입니다.", devCompanyId, clientCompanyId);
 
 		final String requestBody = objectMapper.writeValueAsString(projectCreateWebRequest);
 
