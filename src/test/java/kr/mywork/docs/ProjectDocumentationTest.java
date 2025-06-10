@@ -4,6 +4,7 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.docume
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
@@ -27,6 +28,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
 import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectDeleteWebRequest;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectUpdateWebRequest;
 
 public class ProjectDocumentationTest extends RestDocsDocumentation {
@@ -243,6 +245,47 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.step").type(JsonFieldType.STRING).description("진행 상태"),
 					fieldWithPath("data.detail").type(JsonFieldType.STRING).description("상세 설명"),
 					fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
+	}
+
+	@Test
+	@DisplayName("프로젝트 삭제 성공")
+	@Sql("classpath:sql/project-delete.sql")
+	void 프로젝트_삭제_성공() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+
+		final UUID projectId = UUID.fromString("01975a03-765d-7760-b82f-1bc8ba1b2ab6");
+
+		final ProjectDeleteWebRequest request = new ProjectDeleteWebRequest(projectId);
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			delete("/api/projects")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(objectMapper.writeValueAsString(request))
+		);
+
+		// then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.result").value("SUCCESS"))
+			.andExpect(jsonPath("$.data").exists())
+			.andDo(document("project-delete-success", projectDeleteSuccessResource()));
+	}
+
+	private ResourceSnippet projectDeleteSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project API")
+				.summary("프로젝트 삭제 API")
+				.description("지정한 프로젝트를 삭제한다.")
+				.requestFields(
+					fieldWithPath("id").type(JsonFieldType.STRING).description("삭제할 프로젝트 ID"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("삭제된 프로젝트 ID"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
