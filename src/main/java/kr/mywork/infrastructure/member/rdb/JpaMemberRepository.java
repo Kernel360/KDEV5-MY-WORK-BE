@@ -12,4 +12,6 @@ public interface JpaMemberRepository extends JpaRepository<Member, UUID> {
 	long countByCompanyIdAndDeletedFalse(UUID companyId);
 
 	boolean existsByEmail(String email);
+
+	Optional<Member> findFirstByEmail(String email);
 }
