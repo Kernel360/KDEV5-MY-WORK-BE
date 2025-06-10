@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.hibernate.validator.constraints.Length;
 
+import jakarta.validation.constraints.Pattern;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor(force = true)
 @RequiredArgsConstructor
 public class ProjectCreateWebRequest {
+
+	private static final String PROJECT_KEYWORD_TYPE = "^(NOT_STARTED|IN_PROGRESS|PAUSED|COMPLETED)$";
+
 	@Length(min = 1, max = 200, message = "{project.invalid-name-length}")
 	private final String name;
 
@@ -21,6 +25,7 @@ public class ProjectCreateWebRequest {
 	private final LocalDateTime endAt;
 
 	@Length(min = 1, max = 200, message = "{project.invalid-step-length}")
+	@Pattern(regexp = PROJECT_KEYWORD_TYPE, message = "{project.invalid-status}")
 	private final String step;
 
 	@Length(min = 1, max = 500, message = "{project.invalid-detail-length}")
