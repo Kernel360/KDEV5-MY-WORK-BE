@@ -11,16 +11,16 @@ public record PostSelectWebResponse(UUID postId, String authorName,
 									String title,
 									@JsonFormat(pattern = "yyyy-MM-dd") LocalDateTime createdAt,
 									String approval,
-									String projectStepName) {
+									String projectStepTitle) {
 
 	public static PostSelectWebResponse from(PostSelectResponse postSelectResponse) {
 		return new PostSelectWebResponse(
-			postSelectResponse.postId(),
-			postSelectResponse.authorName(),
-			postSelectResponse.title(),
-			postSelectResponse.createAt(),
-			postSelectResponse.approval(),
-			postSelectResponse.projectStepName()
+			postSelectResponse.getPostId(),
+			postSelectResponse.getAuthorName(),
+			postSelectResponse.getTitle(),
+			postSelectResponse.getCreateAt(),
+			postSelectResponse.getApproval(),
+			postSelectResponse.getProjectStepTitle()
 		);
 	}
 }

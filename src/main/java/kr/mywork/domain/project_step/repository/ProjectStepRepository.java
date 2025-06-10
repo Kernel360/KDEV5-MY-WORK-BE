@@ -1,6 +1,7 @@
 package kr.mywork.domain.project_step.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,4 +11,5 @@ public interface ProjectStepRepository {
 	List<ProjectStep> saveAll(List<ProjectStep> projectSteps);
 	List<ProjectStep> findAllByIds(Set<UUID> projectStepIds);
 	List<ProjectStep> findAllStepsByProjectIdOrderByNumAsc(UUID projectId);
+	Optional<ProjectStep> findById(UUID projectStepId);
 }

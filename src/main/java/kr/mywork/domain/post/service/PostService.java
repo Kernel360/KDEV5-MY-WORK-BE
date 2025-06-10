@@ -20,6 +20,13 @@ import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
 import kr.mywork.domain.post.service.dto.response.PostDetailResponse;
 import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
 import kr.mywork.domain.post.service.dto.response.PostUpdateResponse;
+import kr.mywork.domain.project.errors.ProjectErrorType;
+import kr.mywork.domain.project.errors.ProjectNotFoundException;
+import kr.mywork.domain.project.repository.ProjectRepository;
+import kr.mywork.domain.project_step.errors.ProjectStepErrorType;
+import kr.mywork.domain.project_step.errors.ProjectStepNotFoundException;
+import kr.mywork.domain.project_step.model.ProjectStep;
+import kr.mywork.domain.project_step.repository.ProjectStepRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,6 +38,8 @@ public class PostService {
 
 	private final PostRepository postRepository;
 	private final PostIdRepository postIdRepository;
+	private final ProjectStepRepository projectStepRepository;
+	private final ProjectRepository projectRepository;
 
 	@Transactional
 	public UUID createPostId() {
@@ -66,18 +75,50 @@ public class PostService {
 
 	@Transactional
 	public List<PostSelectResponse> findPostsBySearchConditionWithPaging(final int page, final UUID projectStepId,
-		final String keyword, final Boolean deleted, final UUID projectId, final String keywordType, final String approval) {
+		final String keyword, final Boolean deleted, final UUID projectId, final String keywordType,
+		final String approval) {
 
-		// TODO projectStepId가 null이 아니고, DB에도 존재 하지 않을때 에러 처리해아함.
+		// TODO projectId가 DB에 존재 하지 않을때 에러 처리해아함.
+		projectRepository.findById(projectId).
+			orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
 
-		return postRepository.findPostsBySearchConditionWithPaging(page, postPageSize, projectStepId, keyword, deleted, projectId, keywordType, approval);
+		List<PostSelectResponse> result;
+
+		if (projectStepId != null) { // if (projectStepId != null) 프로젝트단계가 있으면 프로젝트단계에 해당하는 게시물만 조회
+
+			// TODO projectStepId가 DB에 존재 하지 않을때 에러 처리해아함.
+			ProjectStep findProjectStep = projectStepRepository.findById(projectStepId)
+				.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
+
+			String projectStepTitle = findProjectStep.getTitle();
+			result = postRepository.findPostsByProjectStepSearchConditionWithPaging(page, postPageSize, projectStepId,
+				projectStepTitle, keyword, deleted, projectId, keywordType, approval);
+
+		} else { // else () 프로젝트단계가 없으면 프로젝트의 게시물 전체 조회
+
+			result = postRepository.findPostsByProjectSearchConditionWithPaging(page, postPageSize, keyword,
+				deleted, projectId, keywordType, approval);
+
+		}
+		return result;
 	}
 
-	public Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted, UUID projectId, String  keywordType, String approval) {
-		return postRepository.countTotalPostsByCondition(projectStepId, keyword, deleted, projectId, keywordType, approval);
+	public Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted, UUID projectId,
+		String keywordType, String approval) {
+		Long totalCount;
+
+		if (projectStepId != null) {
+			totalCount = postRepository.countTotalPostsByProjectStepCondition(projectStepId, keyword, deleted,
+				projectId, keywordType, approval);
+		} else {
+			List<ProjectStep> projectSteps = projectStepRepository.findAllStepsByProjectIdOrderByNumAsc(projectId);
+			totalCount = postRepository.countTotalPostsByProjectCondition(projectSteps, keyword, deleted, projectId,
+				keywordType, approval);
+		}
+		return totalCount;
 	}
 
-  public UUID deletePost(UUID postId) {
+	public UUID deletePost(UUID postId) {
 		Post post = postRepository.findById(postId)
 			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
 

@@ -1,7 +1,5 @@
 package kr.mywork.infrastructure.post.rdb;
 
-import static kr.mywork.domain.company.model.QCompany.*;
-import static kr.mywork.domain.company.model.QCompany.company;
 import static kr.mywork.domain.post.model.QPost.*;
 import static kr.mywork.domain.project_step.model.QProjectStep.*;
 
@@ -19,6 +17,7 @@ import kr.mywork.domain.post.model.Post;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
+import kr.mywork.domain.project_step.model.ProjectStep;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -38,28 +37,65 @@ public class QueryDslPostRepository implements PostRepository {
 		return postRepository.findById(postId);
 	}
 
-	public List<PostSelectResponse> findPostsBySearchConditionWithPaging(int page, int postPageSize,
-		UUID projectStepId, String keyword, Boolean deleted, UUID projectId, String keywordType, String approval) {
+	public List<PostSelectResponse> findPostsByProjectStepSearchConditionWithPaging(int page, int postPageSize,
+		UUID projectStepId, String projectStepTitle,
+		String keyword, Boolean deleted, UUID projectId, String keywordType, String approval) {
 
 		final int offset = (page - 1) * postPageSize;
 
-		return jpaQueryFactory.select(Projections.constructor(PostSelectResponse.class,
+		// post 테이블에서 projectStepId에 해당하는 모든 게시글 조회
+		List<PostSelectResponse> posts = jpaQueryFactory
+			.select(Projections.constructor(PostSelectResponse.class,
+				post.id,
+				post.createdAt,
+				post.authorName,
+				post.title,
+				post.approval
+			))
+			.from(post)
+			.where(
+				post.projectStepId.eq(projectStepId),
+				eqDeleted(deleted),
+				containsKeyword(keywordType, keyword),
+				eqApproval(approval)
+			)
+			.orderBy(post.createdAt.desc())
+			.offset(offset)
+			.limit(postPageSize)
+			.fetch();
+
+		// 조회 결과 각 객체에 프로젝트 단계명 추가
+		posts.forEach(postResponse -> postResponse.assignProjectStepName(projectStepTitle));
+
+		return posts;
+	}
+
+	// 프로젝트의 전체 게시물 조회
+	public List<PostSelectResponse> findPostsByProjectSearchConditionWithPaging(int page, int postPageSize,
+		String keyword,
+		Boolean deleted, UUID projectId, String keywordType, String approval) {
+
+		final int offset = (page - 1) * postPageSize;
+
+		// post와 project_step을 JOIN하여 한 번의 쿼리로 게시글과 단계명을 함께 조회
+		return jpaQueryFactory
+			.select(Projections.constructor(PostSelectResponse.class,
 				post.id,
 				post.createdAt,
 				post.authorName,
 				post.title,
 				post.approval,
-				projectStep.title
+				projectStep.title.as("projectStepTitle") // 프로젝트 단계명 추가
 			))
 			.from(post)
-			.join(projectStep)
-			.on(post.projectStepId.eq(projectStep.id))
+			.join(projectStep).on(post.projectStepId.eq(projectStep.id))
 			.where(
-				eqProjectId(projectId),
-				eqProjectStepId(projectStepId),
+				projectStep.projectId.eq(projectId), // 특정 프로젝트의 단계들만 필터링
 				eqDeleted(deleted),
 				containsKeyword(keywordType, keyword),
-				eqApproval(approval))
+				eqApproval(approval)
+			)
+			.orderBy(post.createdAt.desc())
 			.offset(offset)
 			.limit(postPageSize)
 			.fetch();
@@ -82,14 +118,12 @@ public class QueryDslPostRepository implements PostRepository {
 	}
 
 	@Override
-	public Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted, UUID projectId,
+	public Long countTotalPostsByProjectStepCondition(UUID projectStepId, String keyword, Boolean deleted,
+		UUID projectId,
 		String keywordType, String approval) {
 		return jpaQueryFactory.select(post.id.count())
 			.from(post)
-			.join(projectStep)
-			.on(post.projectStepId.eq(projectStep.id))
 			.where(
-				eqProjectId(projectId),
 				eqProjectStepId(projectStepId),
 				eqDeleted(deleted),
 				containsKeyword(keywordType, keyword),
@@ -98,20 +132,40 @@ public class QueryDslPostRepository implements PostRepository {
 			.fetchOne();
 	}
 
+	@Override
+	public Long countTotalPostsByProjectCondition(List<ProjectStep> projectSteps, String keyword, Boolean deleted,
+		UUID projectId,
+		String keywordType, String approval) {
+		return jpaQueryFactory.select(post.id.count())
+			.from(post)
+			.where(
+				inProjectStepIds(projectSteps),  // 추가
+				eqDeleted(deleted),
+				containsKeyword(keywordType, keyword),
+				eqApproval(approval)
+			)
+			.fetchOne();
+	}
+
+	// 동적 조건 메서드 추가
+	private BooleanExpression inProjectStepIds(List<ProjectStep> projectSteps) {
+		if (projectSteps == null || projectSteps.isEmpty()) {
+			return null;
+		}
+
+		List<UUID> projectStepIds = projectSteps.stream()
+			.map(ProjectStep::getId)
+			.toList();
+
+		return post.projectStepId.in(projectStepIds);
+	}
+
 	private BooleanExpression eqProjectStepId(UUID projectStepId) {
 		if (projectStepId == null) {
 			return null;
 		}
 
 		return post.projectStepId.eq(projectStepId);
-	}
-
-	private BooleanExpression eqProjectId(UUID projectId) {
-		if (projectId == null) {
-			return null;
-		}
-
-		return post.projectId.eq(projectId);
 	}
 
 	private BooleanExpression eqKeyword(String keyword) {
