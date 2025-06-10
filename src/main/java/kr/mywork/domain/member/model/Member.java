@@ -83,6 +83,9 @@ public class Member {
 	public void softDelete() {
 		this.deleted = true; // ← 더티 체킹 대상
 	}
+	public void setPasswordEncode(String encodedPassword) {
+		this.password = encodedPassword;
+	}
 
 	//관리자용 회원정보 수정
 	public void updateFrom(MemberUpdateRequest memberUpdateRequest) {

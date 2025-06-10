@@ -14,12 +14,15 @@ import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 import kr.mywork.domain.member.errors.EmailAlreadyExistsException;
 import kr.mywork.domain.member.errors.MemberErrorType;
 import kr.mywork.domain.member.errors.MemberIdNotFoundException;
+import kr.mywork.domain.member.errors.MemberNotFoundException;
+import kr.mywork.domain.member.errors.PasswordFailException;
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
 import kr.mywork.domain.member.service.dto.request.MemberUpdateRequest;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
 import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
+import kr.mywork.interfaces.member.controller.dto.request.ResetPasswordWebRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -106,5 +109,22 @@ public class MemberService {
 	public MemberDetailResponse findMemberDetailByMemberId(UUID memberId) {
 
 		return memberRepository.findMemberDetailByMemberId(memberId);
+	}
+	@Transactional
+	public UUID resetMemberPassword(ResetPasswordWebRequest resetPasswordWebRequest){
+		Member member = memberRepository.findFirstByEmail(resetPasswordWebRequest.email())
+			.orElseThrow(() -> new MemberNotFoundException(MemberErrorType.MEMBER_NOT_FOUND));
+
+		String rawPassword =resetPasswordWebRequest.password();
+		boolean isMath = passwordEncoder.matches(rawPassword, member.getPassword());
+
+		if(isMath){
+			String encodedPassword =passwordEncoder.encode(resetPasswordWebRequest.newPassword());
+			member.setPasswordEncode(encodedPassword);
+		}else{
+			throw new PasswordFailException(MemberErrorType.WRONG_PASSWORD);
+		}
+
+		return member.getId();
 	}
 }

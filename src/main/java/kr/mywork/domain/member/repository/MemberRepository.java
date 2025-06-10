@@ -28,4 +28,6 @@ public interface MemberRepository {
 	List<Member> findMemberListByCompanyId(UUID companyId, UUID projectId);
 
 	MemberDetailResponse findMemberDetailByMemberId(UUID memberId);
+
+	Optional<Member> findFirstByEmail(String email);
 }
