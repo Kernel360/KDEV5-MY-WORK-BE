@@ -126,7 +126,7 @@ public class CompanyController {
 
 	@GetMapping("/names")
 	public ApiResponse<CompanyNamesWebResponse> companyListOnlyIdNameWebResponseApiResponse(
-		@RequestParam(name = "companyType") @Pattern(regexp = COMPANY_TYPE_REGX, message = "{invalid.company-type}") final String companyType) {
+		@RequestParam(name = "companyType",required = false) @Pattern(regexp = COMPANY_TYPE_REGX, message = "{invalid.company-type}") final String companyType) {
 		final List<CompanyNameResponse> companyNames = companyService.findCompanyNamesByCompanyType(companyType);
 
 		final List<CompanyNameWebResponse> companyNameWebResponses = companyNames.stream()
