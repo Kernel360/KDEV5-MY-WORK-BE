@@ -1,5 +1,7 @@
 package kr.mywork.domain.project.repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,4 +15,8 @@ public interface ProjectAssignRepository {
 	Optional<ProjectAssign> findByProjectId(UUID projectId);
 
 	Optional<ProjectAssignResponse> findDtoByProjectId(UUID projectId);
+
+	List<ProjectAssign> findAllByProjectIds(List<UUID> projectIds);
+
+	List<ProjectAssign> findAllByCompanyIdsAndType(final Collection<UUID> companyIds, final String companyType);
 }

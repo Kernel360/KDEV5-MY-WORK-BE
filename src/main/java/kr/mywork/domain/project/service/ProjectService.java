@@ -1,6 +1,8 @@
 package kr.mywork.domain.project.service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.Company;
+import kr.mywork.domain.company.model.CompanyType;
 import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
@@ -26,13 +29,17 @@ import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
 import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
+import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
+
+	private static final String CLIENT_COMPANY_NAME = "CLIENT_COMPANY_NAME";
+	private static final String DEV_COMPANY_NAME = "DEV_COMPANY_NAME";
+	private static final String PROJECT_NAME = "PROJECT_NAME";
 
 	@Value("${project.page.size}")
 	private int projectPageSize;
@@ -93,30 +100,178 @@ public class ProjectService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<ProjectSelectWithAssignResponse> findProjectsBySearchConditionWithPaging(
-		final int page,
-		final UUID memberId,
-		final String nameKeyword,
-		final Boolean deleted
-	) {
-		return projectRepository.findProjectsBySearchConditionWithPaging(
-			page, projectPageSize, memberId, nameKeyword, deleted
-		);
+	public List<ProjectSelectResponse> findProjectsBySearchConditionWithPaging(
+		final String keywordType, final String keyword, final String step, final Integer page) {
+		if (keywordType == null) {
+			final List<Project> projects =
+				projectRepository.findAllByStepAndNameWithPaging(step, null, page, projectPageSize);
+
+			final List<UUID> projectIds = projects.stream().map(Project::getId).toList();
+			projects.sort(Comparator.comparing(Project::getId));
+
+			final Map<UUID, ProjectAssign> projectIdAssignMap =
+				transformProjectAssignMap(projectAssignRepository.findAllByProjectIds(projectIds));
+
+			final List<UUID> devCompanyIds = projectIdAssignMap.values()
+				.stream()
+				.map(ProjectAssign::getDevCompanyId)
+				.toList();
+
+			final List<UUID> clientCompanyIds = projectIdAssignMap.values()
+				.stream().map(ProjectAssign::getClientCompanyId).toList();
+
+			final Map<UUID, Company> devCompanyMap = transformCompanyMap(companyRepository.findAllByIds(devCompanyIds));
+			final Map<UUID, Company> clientCompanyMap = transformCompanyMap(
+				companyRepository.findAllByIds(clientCompanyIds));
+
+			return transformProjectSelectResponses(projects, projectIdAssignMap, devCompanyMap, clientCompanyMap);
+
+		}
+
+		switch (keywordType) {
+			case DEV_COMPANY_NAME -> {
+				final Map<UUID, Company> devCompanyMap =
+					transformCompanyMap(companyRepository.findAllByNameAndType(keyword, CompanyType.DEV.name()));
+
+				final List<ProjectAssign> devCompanyProjectAssigns = projectAssignRepository.findAllByCompanyIdsAndType(
+					devCompanyMap.keySet(), CompanyType.DEV.name());
+
+				final Map<UUID, ProjectAssign> projectIdAssignMap = transformProjectAssignMap(devCompanyProjectAssigns);
+				final List<Project> projects = projectRepository.findAllByIdsAndStep(projectIdAssignMap.keySet(), step,
+					page, projectPageSize);
+
+				projects.sort(Comparator.comparing(Project::getId));
+
+				List<UUID> clientCompanyIds = projects.stream()
+					.map(project -> {
+						final ProjectAssign projectAssign = projectIdAssignMap.get(project.getId());
+						return projectAssign.getClientCompanyId();
+					}).toList();
+
+				final Map<UUID, Company> clientCompanyMap =
+					transformCompanyMap(companyRepository.findAllByIds(clientCompanyIds));
+
+				return transformProjectSelectResponses(projects, projectIdAssignMap, devCompanyMap, clientCompanyMap);
+			}
+
+			case CLIENT_COMPANY_NAME -> {
+				final Map<UUID, Company> clientCompanyMap =
+					transformCompanyMap(companyRepository.findAllByNameAndType(keyword, CompanyType.CLIENT.name()));
+
+				final List<ProjectAssign> clientCompanyProjectAssigns = projectAssignRepository.findAllByCompanyIdsAndType(
+					clientCompanyMap.keySet(), CompanyType.CLIENT.name());
+
+				final Map<UUID, ProjectAssign> projectIdAssignMap =
+					transformProjectAssignMap(clientCompanyProjectAssigns);
+
+				final List<Project> projects =
+					projectRepository.findAllByIdsAndStep(projectIdAssignMap.keySet(), step, page, projectPageSize);
+
+				projects.sort(Comparator.comparing(Project::getId));
+
+				List<UUID> devCompanyIds = projects.stream()
+					.map(project -> {
+						final ProjectAssign projectAssign = projectIdAssignMap.get(project.getId());
+						return projectAssign.getDevCompanyId();
+					}).toList();
+
+				final Map<UUID, Company> devCompanyMap = transformCompanyMap(
+					companyRepository.findAllByIds(devCompanyIds));
+
+				return transformProjectSelectResponses(projects, projectIdAssignMap, devCompanyMap, clientCompanyMap);
+			}
+
+			case PROJECT_NAME -> {
+				final List<Project> projects = projectRepository.findAllByStepAndNameWithPaging(step,
+					keyword, page, projectPageSize);
+
+				projects.sort(Comparator.comparing(Project::getId));
+
+				final List<UUID> projectIds = projects.stream().map(Project::getId).collect(Collectors.toList());
+				final List<ProjectAssign> projectAssigns = projectAssignRepository.findAllByProjectIds(projectIds);
+				final List<UUID> devCompanyIds = projectAssigns.stream().map(ProjectAssign::getDevCompanyId).toList();
+				final List<UUID> clientCompanyIds = projectAssigns.stream()
+					.map(ProjectAssign::getClientCompanyId)
+					.toList();
+
+				final Map<UUID, ProjectAssign> projectIdAssignMap =
+					transformProjectAssignMap(projectAssignRepository.findAllByProjectIds(projectIds));
+				final Map<UUID, Company> devCompanyMap = transformCompanyMap(
+					companyRepository.findAllByIds(devCompanyIds));
+				final Map<UUID, Company> clientCompanyMap = transformCompanyMap(
+					companyRepository.findAllByIds(clientCompanyIds));
+
+				return transformProjectSelectResponses(projects, projectIdAssignMap, devCompanyMap, clientCompanyMap);
+			}
+		}
+
+		throw new IllegalStateException();
+	}
+
+	private List<ProjectSelectResponse> transformProjectSelectResponses(
+		final List<Project> projects,
+		final Map<UUID, ProjectAssign> projectIdAssignMap,
+		final Map<UUID, Company> devCompanyMap,
+		final Map<UUID, Company> clientCompanyMap) {
+
+		return projects.stream()
+			.map(project -> {
+				final ProjectAssign projectAssign = projectIdAssignMap.get(project.getId());
+				final Company devCompany = devCompanyMap.get(projectAssign.getDevCompanyId());
+				final Company clientCompany = clientCompanyMap.get(projectAssign.getClientCompanyId());
+
+				return new ProjectSelectResponse(
+					project.getId(), project.getName(), project.getStartAt(), project.getEndAt(), project.getStep(),
+					devCompany.getId(), devCompany.getName(), clientCompany.getId(), clientCompany.getName());
+			}).toList();
+	}
+
+	private Map<UUID, ProjectAssign> transformProjectAssignMap(final List<ProjectAssign> projectAssigns) {
+		return projectAssigns.stream()
+			.collect(Collectors.toMap(ProjectAssign::getProjectId, projectAssign -> projectAssign));
+	}
+
+	private Map<UUID, Company> transformCompanyMap(final List<Company> companies) {
+		return companies.stream()
+			.collect(Collectors.toMap(Company::getId, company -> company));
 	}
 
 	@Transactional(readOnly = true)
-	public Long countTotalProjectsByCondition(
-		final UUID memberId,
-		final String nameKeyword,
-		final Boolean deleted
-	) {
-		return projectRepository.countTotalProjectsByCondition(memberId, nameKeyword, deleted);
+	public Long countTotalProjectsByCondition(final String keywordType, final String keyword, final String step) {
+		if (PROJECT_NAME.equals(keywordType)) {
+			return projectRepository.countTotalProjectsByNameAndStep(keyword, step);
+		}
+
+		if (DEV_COMPANY_NAME.equals(keywordType)) {
+			final List<Company> devCompanies = companyRepository.findAllByNameAndType(keyword, CompanyType.DEV.name());
+			final List<UUID> devCompanyIds = devCompanies.stream().map(Company::getId).toList();
+
+			final List<ProjectAssign> projectAssigns =
+				projectAssignRepository.findAllByCompanyIdsAndType(devCompanyIds, CompanyType.DEV.name());
+			final List<UUID> projectAssignIds = projectAssigns.stream().map(ProjectAssign::getProjectId).toList();
+
+			return projectRepository.countTotalProjectIdsAndStep(projectAssignIds, step);
+		}
+
+		if (CLIENT_COMPANY_NAME.equals(keywordType)) {
+			final List<Company> clientCompanies =
+				companyRepository.findAllByNameAndType(keyword, CompanyType.CLIENT.name());
+			final List<UUID> clientCompanyIds = clientCompanies.stream().map(Company::getId).toList();
+
+			final List<ProjectAssign> projectAssigns =
+				projectAssignRepository.findAllByCompanyIdsAndType(clientCompanyIds, CompanyType.CLIENT.name());
+			final List<UUID> projectAssignIds = projectAssigns.stream().map(ProjectAssign::getProjectId).toList();
+
+			return projectRepository.countTotalProjectIdsAndStep(projectAssignIds, step);
+		}
+
+		return projectRepository.countTotalProjectIdsAndStep(null, step);
 	}
 
 	@Transactional
-	public List<ProjectMemberResponse> findMemberByCompanyId(UUID companyId ,UUID projectId) {
+	public List<ProjectMemberResponse> findMemberByCompanyId(UUID companyId, UUID projectId) {
 
-		List<Member> companyMembers = memberRepository.findMemberListByCompanyId(companyId,projectId);
+		List<Member> companyMembers = memberRepository.findMemberListByCompanyId(companyId, projectId);
 
 		return companyMembers.stream()
 			.map(member -> new ProjectMemberResponse(

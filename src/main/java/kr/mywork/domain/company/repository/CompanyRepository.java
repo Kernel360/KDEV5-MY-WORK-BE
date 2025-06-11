@@ -23,4 +23,8 @@ public interface CompanyRepository {
 	Optional<Company> findByIdAndType(UUID companyId, CompanyType type);
 
 	List<CompanyNameResponse> findCompanyNamesByCompanyType(String companyType);
+
+	List<Company> findAllByIds(List<UUID> devCompanyIds);
+
+	List<Company> findAllByNameAndType(String companyName, String type);
 }
