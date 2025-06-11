@@ -48,4 +48,12 @@ public class ProjectMember {
 		this.deleted = false;
 		this.createdAt = LocalDateTime.now();
 	}
+
+	public void delete() {
+		this.deleted = true;
+	}
+
+	public void restore() {
+		this.deleted = false;
+	}
 }

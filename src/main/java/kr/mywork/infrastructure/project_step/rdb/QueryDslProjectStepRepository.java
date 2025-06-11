@@ -1,8 +1,9 @@
 package kr.mywork.infrastructure.project_step.rdb;
 
-import static kr.mywork.domain.project_step.model.QProjectStep.projectStep;
+import static kr.mywork.domain.project_step.model.QProjectStep.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,5 +40,10 @@ public class QueryDslProjectStepRepository implements ProjectStepRepository {
 			.where(projectStep.projectId.eq(projectId))
 			.orderBy(projectStep.orderNum.asc())
 			.fetch();
+	}
+
+	@Override
+	public Optional<ProjectStep> findById(UUID projectStepId) {
+		return jpaProjectStepRepository.findById(projectStepId);
 	}
 }

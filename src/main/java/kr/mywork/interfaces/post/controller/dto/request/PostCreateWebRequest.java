@@ -33,8 +33,8 @@ public class PostCreateWebRequest {
 	@Length(min = 1, max = 500, message = "{post-invalid-length-content}")
 	private final String content;
 
-	public PostCreateRequest toServiceDto() {
-		return new PostCreateRequest(this.id, this.projectStepId, this.title, this.companyName,
+	public PostCreateRequest toServiceDto(final UUID projectId) {
+		return new PostCreateRequest(this.id, projectId, this.projectStepId, this.title, this.companyName,
 			this.authorName, this.content, "PENDING", false);
 	}
 

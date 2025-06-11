@@ -1,16 +1,10 @@
 package kr.mywork.docs;
 
-import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.*;
+import static com.epages.restdocs.apispec.ResourceDocumentation.*;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.UUID;
 
@@ -79,6 +73,8 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 		UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
 		UUID projectStepId = UUID.fromString("4321a2a2-00b2-0000-c2bb-81c0000aa00c"); // UUID ver7
+		UUID projectId = UUID.fromString("01975094-466b-7d09-81e1-f79b29d9b85d"); // UUID ver7
+
 		final PostCreateWebRequest postCreateWebRequest =
 			new PostCreateWebRequest(postId, projectStepId, "게시글 제목", "게시글 이름", "저자 이름", "게시글 내용");
 
@@ -86,7 +82,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			post("/api/posts") // HTTP method (URL)
+			post("/api/projects/{project-id}/posts", projectId) // HTTP method (URL)
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody));
@@ -125,6 +121,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 		UUID postId = Generators.timeBasedEpochGenerator().generate(); // UUID ver7
 		UUID projectStepId = UUID.fromString("4321a2a2-00b2-0000-c2bb-81c0000aa00c"); // UUID ver7
+		UUID projectId = UUID.fromString("01975094-466b-7d09-81e1-f79b29d9b85d"); // UUID ver7
 
 		final PostCreateWebRequest postCreateWebRequest =
 			new PostCreateWebRequest(postId, projectStepId, "게시글 제목", "게시글 이름", "저자 이름", "게시글 내용");
@@ -133,7 +130,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			post("/api/posts") // HTTP method (URL)
+			post("/api/projects/{project-id}/posts", projectId) // HTTP method (URL)
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.content(requestBody));
@@ -313,13 +310,22 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 		final String accessToken = createUserAccessToken();
 
 		UUID projectStepId = UUID.fromString("019739d2-2e80-709f-a9c5-7da758c956d1");
+		UUID projectId = UUID.fromString("01975454-e57b-7df5-acb8-598c64aaf54e");
 
+		// get("/api/posts?page={page}&projectStepId={projectStepId}&projectId={projectId}&keyword={keyword}&deleted={deleted}&approval={approval}&keywordType={keywordType}",
+		// 1, projectStepId, projectId, null, null, null, null) // HTTP method (URL)
 		// when
 		final ResultActions result = mockMvc.perform(
-			get("/api/posts?page={page}&projectStepId={projectStepId}&keyword={keyword}&deleted={deleted}",
-				1, projectStepId, null, null) // HTTP method (URL)
+			get("/api/projects/{project-id}/posts", projectId) // HTTP method (URL)
 				.contentType(MediaType.APPLICATION_JSON)
-				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.param("page", "1")
+				.param("projectStepId", projectStepId.toString())
+				.param("keyword", "제목")
+				.param("keywordType", "TITLE")
+				.param("deleted", "false")
+				.param("approval", "PENDING")
+		);
 
 		// then
 		result.andExpectAll(
@@ -335,7 +341,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 			ResourceSnippetParameters.builder()
 				.tag("Post API")
 				.summary("게시글 목록 조회 API")
-				.description("게시글 목록을 검색조건에 따라 조회를 한다.")
+				.description("게시글 목록을 검색조건에 따라 조회를 한다. project_step_id를 넣지 않으면 해당 프로젝트의 모든 게시글이 조회됩니다.")
 				.requestHeaders(
 					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
 					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
@@ -343,7 +349,9 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 					parameterWithName("page").description("페이지 번호"),
 					parameterWithName("projectStepId").description("프로젝트 단계 ID").optional(),
 					parameterWithName("keyword").description("검색어").optional(),
-					parameterWithName("deleted").description("삭제 여부").optional())
+					parameterWithName("keywordType").description("검색조건").optional(),
+					parameterWithName("deleted").description("삭제 여부").optional(),
+					parameterWithName("approval").description("승인 여부").optional())
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.posts.[].postId").type(JsonFieldType.STRING).description("게시글 아이디"),
@@ -351,6 +359,7 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.posts.[].title").type(JsonFieldType.STRING).description("게시글 제목"),
 					fieldWithPath("data.posts.[].createdAt").type(JsonFieldType.STRING).description("생성 일자"),
 					fieldWithPath("data.posts.[].approval").type(JsonFieldType.STRING).description("승인여부"),
+					fieldWithPath("data.posts.[].projectStepTitle").type(JsonFieldType.STRING).description("프로젝트단계명"),
 					fieldWithPath("data.totalCount").type(JsonFieldType.NUMBER).description("총 갯수"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()

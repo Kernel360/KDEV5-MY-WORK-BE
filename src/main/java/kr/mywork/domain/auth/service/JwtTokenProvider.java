@@ -8,7 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import kr.mywork.common.auth.JwtProperties;
+import kr.mywork.common.auth.config.JwtProperties;
 import kr.mywork.domain.auth.errors.InvalidTokenException;
 import kr.mywork.domain.auth.errors.TokenExpiredException;
 import kr.mywork.domain.auth.errors.AuthErrorType;

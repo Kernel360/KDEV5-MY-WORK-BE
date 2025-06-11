@@ -109,4 +109,45 @@ public class ProjectMemberDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
+	@Test
+	@DisplayName("프로젝트 멤버 삭제 성공")
+	@Sql("classpath:sql/project-member-delete.sql")
+	void 프로젝트_멤버_삭제_성공() throws Exception {
+		// given
+		final String accessToken = createDevAdminAccessToken();
+
+		final UUID projectId = UUID.fromString("01974f0b-5c7a-7fa2-9aba-1323490b77e9");
+		final UUID memberId = UUID.fromString("6939d8be-1bf2-4f01-9189-12864e38d913");
+
+		// when
+		final ResultActions result = mockMvc.perform(delete("/api/project-member")
+			.param("memberId", memberId.toString())
+			.param("projectId", projectId.toString())
+			.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("project-member-delete-success", projectMemberDeleteSuccessResource()));
+	}
+
+	private ResourceSnippet projectMemberDeleteSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project Member API")
+				.summary("프로젝트 멤버 삭제 API")
+				.description("프로젝트 멤버를 삭제한다")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("삭제된 프로젝트 멤버 아이디"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
+	}
 }

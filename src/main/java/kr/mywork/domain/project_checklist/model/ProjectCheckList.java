@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
+import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListApprovalRequest;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListUpdateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -63,5 +64,9 @@ public class ProjectCheckList {
 
 	public void softDelete() {
 		this.deleted = true;
+	}
+
+	public void changeApproval(ProjectCheckListApprovalRequest projectCheckListApprovalRequest) {
+		this.approval = projectCheckListApprovalRequest.getApproval();
 	}
 }

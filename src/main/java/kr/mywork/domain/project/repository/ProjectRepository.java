@@ -6,12 +6,11 @@ import java.util.UUID;
 
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
-import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
 
 public interface ProjectRepository {
 
-	Project save(ProjectCreateRequest projectCreateRequest);
+	Project save(Project project);
 
 	Optional<Project> findById(UUID projectId);
 

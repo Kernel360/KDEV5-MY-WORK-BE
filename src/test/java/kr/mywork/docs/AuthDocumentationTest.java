@@ -59,7 +59,6 @@ public class AuthDocumentationTest extends RestDocsDocumentation {
 		result.andExpect(status().isOk())
 			.andExpect(jsonPath("$.result").value(ResultType.SUCCESS.name()))
 			.andExpect(jsonPath("$.data.accessToken").exists())
-			.andExpect(jsonPath("$.data.expiresAt").exists())
 			.andExpect(cookie().exists("refreshToken"))
 			.andDo(document("auth-login-success",
 				resource(
@@ -74,7 +73,6 @@ public class AuthDocumentationTest extends RestDocsDocumentation {
 						.responseFields(
 							fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 							fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
-							fieldWithPath("data.expiresAt").type(JsonFieldType.STRING).description("액세스 토큰 만료 시각"),
 							fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("사용자 아이디"),
 							fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("사용자 이름"),
 							fieldWithPath("data.memberRole").type(JsonFieldType.STRING).description("사용자 역할"),

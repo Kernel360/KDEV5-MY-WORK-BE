@@ -22,7 +22,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import kr.mywork.common.auth.JwtProperties;
 import kr.mywork.domain.auth.service.JwtTokenProvider;
 import kr.mywork.domain.auth.service.TokenAuthenticationService;
 import kr.mywork.domain.member.model.MemberRole;
@@ -149,7 +148,8 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 
-		config.setAllowedOrigins(List.of("http://localhost:3000", "https://d16zykr4498a0c.cloudfront.net"));
+		config.setAllowedOrigins(List.of("http://localhost:3000", "https://d16zykr4498a0c.cloudfront.net",
+			"http://mywork-fe-bucket.s3-website.ap-northeast-2.amazonaws.com"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true); // 쿠키, 인증 정보 포함 시 필수

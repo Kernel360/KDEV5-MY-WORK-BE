@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import kr.mywork.domain.project.model.ProjectMember;
+import kr.mywork.domain.project_member.error.ProjectMemberErrorType;
+import kr.mywork.domain.project_member.error.ProjectMemberNotFoundException;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,21 +17,48 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProjectMemberService {
 
-	final ProjectMemberRepository projectMemberRepository;
+	private final ProjectMemberRepository projectMemberRepository;
 
 	@Transactional
 	public UUID addMemberToCompany(UUID projectId, UUID memberId) {
+		final boolean hasDeletedProjectMember =
+			projectMemberRepository.existsByMemberIdAndProjectIdAndDeleted(memberId, projectId, true);
 
-		ProjectMember projectMember = new ProjectMember(projectId,memberId);
+		if (hasDeletedProjectMember) {
+			return restoreProjectMember(projectId, memberId);
+		}
 
-		final ProjectMember savedMember = projectMemberRepository.save(projectMember);
+		return createProjectMember(projectId, memberId);
+	}
+
+	private UUID createProjectMember(final UUID projectId, final UUID memberId) {
+		final ProjectMember savedMember = projectMemberRepository.save(new ProjectMember(projectId, memberId));
 
 		return savedMember.getMemberId();
 	}
 
-	@Transactional
-	public List<CompanyMemberInProjectResponse> findCompanyMembersInProject (UUID projectId,UUID companyId) {
+	private UUID restoreProjectMember(final UUID projectId, final UUID memberId) {
+		final ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(projectId, memberId)
+			.orElseThrow(() -> new ProjectMemberNotFoundException(ProjectMemberErrorType.PROJECT_MEMBER_NOT_FOUND));
 
-		return projectMemberRepository.findCompanyMembersInProject(projectId,companyId);
+		projectMember.restore();
+
+		return projectMember.getId();
+	}
+
+	@Transactional
+	public List<CompanyMemberInProjectResponse> findCompanyMembersInProject(UUID projectId, UUID companyId) {
+
+		return projectMemberRepository.findCompanyMembersInProject(projectId, companyId);
+	}
+
+	@Transactional
+	public UUID deleteMemberById(UUID memberId, UUID projectId) {
+		ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(memberId, projectId)
+			.orElseThrow(() -> new ProjectMemberNotFoundException(ProjectMemberErrorType.PROJECT_MEMBER_NOT_FOUND));
+
+		projectMember.delete();
+
+		return projectMember.getId();
 	}
 }

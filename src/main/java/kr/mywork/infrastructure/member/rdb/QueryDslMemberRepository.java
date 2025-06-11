@@ -94,10 +94,8 @@ public class QueryDslMemberRepository implements MemberRepository {
 	public Long countTotalmembersByCondition(final String keyword, final String keywordType,final UUID companyId) {
 		BooleanBuilder builder = new BooleanBuilder();
 
-		// companyId 조건 추가
-		if (companyId != null) {
-			builder.and(member.companyId.eq(companyId));
-		}
+		builder.and(member.deleted.eq(false));
+		if (companyId != null) {builder.and(member.companyId.eq(companyId));}
 
 		if (keyword != null && keywordType != null) {
 			switch (keywordType) {
@@ -122,10 +120,10 @@ public class QueryDslMemberRepository implements MemberRepository {
 		BooleanBuilder builder = new BooleanBuilder();
 		final int offset = (page - 1) * memberPageSize;
 
-		// companyId 조건 추가
-		if (companyId != null) {
-			builder.and(member.companyId.eq(companyId));
-		}
+
+
+		builder.and(member.deleted.eq(false));
+		if (companyId != null) {builder.and(member.companyId.eq(companyId));}
 
 		if (keyword != null && keywordType != null) {
 			switch (keywordType) {

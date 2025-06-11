@@ -17,9 +17,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
-import kr.mywork.domain.project.model.ProjectAssign;
 import kr.mywork.domain.project.repository.ProjectRepository;
-import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -29,25 +27,11 @@ import lombok.RequiredArgsConstructor;
 public class QueryDslProjectRepository implements ProjectRepository {
 
 	private final JpaProjectRepository projectRepository;
-	private final JpaProjectAssignRepository projectAssignRepository;
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public Project save(ProjectCreateRequest request) {
-		// 1) Project 저장(신규 생성 또는 수정)
-		Project project = projectRepository.save(request.toEntity());
-
-		// 2) 항상 새로운 ProjectAssign 객체 생성
-		ProjectAssign assign = new ProjectAssign(
-			project.getId(),                          // 방금 저장된 Project 엔티티
-			request.getDevCompanyId(),       // 요청에서 전달된 개발사 ID
-			request.getClientCompanyId()    // 요청에서 전달된 고객사 ID
-		);
-
-		// 3) 바로 저장 (기존 데이터 조회 없이 INSERT)
-		projectAssignRepository.save(assign);
-
-		return project;
+	public Project save(final Project project) {
+		return projectRepository.save(project);
 	}
 
 	@Override

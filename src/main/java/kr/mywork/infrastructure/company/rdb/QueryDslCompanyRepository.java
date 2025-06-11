@@ -44,7 +44,8 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 	}
 
 	@Override
-	public List<CompanySelectResponse> findCompaniesBySearchConditionWithPaging(final int page, final int companyPageSize,
+	public List<CompanySelectResponse> findCompaniesBySearchConditionWithPaging(final int page,
+		final int companyPageSize,
 		final String companyType, final String keywordType, String keyword, Boolean deleted) {
 
 		final int offset = (page - 1) * companyPageSize;
@@ -113,8 +114,14 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 				company.id,
 				company.name))
 			.from(company)
-			.where(company.deleted.isFalse(),
-				company.type.stringValue().eq(companyType))
+			.where(
+				eqCompanyType(companyType),
+				company.deleted.eq(false)
+			)
 			.fetch();
+	}
+
+	public BooleanExpression eqCompanyType(final String companyType) {
+		return (companyType == null) ? null : company.type.stringValue().eq(companyType);
 	}
 }

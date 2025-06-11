@@ -1,11 +1,14 @@
 package kr.mywork.infrastructure.project_member.rdb;
 
+import static kr.mywork.domain.member.model.QMember.member;
+import static kr.mywork.domain.project.model.QProjectMember.projectMember;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
-import static kr.mywork.domain.member.model.QMember.member;
-import static kr.mywork.domain.project.model.QProjectMember.projectMember;
+
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -46,5 +49,21 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 			.fetch();
 	}
 
+	@Override
+	public Optional<ProjectMember> findByMemberIdAndProjectId(UUID memberId,UUID projectId) {
+		return jpaProjectMemberRepository.findByMemberIdAndProjectId(memberId,projectId);
+	}
+
+	@Override
+	public boolean existsByMemberIdAndProjectIdAndDeleted(final UUID memberId, final UUID projectId,
+		final boolean deleted) {
+		return queryFactory.select(projectMember.id)
+			.from(projectMember)
+			.where(projectMember.deleted.isTrue()
+				.and(projectMember.memberId.eq(memberId))
+				.and(projectMember.projectId.eq(projectId)))
+			.limit(1)
+			.fetchFirst() != null;
+	}
 
 }

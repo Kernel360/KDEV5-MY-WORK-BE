@@ -3,6 +3,7 @@ package kr.mywork.interfaces.project_member.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import kr.mywork.domain.project_member.service.ProjectMemberService;
 import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
 import kr.mywork.interfaces.project_member.controller.dto.response.CompanyMembersInProjectWebResponse;
 import kr.mywork.interfaces.project_member.controller.dto.response.ProjectMemberAddWebResponse;
+import kr.mywork.interfaces.project_member.controller.dto.response.ProjectMemberDeleteWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -44,6 +46,17 @@ public class ProjectMemberController {
 
 		return ApiResponse.success(CompanyMembersInProjectWebResponse.from(companyMemberInProjectResponseList));
 		
+	}
+	@DeleteMapping  //전달 받은 멤버를 프로젝트 멤버에서 제외한다.
+	public ApiResponse<ProjectMemberDeleteWebResponse> deleteProjectMember(
+		@RequestParam(name="memberId") UUID memberId,
+		@RequestParam(name="projectId") UUID projectId
+	) {
+		final UUID deletedMemberId =projectMemberService.deleteMemberById(memberId,projectId);
+
+		final ProjectMemberDeleteWebResponse projectMemberDeleteWebResponse = new ProjectMemberDeleteWebResponse(deletedMemberId);
+
+		return ApiResponse.success(projectMemberDeleteWebResponse);
 	}
 }
 

@@ -3,17 +3,19 @@ package kr.mywork.interfaces.project.controller.dto.response;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
 
 public record ProjectSelectWebResponse(
 	UUID id,
 	String name,
-	LocalDateTime startAt,
-	LocalDateTime endAt,
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startAt,
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime endAt,
 	String step,
 	String detail,
 	Boolean deleted,
-	LocalDateTime createdAt,
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime createdAt,
 	UUID devCompanyId,
 	UUID clientCompanyId
 ) {
