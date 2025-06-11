@@ -289,4 +289,61 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
+
+	@Test
+	@DisplayName("프로젝트 목록 조회 성공")
+	@Sql("classpath:sql/project-keyword-search.sql")
+	void 프로젝트_목록_조회_성공() throws Exception {
+		//given
+		final String accessToken = createDevAdminAccessToken();
+
+		//when
+		final ResultActions result = mockMvc.perform(
+			get("/api/projects?page={page}&keywordType={keywordType}&keyword={keyword}&step={step}",
+				1, "DEV_COMPANY_NAME", "개발사", "IN_PROGRESS")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		//then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.data.projects").isArray(),
+				jsonPath("$.data.totalCount").isNumber(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("project-list-success", projectListSuccessResource()));
+	}
+
+	private ResourceSnippet projectListSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project API")
+				.summary("프로젝트 목록 조회 API")
+				.description("프로젝트 목록을 조회한다 (검색 조건, 페이징 포함)")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.queryParameters(
+					parameterWithName("page").description("페이지 번호 (1부터 시작)"),
+					parameterWithName("keywordType").description(
+						"검색 키워드 타입 (DEV_COMPANY_NAME|CLIENT_COMPANY_NAME|PROJECT_NAME)").optional(),
+					parameterWithName("keyword").description("검색 키워드").optional(),
+					parameterWithName("step").description("프로젝트 진행 상태").optional())
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.projects").type(JsonFieldType.ARRAY).description("프로젝트 목록"),
+					fieldWithPath("data.projects[].id").type(JsonFieldType.STRING).description("프로젝트 아이디"),
+					fieldWithPath("data.projects[].name").type(JsonFieldType.STRING).description("프로젝트 이름"),
+					fieldWithPath("data.projects[].startAt").type(JsonFieldType.STRING).description("프로젝트 시작일"),
+					fieldWithPath("data.projects[].endAt").type(JsonFieldType.STRING).description("프로젝트 종료일"),
+					fieldWithPath("data.projects[].step").type(JsonFieldType.STRING).description("프로젝트 진행 상태"),
+					fieldWithPath("data.projects[].devCompanyId").type(JsonFieldType.STRING).description("개발사 아이디"),
+					fieldWithPath("data.projects[].devCompanyName").type(JsonFieldType.STRING).description("개발사 이름"),
+					fieldWithPath("data.projects[].clientCompanyId").type(JsonFieldType.STRING).description("고객사 아이디"),
+					fieldWithPath("data.projects[].clientCompanyName").type(JsonFieldType.STRING).description("고객사 이름"),
+					fieldWithPath("data.totalCount").type(JsonFieldType.NUMBER).description("전체 프로젝트 개수"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
+	}
 }
