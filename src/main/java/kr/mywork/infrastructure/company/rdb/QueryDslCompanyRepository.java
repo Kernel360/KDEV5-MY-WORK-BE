@@ -121,6 +121,20 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 			.fetch();
 	}
 
+	@Override
+	public List<Company> findAllByIds(final List<UUID> devCompanyIds) {
+		return queryFactory.selectFrom(company)
+			.where(company.id.in(devCompanyIds))
+			.fetch();
+	}
+
+	@Override
+	public List<Company> findAllByNameAndType(final String companyName, final String type) {
+		return queryFactory.selectFrom(company)
+			.where(company.name.contains(companyName), company.type.stringValue().eq(type))
+			.fetch();
+	}
+
 	public BooleanExpression eqCompanyType(final String companyType) {
 		return (companyType == null) ? null : company.type.stringValue().eq(companyType);
 	}
