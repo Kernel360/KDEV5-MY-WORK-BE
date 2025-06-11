@@ -17,13 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.project.service.ProjectService;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
 import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
+import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectDeleteWebRequest;
@@ -42,6 +43,9 @@ import lombok.RequiredArgsConstructor;
 @Validated
 @RequiredArgsConstructor
 public class ProjectController {
+
+	private static final String PROJECT_SEARCH_KEYWORD_TYPE = "^(PROJECT_NAME|DEV_COMPANY_NAME|CLIENT_COMPANY_NAME)$";
+	private static final String PROJECT_STEP_TYPE = "^(NOT_STARTED|IN_PROGRESS|PAUSED|COMPLETED)$";
 
 	private final ProjectService projectService;
 
@@ -96,19 +100,21 @@ public class ProjectController {
 
 	@GetMapping
 	public ApiResponse<ProjectListWebResponse> listProjects(
-		@RequestParam(name = "page") @Min(value = 1, message = "{invalid.page}") final int page,
-		@RequestParam(name = "memberId", required = false) final UUID memberId,
-		@RequestParam(name = "nameKeyword", required = false) final String nameKeyword,
-		@RequestParam(name = "deleted", required = false) final Boolean deleted
-	) {
-		List<ProjectSelectWithAssignResponse> serviceList =
-			projectService.findProjectsBySearchConditionWithPaging(page, memberId, nameKeyword, deleted);
+		@RequestParam(name = "keywordType", required = false)
+		@Pattern(regexp = PROJECT_SEARCH_KEYWORD_TYPE, message = "{project.invalid-search-keyword-type}") final String keywordType,
+		@RequestParam(name = "keyword", required = false) final String keyword,
+		@RequestParam(name = "step", required = false)
+		@Pattern(regexp = PROJECT_STEP_TYPE, message = "{project.invalid-status}") final String step,
+		@RequestParam(name = "page") @Min(value = 1, message = "{invalid.page}") final int page) {
 
-		List<ProjectSelectWebResponse> webList = serviceList.stream()
+		List<ProjectSelectResponse> projectSelectResponses =
+			projectService.findProjectsBySearchConditionWithPaging(keywordType, keyword, step, page);
+
+		List<ProjectSelectWebResponse> webList = projectSelectResponses.stream()
 			.map(ProjectSelectWebResponse::from)
 			.collect(Collectors.toList());
 
-		long totalCount = projectService.countTotalProjectsByCondition(memberId, nameKeyword, deleted);
+		long totalCount = projectService.countTotalProjectsByCondition(keywordType, keyword, step);
 
 		return ApiResponse.success(new ProjectListWebResponse(webList, totalCount));
 	}
