@@ -54,4 +54,16 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 		return jpaProjectMemberRepository.findByMemberIdAndProjectId(memberId,projectId);
 	}
 
+	@Override
+	public boolean existsByMemberIdAndProjectIdAndDeleted(final UUID memberId, final UUID projectId,
+		final boolean deleted) {
+		return queryFactory.select(projectMember.id)
+			.from(projectMember)
+			.where(projectMember.deleted.isTrue()
+				.and(projectMember.memberId.eq(memberId))
+				.and(projectMember.projectId.eq(projectId)))
+			.limit(1)
+			.fetchFirst() != null;
+	}
+
 }
