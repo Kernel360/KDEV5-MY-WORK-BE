@@ -4,11 +4,15 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.docume
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +27,9 @@ import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
 import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectDeleteWebRequest;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectUpdateWebRequest;
 
 public class ProjectDocumentationTest extends RestDocsDocumentation {
 
@@ -124,6 +131,161 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.clientCompanyId").type(JsonFieldType.STRING).description("프로젝트 고객사 아이디"),
 					fieldWithPath("data.clientCompanyName").type(JsonFieldType.STRING).description("프로젝트 고객사 이름"),
 					fieldWithPath("data.clientContactPhoneNum").type(JsonFieldType.STRING).description("프로젝트 고객사 전화번호"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
+	}
+
+	@Test
+	@DisplayName("프로젝트 생성 성공")
+	void 프로젝트_생성_성공() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+
+		final ProjectCreateWebRequest request = new ProjectCreateWebRequest(
+			"고객사 개발 프로젝트",
+			LocalDateTime.of(2025, 1, 1, 10, 0),
+			LocalDateTime.of(2025, 12, 31, 18, 0),
+			"IN_PROGRESS",
+			"서비스 개발 프로젝트입니다.",
+			UUID.fromString("019759dd-378a-7590-9bd4-b204a064a120"),
+			UUID.fromString("019759de-4cdf-70e6-a0c9-3188cac11476")
+		);
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			post("/api/projects")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(objectMapper.writeValueAsString(request)));
+
+		// then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.result").value("SUCCESS"))
+			.andExpect(jsonPath("$.data").exists())
+			.andExpect(jsonPath("$.error").doesNotExist())
+			.andDo(document("project-create-success", projectCreateSuccessResource()));
+	}
+
+	private ResourceSnippet projectCreateSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project API")
+				.summary("프로젝트 생성 API")
+				.description("새로운 프로젝트를 등록하고 개발사, 고객사를 할당한다.")
+				.requestFields(
+					fieldWithPath("name").type(JsonFieldType.STRING).description("프로젝트 이름"),
+					fieldWithPath("startAt").type(JsonFieldType.STRING).description("시작 날짜"),
+					fieldWithPath("endAt").type(JsonFieldType.STRING).description("종료 날짜"),
+					fieldWithPath("step").type(JsonFieldType.STRING)
+						.description("프로젝트 단계 (NOT_STARTED, IN_PROGRESS, PAUSED, COMPLETED)"),
+					fieldWithPath("detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
+					fieldWithPath("devCompanyId").type(JsonFieldType.STRING).description("개발사 UUID"),
+					fieldWithPath("clientCompanyId").type(JsonFieldType.STRING).description("클라이언트 UUID"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("생성된 프로젝트 ID"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("프로젝트 수정 성공")
+	@Sql("classpath:sql/project-update.sql")
+	void 프로젝트_수정_성공() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+
+		final UUID projectId = UUID.fromString("01975a03-765d-7760-b82f-1bc8ba1b2ab6");
+
+		final ProjectUpdateWebRequest request = new ProjectUpdateWebRequest(
+			"고객사 프로젝트 이름 수정",
+			LocalDateTime.of(2025, 2, 1, 9, 0),
+			LocalDateTime.of(2025, 11, 30, 18, 0),
+			"COMPLETED",
+			"프로젝트가 완료되었습니다.",
+			false);
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			put("/api/projects/{projectId}", projectId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(objectMapper.writeValueAsString(request)));
+
+		// then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.result").value("SUCCESS"))
+			.andExpect(jsonPath("$.data").exists())
+			.andDo(document("project-update-success", projectUpdateSuccessResource()));
+	}
+
+	private ResourceSnippet projectUpdateSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project API")
+				.summary("프로젝트 수정 API")
+				.description("기존 프로젝트 정보를 수정한다.")
+				.pathParameters(
+					parameterWithName("projectId").description("수정할 프로젝트 ID"))
+				.requestFields(
+					fieldWithPath("name").type(JsonFieldType.STRING).description("프로젝트 이름"),
+					fieldWithPath("startAt").type(JsonFieldType.STRING).description("시작 날짜"),
+					fieldWithPath("endAt").type(JsonFieldType.STRING).description("종료 날짜"),
+					fieldWithPath("step").type(JsonFieldType.STRING)
+						.description("프로젝트 단계 (NOT_STARTED, IN_PROGRESS, PAUSED, COMPLETED)"),
+					fieldWithPath("detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
+					fieldWithPath("deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("프로젝트 ID"),
+					fieldWithPath("data.name").type(JsonFieldType.STRING).description("프로젝트 이름"),
+					fieldWithPath("data.startAt").type(JsonFieldType.STRING).description("프로젝트 시작일"),
+					fieldWithPath("data.endAt").type(JsonFieldType.STRING).description("프로젝트 종료일"),
+					fieldWithPath("data.step").type(JsonFieldType.STRING).description("진행 상태"),
+					fieldWithPath("data.detail").type(JsonFieldType.STRING).description("상세 설명"),
+					fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
+	}
+
+	@Test
+	@DisplayName("프로젝트 삭제 성공")
+	@Sql("classpath:sql/project-delete.sql")
+	void 프로젝트_삭제_성공() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+
+		final UUID projectId = UUID.fromString("01975a03-765d-7760-b82f-1bc8ba1b2ab6");
+
+		final ProjectDeleteWebRequest request = new ProjectDeleteWebRequest(projectId);
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			delete("/api/projects")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(objectMapper.writeValueAsString(request))
+		);
+
+		// then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.result").value("SUCCESS"))
+			.andExpect(jsonPath("$.data").exists())
+			.andDo(document("project-delete-success", projectDeleteSuccessResource()));
+	}
+
+	private ResourceSnippet projectDeleteSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project API")
+				.summary("프로젝트 삭제 API")
+				.description("지정한 프로젝트를 삭제한다.")
+				.requestFields(
+					fieldWithPath("id").type(JsonFieldType.STRING).description("삭제할 프로젝트 ID"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("삭제된 프로젝트 ID"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}

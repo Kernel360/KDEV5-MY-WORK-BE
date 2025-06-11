@@ -47,26 +47,23 @@ public class ProjectController {
 
 	@PostMapping
 	public ApiResponse<ProjectCreateWebResponse> createProject(
-		@RequestBody @Valid final ProjectCreateWebRequest webRequest
-	) {
-		// 1) WebRequest → Service DTO
-		final ProjectCreateRequest dto = webRequest.toServiceDto();
+		@RequestBody @Valid final ProjectCreateWebRequest projectCreateWebRequest) {
 
-		// 2) 서비스 호출
-		final UUID createdId = projectService.createProject(dto);
+		final ProjectCreateRequest projectCreateRequest = projectCreateWebRequest.toServiceDto();
 
-		// 3) WebResponse 생성 후 반환
+		final UUID createdId = projectService.createProject(projectCreateRequest);
+
 		return ApiResponse.success(new ProjectCreateWebResponse(createdId));
 	}
 
 	@PutMapping("/{projectId}")
 	public ApiResponse<ProjectUpdateWebResponse> updateProject(
 		@RequestBody @Valid final ProjectUpdateWebRequest webRequest,
-		@PathVariable final UUID projectId
-	) {
-		final ProjectUpdateRequest dto = webRequest.toServiceDto(projectId);
+		@PathVariable final UUID projectId) {
 
-		final ProjectUpdateResponse serviceResponse = projectService.updateProject(dto);
+		final ProjectUpdateRequest projectUpdateRequest = webRequest.toServiceDto();
+
+		final ProjectUpdateResponse serviceResponse = projectService.updateProject(projectId, projectUpdateRequest);
 
 		final ProjectUpdateWebResponse webResponse = ProjectUpdateWebResponse.from(serviceResponse);
 

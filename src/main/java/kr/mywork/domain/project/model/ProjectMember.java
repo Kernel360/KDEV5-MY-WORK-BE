@@ -52,4 +52,8 @@ public class ProjectMember {
 	public void delete() {
 		this.deleted = true;
 	}
+
+	public void restore() {
+		this.deleted = false;
+	}
 }

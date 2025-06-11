@@ -67,11 +67,11 @@ public class Project {
 	}
 
 	public void updateFrom(ProjectUpdateRequest request) {
-		this.name = request.getName();
-		this.startAt = request.getStartAt();
-		this.endAt = request.getEndAt();
-		this.step = request.getStep();
-		this.detail = request.getDetail();
-		this.deleted = request.getDeleted();
+		this.name = request.name();
+		this.startAt = request.startAt();
+		this.endAt = request.endAt();
+		this.step = request.step();
+		this.detail = request.detail();
+		this.deleted = request.deleted();
 	}
 }
