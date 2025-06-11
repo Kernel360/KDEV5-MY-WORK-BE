@@ -1,9 +1,9 @@
 package kr.mywork.infrastructure.project.rdb;
 
 import static kr.mywork.domain.project.model.QProject.project;
-import static kr.mywork.domain.project.model.QProjectAssign.projectAssign;
 import static kr.mywork.domain.project.model.QProjectMember.projectMember;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,7 +18,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.repository.ProjectRepository;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -40,58 +39,20 @@ public class QueryDslProjectRepository implements ProjectRepository {
 	}
 
 	@Override
-	public List<ProjectSelectWithAssignResponse> findProjectsBySearchConditionWithPaging(
-		int page,
-		int size,
-		UUID memberId,
-		String nameKeyword,
-		Boolean deleted
-	) {
-		int offset = (page - 1) * size;
-
-		return queryFactory
-			.select(Projections.constructor(
-				ProjectSelectWithAssignResponse.class,
-				project.id,
-				project.name,
-				project.startAt,
-				project.endAt,
-				project.step,
-				project.detail,
-				project.deleted,
-				project.createdAt,
-				projectAssign.devCompanyId,
-				projectAssign.clientCompanyId
-			))
-			.from(project)
-			.leftJoin(projectAssign).on(projectAssign.projectId.eq(project.id))
-			.leftJoin(projectMember).on(projectMember.projectId.eq(project.id))
-			.where(
-				eqMember(memberId),
-				eqName(nameKeyword),
-				eqDeleted(deleted)
-			)
-			.offset(offset)
-			.limit(size)
-			.fetch();
-	}
-
-	@Override
-	public Long countTotalProjectsByCondition(
-		UUID memberId,
-		String nameKeyword,
-		Boolean deleted
-	) {
+	public Long countTotalProjectIdsAndStep(final Collection<UUID> projectIds, final String step) {
 		return queryFactory
 			.select(project.id.count())
 			.from(project)
-			.leftJoin(projectMember).on(projectMember.projectId.eq(project.id))
-			.where(
-				eqMember(memberId),
-				eqName(nameKeyword),
-				eqDeleted(deleted)
-			)
+			.where(eqDeleted(false), inProjectIds(projectIds), eqProjectStep(step))
 			.fetchOne();
+	}
+
+	private BooleanExpression inProjectIds(final Collection<UUID> projectIds) {
+		if (projectIds == null) {
+			return null;
+		}
+
+		return project.id.in(projectIds);
 	}
 
 	@Override
@@ -108,6 +69,56 @@ public class QueryDslProjectRepository implements ProjectRepository {
 				eqDeleted(false)
 			)
 			.fetch();
+	}
+
+	@Override
+	public List<Project> findAllByStepAndNameWithPaging(final String step, final String projectName,
+		final Integer page, final Integer size) {
+
+		final int offset = (page - 1) * size;
+
+		return queryFactory.selectFrom(project)
+			.where(eqDeleted(false), eqProjectStep(step), containsProjectName(projectName))
+			.limit(size)
+			.offset(offset)
+			.fetch();
+	}
+
+	private BooleanExpression containsProjectName(final String projectName) {
+		if (projectName == null) {
+			return null;
+		}
+
+		return project.name.contains(projectName);
+	}
+
+	@Override
+	public List<Project> findAllByIdsAndStep(final Collection<UUID> projectIds, final String step, final Integer page,
+		final Integer size) {
+
+		final int offset = (page - 1) * size;
+
+		return queryFactory.selectFrom(project)
+			.where(eqDeleted(false), inProjectIds(projectIds), eqProjectStep(step))
+			.offset(offset)
+			.limit(size)
+			.fetch();
+	}
+
+	@Override
+	public Long countTotalProjectsByNameAndStep(final String name, final String step) {
+		return queryFactory.select(project.id.count())
+			.from(project)
+			.where(eqDeleted(false), containsProjectName(name), eqProjectStep(step))
+			.fetchOne();
+	}
+
+	private BooleanExpression eqProjectStep(final String step) {
+		if (step == null) {
+			return null;
+		}
+
+		return project.step.eq(step);
 	}
 
 	private BooleanExpression eqMember(UUID memberId) {
