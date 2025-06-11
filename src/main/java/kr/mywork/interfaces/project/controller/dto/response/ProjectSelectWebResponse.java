@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import kr.mywork.domain.project.service.dto.response.ProjectSelectWithAssignResponse;
+import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 
 public record ProjectSelectWebResponse(
 	UUID id,
@@ -13,24 +13,22 @@ public record ProjectSelectWebResponse(
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startAt,
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime endAt,
 	String step,
-	String detail,
-	Boolean deleted,
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime createdAt,
 	UUID devCompanyId,
-	UUID clientCompanyId
-) {
-	public static ProjectSelectWebResponse from(ProjectSelectWithAssignResponse response) {
+	String devCompanyName,
+	UUID clientCompanyId,
+	String clientCompanyName) {
+
+	public static ProjectSelectWebResponse from(ProjectSelectResponse response) {
 		return new ProjectSelectWebResponse(
 			response.id(),
 			response.name(),
 			response.startAt(),
 			response.endAt(),
 			response.step(),
-			response.detail(),
-			response.deleted(),
-			response.createdAt(),
 			response.devCompanyId(),
-			response.clientCompanyId()
+			response.devCompanyName(),
+			response.clientCompanyId(),
+			response.clientCompanyName()
 		);
 	}
 }
