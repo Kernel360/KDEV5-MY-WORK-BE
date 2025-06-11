@@ -3,6 +3,7 @@ package kr.mywork.interfaces.post.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
@@ -33,23 +36,28 @@ import kr.mywork.interfaces.post.controller.dto.response.PostDeleteWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping("/api")
 @RequiredArgsConstructor
+@Validated
 public class PostController {
+
+	private static final String POST_KEYWORD_TYPE = "^(AUTHORNAME|TITLE)?$";
+	private static final String POST_APPROVAL_TYPE = "^(APPROVED|PENDING)?$";
 
 	private final PostService postService;
 
-	@PostMapping("/id/generate")
+	@PostMapping("/posts/id/generate")
 	public ApiResponse<PostIdCreateWebResponse> createPostId() {
 		final UUID postId = postService.createPostId();
 		return ApiResponse.success(new PostIdCreateWebResponse(postId));
 	}
 
-	@PostMapping
+	@PostMapping("/projects/{project-id}/posts")
 	public ApiResponse<PostCreateWebResponse> createPost(
+		@PathVariable(name = "project-id") final UUID projectId,
 		@RequestBody @Valid final PostCreateWebRequest postCreateWebRequest) {
 
-		final PostCreateRequest postCreateRequest = postCreateWebRequest.toServiceDto();
+		final PostCreateRequest postCreateRequest = postCreateWebRequest.toServiceDto(projectId);
 
 		final UUID createdPostId = postService.createPost(postCreateRequest);
 
@@ -59,7 +67,7 @@ public class PostController {
 
 	}
 
-	@PutMapping("/{postId}")
+	@PutMapping("/posts/{postId}")
 	public ApiResponse<PostUpdateWebResponse> updatePost(
 		@RequestBody @Valid final PostUpdateWebRequest postUpdateWebRequest,
 		@PathVariable final UUID postId) {
@@ -73,7 +81,7 @@ public class PostController {
 		return ApiResponse.success(postUpdateWebResponse);
 	}
 
-	@GetMapping("/{postId}")
+	@GetMapping("/posts/{postId}")
 	public ApiResponse<PostDetailWebResponse> getPostDetail(@PathVariable @Valid final UUID postId) {
 
 		PostDetailResponse postDetailResponse = postService.getPostDetail(postId);
@@ -83,18 +91,21 @@ public class PostController {
 		return ApiResponse.success(postDetailWebResponse);
 	}
 
-	@GetMapping
+	@GetMapping("/projects/{project-id}/posts")
 	public ApiResponse<PostListSelectWebResponse> findPostsByOffset(
-		@RequestParam final int page,
+		@RequestParam(name = "page") @Min(value = 1, message = "{invalid.page-size}") final int page,
+		@PathVariable(name = "project-id") final UUID projectId,
 		@RequestParam(name = "keyword", required = false) final String keyword,
+		@RequestParam(name = "keywordType", required = false) @Pattern(regexp = POST_KEYWORD_TYPE, message = "{invalid.post-search-type}") final String keywordType,
 		@RequestParam(name = "projectStepId", required = false) final UUID projectStepId,
-		@RequestParam(name = "deleted", required = false) final Boolean deleted
+		@RequestParam(name = "deleted", required = false) final Boolean deleted,
+		@RequestParam(name = "approval", required = false) @Pattern(regexp = POST_APPROVAL_TYPE, message = "{invalid.post-approval-type}") final String approval
 	) {
 
 		final List<PostSelectResponse> postSelectResponses = postService.findPostsBySearchConditionWithPaging(page,
-			projectStepId, keyword, deleted);
+			projectStepId, keyword, deleted, projectId, keywordType, approval);
 
-		final Long totalCount = postService.countTotalPostsByCondition(projectStepId, keyword, deleted);
+		final Long totalCount = postService.countTotalPostsByCondition(projectStepId, keyword, deleted, projectId, keywordType, approval);
 
 		final List<PostSelectWebResponse> postSelectWebResponses = postSelectResponses.stream()
 			.map(PostSelectWebResponse::from)
@@ -104,7 +115,7 @@ public class PostController {
 
 	}
 
-	@DeleteMapping("/{postId}")
+	@DeleteMapping("/posts/{postId}")
 	public ApiResponse<PostDeleteWebResponse> deletePost(
 		@PathVariable final UUID postId) {
 
