@@ -38,7 +38,7 @@ public class ProjectMemberService {
 	}
 
 	private UUID restoreProjectMember(final UUID projectId, final UUID memberId) {
-		final ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(projectId, memberId)
+		final ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(memberId, projectId)
 			.orElseThrow(() -> new ProjectMemberNotFoundException(ProjectMemberErrorType.PROJECT_MEMBER_NOT_FOUND));
 
 		projectMember.restore();
