@@ -1,5 +1,6 @@
 package kr.mywork.interfaces.project_checklist.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +17,7 @@ import kr.mywork.domain.project_checklist.service.ProjectCheckListService;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListApprovalRequest;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListCreateRequest;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListUpdateRequest;
+import kr.mywork.domain.project_checklist.service.dto.response.CheckListProjectStepProgressResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListApprovalResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListCreateResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListDetailResponse;
@@ -27,6 +29,8 @@ import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectChe
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListCreateWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListDeleteWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListDetailWebResponse;
+import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListProgressListWebResponse;
+import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListProgressWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListUpdateWebResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -74,7 +78,7 @@ public class ProjectCheckListController {
 	public ApiResponse<ProjectCheckListDeleteWebResponse> deleteProjectCheckList(
 		@PathVariable final UUID checkListId) {
 
-		UUID deletedCheckListId  = projectCheckListService.deleteProjectCheckList(
+		UUID deletedCheckListId = projectCheckListService.deleteProjectCheckList(
 			checkListId);
 
 		return ApiResponse.success(new ProjectCheckListDeleteWebResponse(deletedCheckListId));
@@ -91,4 +95,18 @@ public class ProjectCheckListController {
 		return ApiResponse.success(new ProjectCheckListApprovalWebResponse(projectCheckListApprovalResponse));
 	}
 
+	@GetMapping("/api/projects/{projectId}/check-list/progress")
+	public ApiResponse<ProjectCheckListProgressListWebResponse> getProjectCheckListProgress(
+		@PathVariable(name = "projectId") final UUID projectId) {
+
+		final List<CheckListProjectStepProgressResponse> checkListProjectStepProgressResponses =
+			projectCheckListService.getCheckListProgress(projectId, "APPROVED");
+
+		final List<ProjectCheckListProgressWebResponse> projectCheckListProgressWebResponses =
+			checkListProjectStepProgressResponses.stream()
+				.map(ProjectCheckListProgressWebResponse::fromServiceResponse)
+				.toList();
+
+		return ApiResponse.success(new ProjectCheckListProgressListWebResponse(projectCheckListProgressWebResponses));
+	}
 }
