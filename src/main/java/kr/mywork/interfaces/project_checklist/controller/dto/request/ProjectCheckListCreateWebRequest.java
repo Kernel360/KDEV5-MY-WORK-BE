@@ -18,19 +18,12 @@ public class ProjectCheckListCreateWebRequest {
 	private String title;
 
 	@NotNull
-	private UUID devCompanyId;
-
-	@NotNull
-	private UUID clientCompanyId;
-
-	@NotNull
 	private UUID projectStepId;
 
 	@NotNull
 	private String approval;
 
 	public ProjectCheckListCreateRequest toServiceDto() {
-		return new ProjectCheckListCreateRequest(this.title, this.devCompanyId, this.clientCompanyId,
-			this.projectStepId, this.approval);
+		return new ProjectCheckListCreateRequest(this.title, this.projectStepId, this.approval);
 	}
 }

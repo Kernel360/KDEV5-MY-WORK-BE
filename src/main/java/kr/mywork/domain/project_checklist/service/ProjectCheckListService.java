@@ -28,18 +28,11 @@ import lombok.RequiredArgsConstructor;
 public class ProjectCheckListService {
 
 	private final ProjectCheckListRepository projectCheckListRepository;
-	private final CompanyRepository companyRepository;
 	private final ProjectStepRepository projectStepRepository;
 
 	@Transactional
 	public ProjectCheckListCreateResponse createProjectCheckList(
 		ProjectCheckListCreateRequest projectCheckListRequest) {
-
-		companyRepository.findByIdAndType(projectCheckListRequest.getClientCompanyId(), CompanyType.CLIENT)
-			.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
-
-		companyRepository.findByIdAndType(projectCheckListRequest.getDevCompanyId(), CompanyType.DEV)
-			.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
 
 		//TODO 프로젝트 단계 존재하는지 체크해야함.
 

@@ -30,12 +30,6 @@ public class ProjectCheckList {
 	private String title;
 
 	@Column(nullable = false)
-	private UUID devCompanyId;
-
-	@Column(nullable = false)
-	private UUID clientCompanyId;
-
-	@Column(nullable = false)
 	private UUID projectStepId;
 
 	@Column(nullable = false)
@@ -47,11 +41,8 @@ public class ProjectCheckList {
 	@NotNull
 	private Boolean deleted;
 
-	public ProjectCheckList(String title, UUID devCompanyId, UUID clientCompanyId,
-		UUID projectStepId, String approval) {
+	public ProjectCheckList(String title, UUID projectStepId, String approval) {
 		this.title = title;
-		this.devCompanyId = devCompanyId;
-		this.clientCompanyId = clientCompanyId;
 		this.projectStepId = projectStepId;
 		this.approval = approval;
 		this.deleted = false;

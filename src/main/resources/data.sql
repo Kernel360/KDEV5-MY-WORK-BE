@@ -3,18 +3,18 @@ INSERT INTO member (id, name, email, password, role, birth_date, phone_number,
 VALUES
     -- system admin
     (UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
-        '관리자',
-        'admin@example.com',
-        '$2a$12$TltsHoe3g9myZdiJaNCDnezKnx6sybA1csuL9jFvFFQE8GaA3fhmK', -- 'password1234' bcrypt
-        'SYSTEM_ADMIN',
-        NOW(),
-        '010-1234-5678',
-        UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
-        '개발팀',
-        'CTO',
-        NOW(),
-        NOW(),
-        false);
+     '관리자',
+     'admin@example.com',
+     '$2a$12$TltsHoe3g9myZdiJaNCDnezKnx6sybA1csuL9jFvFFQE8GaA3fhmK', -- 'password1234' bcrypt
+     'SYSTEM_ADMIN',
+     NOW(),
+     '010-1234-5678',
+     UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
+     '개발팀',
+     'CTO',
+     NOW(),
+     NOW(),
+     false);
 
 INSERT INTO company (id, name, detail, business_number, address, type,
                      contact_phone_number, contact_email, logo_image_path,
@@ -37,18 +37,17 @@ VALUES (UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
 -- =====================================================
 
 -- 1. Company ID 테이블 (회사 ID 사전 발급)
-INSERT INTO company_id (id) VALUES
-                                (UNHEX(REPLACE('0197539a-99f1-7ce0-9f36-e571c06d695c', '-', ''))),
-                                (UNHEX(REPLACE('0197539a-99f1-7466-aed6-67f98bfbd07f', '-', ''))),
-                                (UNHEX(REPLACE('0197539a-99f1-76f0-acd3-e0803f82adc3', '-', ''))),
-                                (UNHEX(REPLACE('0197539a-99f1-79c3-8f7b-e310eb6b9dcb', '-', ''))),
-                                (UNHEX(REPLACE('0197539a-99f1-75d8-8c0d-0ef857c9c9a7', '-', '')));
+INSERT INTO company_id (id)
+VALUES (UNHEX(REPLACE('0197539a-99f1-7ce0-9f36-e571c06d695c', '-', ''))),
+       (UNHEX(REPLACE('0197539a-99f1-7466-aed6-67f98bfbd07f', '-', ''))),
+       (UNHEX(REPLACE('0197539a-99f1-76f0-acd3-e0803f82adc3', '-', ''))),
+       (UNHEX(REPLACE('0197539a-99f1-79c3-8f7b-e310eb6b9dcb', '-', ''))),
+       (UNHEX(REPLACE('0197539a-99f1-75d8-8c0d-0ef857c9c9a7', '-', '')));
 
 -- 2. Company 테이블 (회사 정보)
-INSERT INTO company (
-    id, name, detail, business_number, address, type, contact_phone_number,
-    contact_email, logo_image_path, created_at, modified_at, deleted
-) VALUES
+INSERT INTO company (id, name, detail, business_number, address, type, contact_phone_number,
+                     contact_email, logo_image_path, created_at, modified_at, deleted)
+VALUES
 -- DEV 회사들
 (UNHEX(REPLACE('0197539a-99f1-7ce0-9f36-e571c06d695c', '-', '')),
  'TechCorp Ltd', '최신 기술로 혁신하는 개발 회사입니다', '123-45-67811',
@@ -77,10 +76,9 @@ INSERT INTO company (
  'info@smartretail.com', '/images/smartretail_logo.png', NOW(), NOW(), false);
 
 -- 3. Member 테이블 (회원 정보)
-INSERT INTO member (
-    id, company_id, name, department, position, role, phone_number, email, password,
-    deleted, created_at, modified_at, birth_date
-) VALUES
+INSERT INTO member (id, company_id, name, department, position, role, phone_number, email, password,
+                    deleted, created_at, modified_at, birth_date)
+VALUES
 -- TechCorp 직원들
 (UNHEX(REPLACE('0197539a-99f1-71ce-b445-b3f4d26c508a', '-', '')),
  UNHEX(REPLACE('0197539a-99f1-7ce0-9f36-e571c06d695c', '-', '')),
@@ -146,28 +144,25 @@ INSERT INTO member (
  false, NOW(), NOW(), '1989-08-25');
 
 -- 4. Project 테이블 (프로젝트 정보)
-INSERT INTO project (
-    id, name, start_at, end_at, step, created_at, modified_at, detail, deleted
-) VALUES
-      (UNHEX(REPLACE('0197539a-99f1-738a-a17b-5ce91f8e570b', '-', '')),
-       'GreenLife 친환경 ERP 시스템 구축', '2024-01-15 09:00:00', '2024-06-30 18:00:00',
-       '개발진행', NOW(), NOW(),
-       '친환경 제품 생산 및 유통 관리를 위한 통합 ERP 시스템 개발 프로젝트', false),
+INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted)
+VALUES (UNHEX(REPLACE('0197539a-99f1-738a-a17b-5ce91f8e570b', '-', '')),
+        'GreenLife 친환경 ERP 시스템 구축', '2024-01-15 09:00:00', '2024-06-30 18:00:00',
+        '개발진행', NOW(), NOW(),
+        '친환경 제품 생산 및 유통 관리를 위한 통합 ERP 시스템 개발 프로젝트', false),
 
-      (UNHEX(REPLACE('0197539a-99f1-7b40-9259-38fa0b9fa070', '-', '')),
-       'SmartRetail 옴니채널 플랫폼 개발', '2024-02-01 09:00:00', '2024-08-31 18:00:00',
-       '기획완료', NOW(), NOW(),
-       '온라인/오프라인 통합 리테일 플랫폼 구축을 위한 개발 프로젝트', false),
+       (UNHEX(REPLACE('0197539a-99f1-7b40-9259-38fa0b9fa070', '-', '')),
+        'SmartRetail 옴니채널 플랫폼 개발', '2024-02-01 09:00:00', '2024-08-31 18:00:00',
+        '기획완료', NOW(), NOW(),
+        '온라인/오프라인 통합 리테일 플랫폼 구축을 위한 개발 프로젝트', false),
 
-      (UNHEX(REPLACE('0197539a-99f1-7f67-98a1-961ba7fe6087', '-', '')),
-       'TechCorp 내부 업무관리 시스템', '2024-03-01 09:00:00', '2024-05-31 18:00:00',
-       '테스트', NOW(), NOW(),
-       'TechCorp 사내 업무 관리 및 협업 도구 개발', false);
+       (UNHEX(REPLACE('0197539a-99f1-7f67-98a1-961ba7fe6087', '-', '')),
+        'TechCorp 내부 업무관리 시스템', '2024-03-01 09:00:00', '2024-05-31 18:00:00',
+        '테스트', NOW(), NOW(),
+        'TechCorp 사내 업무 관리 및 협업 도구 개발', false);
 
 -- 5. Project Step 테이블 (프로젝트 단계)
-INSERT INTO project_step (
-    id, project_id, title, order_num, created_at
-) VALUES
+INSERT INTO project_step (id, project_id, title, order_num, created_at)
+VALUES
 -- GreenLife ERP 프로젝트 단계들
 (UNHEX(REPLACE('0197539a-99f1-727f-ba28-8ca7246dbd0a', '-', '')),
  UNHEX(REPLACE('0197539a-99f1-738a-a17b-5ce91f8e570b', '-', '')),
@@ -208,9 +203,8 @@ INSERT INTO project_step (
  '개발', 2, NOW());
 
 -- 6. Project Member 테이블 (프로젝트 참여자)
-INSERT INTO project_member (
-    id, project_id, member_id, manager, deleted, created_at
-) VALUES
+INSERT INTO project_member (id, project_id, member_id, manager, deleted, created_at)
+VALUES
 -- GreenLife ERP 프로젝트 팀
 (UNHEX(REPLACE('0197539a-99f1-7848-aed6-222a071b49a7', '-', '')),
  UNHEX(REPLACE('0197539a-99f1-738a-a17b-5ce91f8e570b', '-', '')),
@@ -249,81 +243,67 @@ INSERT INTO project_member (
  false, false, NOW());
 
 -- 7. Project Checklist 테이블 (프로젝트 체크리스트)
-INSERT INTO project_check_list (
-    id, title, dev_company_id, client_company_id, project_step_id, approval, created_at, deleted
-) VALUES
+INSERT INTO project_check_list (id, title, project_step_id, approval, created_at, deleted)
+VALUES
 -- GreenLife ERP 요구사항 분석 단계 체크리스트
 (UNHEX(REPLACE('0197539a-99f1-72ee-84ee-97bf7d8ad655', '-', '')),
  '비즈니스 요구사항 정의서 작성',
- UNHEX(REPLACE('0197539a-99f1-7ce0-9f36-e571c06d695c', '-', '')),
- UNHEX(REPLACE('0197539a-99f1-79c3-8f7b-e310eb6b9dcb', '-', '')),
  UNHEX(REPLACE('0197539a-99f1-727f-ba28-8ca7246dbd0a', '-', '')),
  'PENDING', NOW(), false),
 
 (UNHEX(REPLACE('0197539a-99f1-73b5-b2a2-8e40c4ef24fb', '-', '')),
  '기술 요구사항 분석 보고서',
- UNHEX(REPLACE('0197539a-99f1-7ce0-9f36-e571c06d695c', '-', '')),
- UNHEX(REPLACE('0197539a-99f1-79c3-8f7b-e310eb6b9dcb', '-', '')),
  UNHEX(REPLACE('0197539a-99f1-727f-ba28-8ca7246dbd0a', '-', '')),
  'APPROVED', NOW(), false),
 
 -- GreenLife ERP 시스템 설계 단계 체크리스트
 (UNHEX(REPLACE('0197539a-99f1-7d09-b508-1477dc3783fe', '-', '')),
  'DB 설계서 검토',
- UNHEX(REPLACE('0197539a-99f1-7ce0-9f36-e571c06d695c', '-', '')),
- UNHEX(REPLACE('0197539a-99f1-79c3-8f7b-e310eb6b9dcb', '-', '')),
  UNHEX(REPLACE('0197539a-99f1-7305-860b-e1b63c0c718a', '-', '')),
  'APPROVED', NOW(), false),
 
 -- SmartRetail 기획 단계 체크리스트
 (UNHEX(REPLACE('0197539a-99f1-7b09-bc8c-736c25309a40', '-', '')),
  '사용자 스토리 작성',
- UNHEX(REPLACE('0197539a-99f1-7466-aed6-67f98bfbd07f', '-', '')),
- UNHEX(REPLACE('0197539a-99f1-75d8-8c0d-0ef857c9c9a7', '-', '')),
  UNHEX(REPLACE('0197539a-99f1-7790-b036-fb20f8b349f4', '-', '')),
  'PENDING', NOW(), false),
 
 (UNHEX(REPLACE('0197539a-99f1-765b-aaa3-e1fd945e5b26', '-', '')),
  '화면 플로우 설계',
- UNHEX(REPLACE('0197539a-99f1-7466-aed6-67f98bfbd07f', '-', '')),
- UNHEX(REPLACE('0197539a-99f1-75d8-8c0d-0ef857c9c9a7', '-', '')),
  UNHEX(REPLACE('0197539a-99f1-7790-b036-fb20f8b349f4', '-', '')),
  'REJECTED', NOW(), false);
 
 -- 8. Post 테이블 (게시물)
-INSERT INTO post (
-    id, project_step_id, title, company_name, author_name, content,
-    approval, deleted, modified_at, created_at
-) VALUES
-      (UNHEX(REPLACE('0197539a-99f1-79fd-ab99-b5c1e3e48a58', '-', '')),
-       UNHEX(REPLACE('0197539a-99f1-727f-ba28-8ca7246dbd0a', '-', '')),
-       '요구사항 분석 진행 상황 보고', 'TechCorp Ltd', '이개발',
-       'GreenLife ERP 시스템의 요구사항 분석이 순조롭게 진행되고 있습니다. 주요 비즈니스 프로세스 파악이 완료되었으며, 다음 주까지 상세 요구사항 정의서를 완성할 예정입니다.',
-       'APPROVED', false, NOW(), NOW()),
+INSERT INTO post (id, project_step_id, title, company_name, author_name, content,
+                  approval, deleted, modified_at, created_at)
+VALUES (UNHEX(REPLACE('0197539a-99f1-79fd-ab99-b5c1e3e48a58', '-', '')),
+        UNHEX(REPLACE('0197539a-99f1-727f-ba28-8ca7246dbd0a', '-', '')),
+        '요구사항 분석 진행 상황 보고', 'TechCorp Ltd', '이개발',
+        'GreenLife ERP 시스템의 요구사항 분석이 순조롭게 진행되고 있습니다. 주요 비즈니스 프로세스 파악이 완료되었으며, 다음 주까지 상세 요구사항 정의서를 완성할 예정입니다.',
+        'APPROVED', false, NOW(), NOW()),
 
-      (UNHEX(REPLACE('0197539a-99f1-7ca6-ad2f-0a264565bd5e', '-', '')),
-       UNHEX(REPLACE('0197539a-99f1-7305-860b-e1b63c0c718a', '-', '')),
-       'DB 스키마 설계 완료 알림', 'TechCorp Ltd', '최백엔드',
-       '친환경 제품 관리를 위한 데이터베이스 스키마 설계가 완료되었습니다. 제품 분류, 재고 관리, 생산 이력 추적 등의 핵심 기능들이 반영되었습니다.',
-       'PENDING', false, NOW(), NOW()),
+       (UNHEX(REPLACE('0197539a-99f1-7ca6-ad2f-0a264565bd5e', '-', '')),
+        UNHEX(REPLACE('0197539a-99f1-7305-860b-e1b63c0c718a', '-', '')),
+        'DB 스키마 설계 완료 알림', 'TechCorp Ltd', '최백엔드',
+        '친환경 제품 관리를 위한 데이터베이스 스키마 설계가 완료되었습니다. 제품 분류, 재고 관리, 생산 이력 추적 등의 핵심 기능들이 반영되었습니다.',
+        'PENDING', false, NOW(), NOW()),
 
-      (UNHEX(REPLACE('0197539a-99f1-7144-9725-2d6ab40c27be', '-', '')),
-       UNHEX(REPLACE('0197539a-99f1-7790-b036-fb20f8b349f4', '-', '')),
-       '옴니채널 플랫폼 기획서 1차 완성', 'InnoSoft Solutions', '정관리자',
-       '온라인/오프라인 통합 채널 전략 및 고객 여정 맵핑이 포함된 기획서가 완성되었습니다. 클라이언트 검토 후 피드백을 반영하여 최종본을 완성할 예정입니다.',
-       'APPROVED', false, NOW(), NOW()),
+       (UNHEX(REPLACE('0197539a-99f1-7144-9725-2d6ab40c27be', '-', '')),
+        UNHEX(REPLACE('0197539a-99f1-7790-b036-fb20f8b349f4', '-', '')),
+        '옴니채널 플랫폼 기획서 1차 완성', 'InnoSoft Solutions', '정관리자',
+        '온라인/오프라인 통합 채널 전략 및 고객 여정 맵핑이 포함된 기획서가 완성되었습니다. 클라이언트 검토 후 피드백을 반영하여 최종본을 완성할 예정입니다.',
+        'APPROVED', false, NOW(), NOW()),
 
-      (UNHEX(REPLACE('0197539a-99f1-7e94-81ab-5baed9534781', '-', '')),
-       UNHEX(REPLACE('0197539a-99f1-7590-8a4f-6915a25856a7', '-', '')),
-       '내부 업무관리 시스템 요구사항 정리', 'TechCorp Ltd', '박프론트',
-       '사내 구성원들의 요구사항을 수집하여 정리하였습니다. 프로젝트 관리, 일정 공유, 문서 관리 기능이 핵심으로 파악되었습니다.',
-       'REJECTED', false, NOW(), NOW());
+       (UNHEX(REPLACE('0197539a-99f1-7e94-81ab-5baed9534781', '-', '')),
+        UNHEX(REPLACE('0197539a-99f1-7590-8a4f-6915a25856a7', '-', '')),
+        '내부 업무관리 시스템 요구사항 정리', 'TechCorp Ltd', '박프론트',
+        '사내 구성원들의 요구사항을 수집하여 정리하였습니다. 프로젝트 관리, 일정 공유, 문서 관리 기능이 핵심으로 파악되었습니다.',
+        'REJECTED', false, NOW(), NOW());
 
 -- 9. Review 테이블 (댓글)
-INSERT INTO review (
-    id, post_id, parent_id, member_id, comment, company_name, author_name,
-    deleted, created_at, modified_at
-) VALUES
+INSERT INTO review (id, post_id, parent_id, member_id, comment, company_name, author_name,
+                    deleted, created_at, modified_at)
+VALUES
 -- 첫 번째 게시물에 대한 댓글들
 (UNHEX(REPLACE('0197539a-99f1-78ed-bdc7-5a76a1333185', '-', '')),
  UNHEX(REPLACE('0197539a-99f1-79fd-ab99-b5c1e3e48a58', '-', '')),
