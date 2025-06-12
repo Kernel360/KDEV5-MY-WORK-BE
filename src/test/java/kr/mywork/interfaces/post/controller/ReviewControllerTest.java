@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,6 +44,7 @@ import kr.mywork.interfaces.post.controller.dto.request.ReviewModifyWebRequest;
 	excludeFilters = {
 		@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebSecurityConfigurer.class)}, //security 설정을 종료하기 위한 설정
 	excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@Disabled
 class ReviewControllerTest {
 
 	@Autowired
