@@ -26,15 +26,14 @@ import kr.mywork.domain.company.service.dto.response.CompanySelectResponse;
 import kr.mywork.domain.member.service.MemberService;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
-import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyCreateWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyDeleteWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyDetailWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyIdCreateWebResponse;
+import kr.mywork.interfaces.company.controller.dto.response.CompanyListWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyNameWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyNamesWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyListWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanySelectWebResponse;
 import kr.mywork.interfaces.company.controller.dto.response.CompanyUpdateWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberListWebResponse;
@@ -85,10 +84,10 @@ public class CompanyController {
 		return ApiResponse.success(companyUpdateWebResponse);
 	}
 
-	@DeleteMapping
+	@DeleteMapping("/{companyId}")
 	public ApiResponse<CompanyDeleteWebResponse> deleteCompany(
-		@RequestBody final CompanyDeleteWebRequest companyDeleteWebRequest) {
-		final UUID deleteCompanyId = companyService.deleteCompany(companyDeleteWebRequest.id());
+		@PathVariable (name="companyId")UUID companyId) {
+		final UUID deleteCompanyId = companyService.deleteCompany(companyId);
 
 		final CompanyDeleteWebResponse companyDeleteWebResponse = new CompanyDeleteWebResponse(deleteCompanyId);
 
