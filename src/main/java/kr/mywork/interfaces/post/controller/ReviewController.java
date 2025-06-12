@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.common.auth.components.annotation.LoginMember;
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.post.service.ReviewService;
 import kr.mywork.domain.post.service.dto.ReviewSelectResponse;
 import kr.mywork.domain.post.service.dto.request.ReviewCreateRequest;
@@ -42,16 +44,16 @@ public class ReviewController {
 
 	@PostMapping("/api/reviews")
 	public ApiResponse<ReviewCreateWebResponse> createReview(
-		//TODO 인증 객체 전달 로직 필요
+		@LoginMember LoginMemberDetail loginMemberDetail,
 		@RequestBody @Valid ReviewCreateWebRequest reviewCreateWebRequest) {
 
 		final ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(
 			reviewCreateWebRequest.getPostId(),
 			reviewCreateWebRequest.getParentId(),
-			UUID.fromString("01972ea5-73ff-75e1-9083-d1d51a0f186a"), // TODO 인증 로직 추가시 해당 코드 변경
+			loginMemberDetail.memberId(),
 			reviewCreateWebRequest.getComment(),
-			"작성자1", // TODO 인증 로직 추가시 해당 코드 변경
-			"회사01"); // TODO 인증 로직 추가시 해당 코드 변경
+			loginMemberDetail.memberName(),
+			loginMemberDetail.companyName());
 
 		final ReviewCreateResponse reviewCreateResponse = reviewService.save(reviewCreateRequest);
 		return ApiResponse.success(ReviewCreateWebResponse.fromServiceRequest(reviewCreateResponse));
@@ -59,13 +61,12 @@ public class ReviewController {
 
 	@PutMapping("/api/reviews/{reviewId}")
 	public ApiResponse<ReviewModifyWebResponse> createReview(
-		// TODO 인증 사용자 정보 필요
+		@LoginMember LoginMemberDetail loginMemberDetail,
 		@PathVariable(name = "reviewId") UUID reviewId,
 		@RequestBody @Valid ReviewModifyWebRequest reviewModifyWebRequest) {
 
 		final ReviewModifyRequest reviewModifyRequest = new ReviewModifyRequest(
-			UUID.fromString("01972ea5-73ff-75e1-9083-d1d51a0f186a"), // TODO 인증 로직 추가시 해당 코드 변경
-			reviewId, reviewModifyWebRequest.getComment());
+			loginMemberDetail.memberId(), reviewId, reviewModifyWebRequest.getComment());
 
 		final ReviewModifyResponse reviewModifyResponse = reviewService.modifyComment(reviewModifyRequest);
 
