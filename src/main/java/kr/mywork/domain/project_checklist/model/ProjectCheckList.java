@@ -33,7 +33,7 @@ public class ProjectCheckList {
 	private UUID projectStepId;
 
 	@Column(nullable = false)
-	private String approval;
+	private String approval; // PENDING / APPROVED / REJECTED / UPDATE_REQUEST
 
 	@CreationTimestamp
 	private LocalDateTime createdAt;
