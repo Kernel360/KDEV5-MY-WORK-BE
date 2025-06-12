@@ -12,18 +12,12 @@ public class ProjectCheckListCreateWebResponse {
 
 	private String title;
 
-	private UUID devCompanyId;
-
-	private UUID clientCompanyId;
-
 	private UUID projectStepId;
 
 	private String approval;
 
 	public ProjectCheckListCreateWebResponse(ProjectCheckListCreateResponse projectCheckListCreateResponse) {
 		this.title = projectCheckListCreateResponse.title();
-		this.devCompanyId = projectCheckListCreateResponse.devCompanyId();
-		this.clientCompanyId = projectCheckListCreateResponse.clientCompanyId();
 		this.projectStepId = projectCheckListCreateResponse.projectStepId();
 		this.approval = projectCheckListCreateResponse.approval();
 	}
