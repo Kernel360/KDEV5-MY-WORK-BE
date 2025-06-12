@@ -1038,9 +1038,7 @@ VALUES
     (UNHEX(REPLACE('01975d9a-b4a8-7ff4-a838-510bc0e3d42a','-','')),'실시간 채팅 고객지원 시스템 개발','NOT_STARTED','실시간 채팅 고객지원 시스템 개발을(를) 통해 조직의 업무 효율 및 가시성을 극대화합니다.','2025-09-12 21:45:40','2026-01-25 05:45:40',b'0',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),
     (UNHEX(REPLACE('01975d9a-b4a8-7065-8c7e-d67cee07c102','-','')),'데이터 백업 및 복구 시스템 구축','IN_PROGRESS','데이터 백업 및 복구 시스템 구축을(를) 통해 조직의 업무 효율 및 가시성을 극대화합니다.','2025-09-04 19:23:03','2026-04-16 20:23:03',b'0',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),
     (UNHEX(REPLACE('01975d9a-b4a8-7219-9921-7629950bd8b2','-','')),'전자 서명 서비스 통합','PAUSED','전자 서명 서비스 통합을(를) 통해 조직의 업무 효율 및 가시성을 극대화합니다.','2025-08-12 05:57:55','2026-03-29 11:57:55',b'0',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),
-    (UNHEX(REPLACE('01975d9a-b4a8-762f-9ec6-e9a35366a0d0','-','')),'SSL 인증서 관리 자동화','PAUSED','SSL 인증서 관리 자동화을(를) 통해 조직의 업무 효율 및 가시성을 극대화합니다.','2025-05-15 07:06:06','2025-11-26 13:06:06',b'0',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),
-    (UNHEX(REPLACE('01975d9a-b4a8-7bc6-8e24-ecfb155f906d','-','')),'모바일 지불 결제 시스템 구현','NOT_STARTED','모바일 지불 결제 시스템 구현을(를) 통해 조직의 업무 효율 및 가시성을 극대화합니다.','2025-08-24 22:03:56','2026-01-19 01:03:56',b'0',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-
+    (UNHEX(REPLACE('01975d9a-b4a8-762f-9ec6-e9a35366a0d0','-','')),'SSL 인증서 관리 자동화','PAUSED','SSL 인증서 관리 자동화을(를) 통해 조직의 업무 효율 및 가시성을 극대화합니다.','2025-05-15 07:06:06','2025-11-26 13:06:06',b'0',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 
 
 -- 프로젝트 스탭을 시작합니다.
@@ -1195,10 +1193,7 @@ VALUES
     (UNHEX(REPLACE('01975dbf-6fbf-7575-bff8-513c8dc8ae36','-','')),UNHEX(REPLACE('01975d9a-b4a8-7219-9921-7629950bd8b2','-','')), 3, '설계', CURRENT_TIMESTAMP(6)),
     (UNHEX(REPLACE('01975dbf-6fbf-7879-a94b-0e0632565e5b','-','')),UNHEX(REPLACE('01975d9a-b4a8-762f-9ec6-e9a35366a0d0','-','')), 1, '기획', CURRENT_TIMESTAMP(6)),
     (UNHEX(REPLACE('01975dbf-6fbf-7f02-8232-b6cc08b57d0a','-','')),UNHEX(REPLACE('01975d9a-b4a8-762f-9ec6-e9a35366a0d0','-','')), 2, '분석', CURRENT_TIMESTAMP(6)),
-    (UNHEX(REPLACE('01975dbf-6fbf-7d93-b68f-d258c1d50800','-','')),UNHEX(REPLACE('01975d9a-b4a8-762f-9ec6-e9a35366a0d0','-','')), 3, '설계', CURRENT_TIMESTAMP(6)),
-    (UNHEX(REPLACE('01975dbf-6fbf-7b93-b4a2-4bcb90e9bc7a','-','')),UNHEX(REPLACE('01975d9a-b4a8-7bc6-8e24-ecfb155f906d','-','')), 1, '기획', CURRENT_TIMESTAMP(6)),
-    (UNHEX(REPLACE('01975dbf-6fbf-77f2-9790-ced5ab716e20','-','')),UNHEX(REPLACE('01975d9a-b4a8-7bc6-8e24-ecfb155f906d','-','')), 2, '분석', CURRENT_TIMESTAMP(6)),
-    (UNHEX(REPLACE('01975dbf-6fbf-7107-b1f3-bbdcf3e35747','-','')),UNHEX(REPLACE('01975d9a-b4a8-7bc6-8e24-ecfb155f906d','-','')), 3, '설계', CURRENT_TIMESTAMP(6));
+    (UNHEX(REPLACE('01975dbf-6fbf-7d93-b68f-d258c1d50800','-','')),UNHEX(REPLACE('01975d9a-b4a8-762f-9ec6-e9a35366a0d0','-','')), 3, '설계', CURRENT_TIMESTAMP(6));
 
 
 
@@ -2589,3 +2584,15 @@ VALUES
     (0, '2025-05-24 14:40:57.898842', '2025-05-24 14:40:57.898842', UUID_TO_BIN('8db46578-4be6-48f5-80ed-02420ddabc81'), UUID_TO_BIN('01975dbf-6fbe-7e50-8955-7be6661527f7'), 'PENDING', '김윤아', '주식회사 프레시푸드', '데이터 흐름 분석', '기술 스택 검토 결과 공유. 일부 변경 사항 논의 필요.'),
     (0, '2025-05-04 17:57:37.075658', '2025-05-04 17:57:37.075658', UUID_TO_BIN('9cbcfb57-14b7-4acf-b965-161bb86cd8c0'), UUID_TO_BIN('01975dbf-6fbe-7e50-8955-7be6661527f7'), 'APPROVED', '심재민', '주식회사 하이테크물류', '프로토타입 개발 진행 상황', 'QA 테스트 계획 수립 및 케이스 정의 작업 중.'),
     (0, '2025-05-16 10:14:27.678509', '2025-05-16 10:14:27.678509', UUID_TO_BIN('d4b85f74-f60e-44a6-8e44-9ac5ac039a0d'), UUID_TO_BIN('01975dbf-6fbe-7e50-8955-7be6661527f7'), 'PENDING', '이도현', '주식회사 프레시푸드', '보안 정책 논의', '운영 계획안 초안 작성 중. 인프라 구성 포함 예정.');
+
+
+-- 관리자 회사생성 01976356-dfbe-78af-942a-725910736950
+INSERT INTO mywork_db.company(id,name,contact_phone_number,business_number,address,contact_email,detail,logo_image_path,type,created_at,modified_at,deleted)
+VALUES
+    (UNHEX(REPLACE('01976356-dfbe-78af-942a-725910736950','-','')),'주식회사 관리자','02-0000-0001','000-00-00001','서울특별시 강남구 테헤란로 123','admin@admin.com','관리자 회사 입니다.','/images/logos/devkorea.png','SYSTEM',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,b'0');
+
+-- 관리자 생성  회사 ID (01976356-dfbe-78af-942a-725910736950) 기준 user 10명
+INSERT INTO member(id,company_id,name,department,position,role,phone_number,email,password,deleted,birth_date,created_at,modified_at)
+VALUES
+    (UNHEX(REPLACE('0197635a-5227-70ef-9fcf-32cca2d430d1','-','')),UNHEX(REPLACE('01976356-dfbe-78af-942a-725910736950','-','')),'관리자','관리자','관리자','SYSTEM_ADMIN','010-0000-0001','admin','$2a$12$/pyeLcaZSOu5yQtbMEdNIeURzl21SbeShNoYWytaEiOosaduV.ebi',0,'1990-01-01',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+
