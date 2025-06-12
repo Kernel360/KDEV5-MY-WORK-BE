@@ -2596,3 +2596,6 @@ INSERT INTO member(id,company_id,name,department,position,role,phone_number,emai
 VALUES
     (UNHEX(REPLACE('0197635a-5227-70ef-9fcf-32cca2d430d1','-','')),UNHEX(REPLACE('01976356-dfbe-78af-942a-725910736950','-','')),'관리자','관리자','관리자','SYSTEM_ADMIN','010-0000-0001','admin@example.com','$2a$12$KzBy1DR546BgrsnKYdY0EeMpOcxpIPbNCV3a635Oj0B7CbAy.CMaC',0,'1990-01-01',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 
+INSERT INTO mywork_db.company(id,name,contact_phone_number,business_number,address,contact_email,detail,logo_image_path,type,created_at,modified_at,deleted)
+VALUES
+    (UNHEX(REPLACE('01975da1-03ef-7be2-be4b-42d0036ae555','-','')),'주식회사 뉴웨이브','031-555-1234','123-45-67890','경기도 성남시 판교로 88','contact@newwave.com','혁신적인 IT 솔루션을 제공하는 신생 기업입니다.','/images/logos/newwave.png','DEV',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,b'0');
