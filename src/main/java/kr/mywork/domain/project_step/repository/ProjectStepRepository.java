@@ -12,4 +12,5 @@ public interface ProjectStepRepository {
 	List<ProjectStep> findAllByIds(Collection<UUID> projectStepIds);
 	List<ProjectStep> findAllStepsByProjectIdOrderByNumAsc(UUID projectId);
 	Optional<ProjectStep> findById(UUID projectStepId);
+	List<ProjectStep> findAllByProjectId(UUID projectId);
 }
