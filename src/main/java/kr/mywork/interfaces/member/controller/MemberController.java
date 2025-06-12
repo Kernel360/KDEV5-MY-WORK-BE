@@ -33,6 +33,7 @@ import kr.mywork.interfaces.member.controller.dto.response.MemberDeleteWebRespon
 import kr.mywork.interfaces.member.controller.dto.response.MemberDetailsWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberListWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberProjectInfoWebResponse;
+import kr.mywork.interfaces.member.controller.dto.response.MemberProjectsListWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberSelectWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.MemberUpdateWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.ResetPasswordWebResponse;
@@ -125,5 +126,18 @@ public class MemberController {
 		ResetPasswordWebResponse resetPasswordWebResponse = new ResetPasswordWebResponse(memberId);
 
 		return ApiResponse.success(resetPasswordWebResponse);
+	}
+
+	@GetMapping("/{memberId}/myProjects")
+	public ApiResponse<MemberProjectsListWebResponse> getMemberProjectInfo(@PathVariable("memberId") final UUID memberId) {
+
+		List<MemberProjectInfoResponse> memberProjectInfoResponse = projectService.findProjectsAssignedMember(memberId);
+
+		List<MemberProjectInfoWebResponse> memberAssignProjectWebResponses = memberProjectInfoResponse.stream()
+			.map(MemberProjectInfoWebResponse::from)
+			.toList();
+
+		MemberProjectsListWebResponse memberProjectsListWebResponse = new MemberProjectsListWebResponse(memberAssignProjectWebResponses);
+		return ApiResponse.success(memberProjectsListWebResponse);
 	}
 }
