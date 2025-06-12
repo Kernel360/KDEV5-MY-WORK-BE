@@ -303,12 +303,68 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-					fieldWithPath("data.projectCheckListProgress[].projectStepId").type(JsonFieldType.STRING).description("프로젝트 단계 ID"),
-					fieldWithPath("data.projectCheckListProgress[].projectStepName").type(JsonFieldType.STRING).description("프로젝트 단계명"),
-					fieldWithPath("data.projectCheckListProgress[].totalCount").type(JsonFieldType.NUMBER).description("전체 체크리스트 개수"),
-					fieldWithPath("data.projectCheckListProgress[].approvalCount").type(JsonFieldType.NUMBER).description("승인된 체크리스트 개수"),
+					fieldWithPath("data.projectCheckListProgress[].projectStepId").type(JsonFieldType.STRING)
+						.description("프로젝트 단계 ID"),
+					fieldWithPath("data.projectCheckListProgress[].projectStepName").type(JsonFieldType.STRING)
+						.description("프로젝트 단계명"),
+					fieldWithPath("data.projectCheckListProgress[].totalCount").type(JsonFieldType.NUMBER)
+						.description("전체 체크리스트 개수"),
+					fieldWithPath("data.projectCheckListProgress[].approvalCount").type(JsonFieldType.NUMBER)
+						.description("승인된 체크리스트 개수"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
+	}
+
+	@Test
+	@DisplayName("프로젝트별 체크리스트 목록 조회 성공")
+	@Sql("classpath:sql/project_checklist_by_step02.sql")
+	void 프로젝트별_체크리스트_목록_조회_성공() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+		final UUID projectId = UUID.fromString("01975d7f-052c-7d8f-819b-9a08f322ead3");
+		final UUID projectStatusId = UUID.fromString("01975dbf-6fbe-71b9-8dab-0455e155bbe8"); // Optional
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			get("/api/projects/{projectId}/check-list?projectStepId={projectStepId}", projectId,
+				projectStatusId.toString())
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+		);
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data.projectCheckLists").isArray(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("project-check-list-list-success", projectCheckListListSuccessResource()));
+	}
+
+	private ResourceSnippet projectCheckListListSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("ProjectCheckList API")
+				.summary("프로젝트 체크리스트 목록 조회 API")
+				.description("프로젝트 ID와 상태 ID로 체크리스트 목록을 조회한다.")
+				.pathParameters(
+					parameterWithName("projectId").description("프로젝트 단계 ID"))
+				.queryParameters(
+					parameterWithName("projectStepId").description("프로젝트 단계 ID").optional())
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.projectCheckLists[].checkListName").type(JsonFieldType.STRING)
+						.description("체크리스트 명"),
+					fieldWithPath("data.projectCheckLists[].approval").type(JsonFieldType.STRING).description("승인 여부"),
+					fieldWithPath("data.projectCheckLists[].projectStepName").type(JsonFieldType.STRING)
+						.description("프로젝트 단계명"),
+					fieldWithPath("data.projectCheckLists[].createdAt").type(JsonFieldType.STRING)
+						.description("체크리스트 생성 일시"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
 	}
 }
