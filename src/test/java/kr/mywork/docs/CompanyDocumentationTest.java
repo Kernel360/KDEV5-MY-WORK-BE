@@ -29,7 +29,6 @@ import com.fasterxml.uuid.Generators;
 
 import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
-import kr.mywork.interfaces.company.controller.dto.request.CompanyDeleteWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
 
 public class CompanyDocumentationTest extends RestDocsDocumentation {
@@ -273,17 +272,11 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		final String accessToken = createSystemAccessToken();
 
 		UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // company-id.sql과 동일한 값
-		CompanyDeleteWebRequest deleteReq = new CompanyDeleteWebRequest(companyId);
-
-		// JSON 요청 본문 생성
-		String requestBody = objectMapper.writeValueAsString(deleteReq);
-
 		// When
 		ResultActions result = mockMvc.perform(
-			delete("/api/companies", companyId)
+			delete("/api/companies/{companyId}", companyId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
-				.content(requestBody)
 		);
 
 		// Then
