@@ -64,7 +64,7 @@ public class Post {
 		this.title = postUpdateRequest.getTitle();
 	}
 
-	public void softDelete() {
+	public void delete() {
 		this.deleted = true;
 	}
 }
