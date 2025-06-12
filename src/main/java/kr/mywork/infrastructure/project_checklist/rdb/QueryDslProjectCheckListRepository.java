@@ -1,14 +1,24 @@
 package kr.mywork.infrastructure.project_checklist.rdb;
 
+import static com.querydsl.core.types.ExpressionUtils.count;
+import static kr.mywork.domain.project_checklist.model.QProjectCheckList.projectCheckList;
+import static kr.mywork.domain.project_step.model.QProjectStep.projectStep;
+
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
 import kr.mywork.domain.project_checklist.repository.ProjectCheckListRepository;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListCreateRequest;
-import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListDetailResponse;
+import kr.mywork.domain.project_checklist.service.dto.response.ProjectStepCheckListCountResponse;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -16,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class QueryDslProjectCheckListRepository implements ProjectCheckListRepository {
 
 	private final JpaProjectCheckListRepository projectCheckListRepository;
+	private final JPAQueryFactory queryFactory;
 
 	@Override
 	public ProjectCheckList save(ProjectCheckListCreateRequest projectCheckListCreateRequest) {
@@ -26,5 +37,30 @@ public class QueryDslProjectCheckListRepository implements ProjectCheckListRepos
 	@Override
 	public Optional<ProjectCheckList> findById(UUID checkListId) {
 		return projectCheckListRepository.findById(checkListId);
+	}
+
+	@Override
+	public List<ProjectStepCheckListCountResponse> findProgressCountGroupByProjectStepIdAndApproval(
+		final Collection<UUID> projectStepIds, final String approval) {
+		return queryFactory.select(Projections.constructor(ProjectStepCheckListCountResponse.class,
+				projectCheckList.projectStepId,
+				count(projectCheckList.id),
+				projectStep.orderNum))
+			.from(projectCheckList)
+			.join(projectStep).on(projectCheckList.projectStepId.eq(projectStep.id))
+			.where(
+				projectCheckList.deleted.isFalse(),
+				eqApproval(approval),
+				projectCheckList.projectStepId.in(projectStepIds))
+			.groupBy(projectCheckList.projectStepId, projectStep.orderNum)
+			.orderBy(projectStep.orderNum.asc())
+			.fetch();
+	}
+
+	private BooleanExpression eqApproval(final String approval) {
+		if (approval == null) {
+			return null;
+		}
+		return projectCheckList.approval.eq(approval);
 	}
 }

@@ -1,10 +1,10 @@
 package kr.mywork.infrastructure.project_step.rdb;
 
-import static kr.mywork.domain.project_step.model.QProjectStep.*;
+import static kr.mywork.domain.project_step.model.QProjectStep.projectStep;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -28,7 +28,7 @@ public class QueryDslProjectStepRepository implements ProjectStepRepository {
 	}
 
 	@Override
-	public List<ProjectStep> findAllByIds(final Set<UUID> projectStepIds) {
+	public List<ProjectStep> findAllByIds(final Collection<UUID> projectStepIds) {
 		return queryFactory.selectFrom(projectStep)
 			.where(projectStep.id.in(projectStepIds))
 			.fetch();
@@ -45,5 +45,12 @@ public class QueryDslProjectStepRepository implements ProjectStepRepository {
 	@Override
 	public Optional<ProjectStep> findById(UUID projectStepId) {
 		return jpaProjectStepRepository.findById(projectStepId);
+	}
+
+	@Override
+	public List<ProjectStep> findAllByProjectId(final UUID projectId) {
+		return queryFactory.selectFrom(projectStep)
+			.where(projectStep.projectId.eq(projectId))
+			.fetch();
 	}
 }
