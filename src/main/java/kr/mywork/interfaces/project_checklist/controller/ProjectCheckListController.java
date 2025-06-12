@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -21,16 +22,19 @@ import kr.mywork.domain.project_checklist.service.dto.response.CheckListProjectS
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListApprovalResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListCreateResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListDetailResponse;
+import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListSelectResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListUpdateResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.request.ProjectCheckListApprovalWebRequest;
 import kr.mywork.interfaces.project_checklist.controller.dto.request.ProjectCheckListCreateWebRequest;
 import kr.mywork.interfaces.project_checklist.controller.dto.request.ProjectCheckListUpdateWebRequest;
+import kr.mywork.interfaces.project_checklist.controller.dto.response.CheckListsSelectWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListApprovalWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListCreateWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListDeleteWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListDetailWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListProgressListWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListProgressWebResponse;
+import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListSelectWebResponse;
 import kr.mywork.interfaces.project_checklist.controller.dto.response.ProjectCheckListUpdateWebResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -108,5 +112,20 @@ public class ProjectCheckListController {
 				.toList();
 
 		return ApiResponse.success(new ProjectCheckListProgressListWebResponse(projectCheckListProgressWebResponses));
+	}
+
+	@GetMapping("/api/projects/{projectId}/check-list")
+	public ApiResponse<CheckListsSelectWebResponse> findCheckListByProjectIdAndProjectStatusId(
+		@PathVariable("projectId") final UUID projectId, @RequestParam(required = false) final UUID projectStepId) {
+
+		final List<ProjectCheckListSelectResponse> projectCheckListSelectResponses =
+			projectCheckListService.findAllByProjectIdAndProjectStepId(projectId, projectStepId);
+
+		List<ProjectCheckListSelectWebResponse> projectCheckListSelectWebResponses =
+			projectCheckListSelectResponses.stream()
+				.map(ProjectCheckListSelectWebResponse::fromServiceResponse)
+				.toList();
+
+		return ApiResponse.success(new CheckListsSelectWebResponse(projectCheckListSelectWebResponses));
 	}
 }
