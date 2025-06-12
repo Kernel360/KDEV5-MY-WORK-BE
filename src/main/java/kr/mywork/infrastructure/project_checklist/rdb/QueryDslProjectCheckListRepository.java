@@ -18,6 +18,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
 import kr.mywork.domain.project_checklist.repository.ProjectCheckListRepository;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListCreateRequest;
+import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListSelectResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectStepCheckListCountResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -55,6 +56,27 @@ public class QueryDslProjectCheckListRepository implements ProjectCheckListRepos
 			.groupBy(projectCheckList.projectStepId, projectStep.orderNum)
 			.orderBy(projectStep.orderNum.asc())
 			.fetch();
+	}
+
+	@Override
+	public List<ProjectCheckListSelectResponse> findAllByProjectIdAndStepId(final UUID projectId, final UUID projectStepId) {
+		return queryFactory.select(Projections.constructor(ProjectCheckListSelectResponse.class,
+				projectCheckList.title,
+				projectCheckList.approval,
+				projectStep.title,
+				projectCheckList.createdAt))
+			.from(projectCheckList)
+			.join(projectStep).on(projectCheckList.projectStepId.eq(projectStep.id))
+			.where(projectStep.projectId.eq(projectId), eqProjectStepId(projectStepId))
+			.fetch();
+	}
+
+	private BooleanExpression eqProjectStepId(final UUID projectStepId) {
+		if (projectStepId == null) {
+			return null;
+		}
+
+		return projectStep.id.eq(projectStepId);
 	}
 
 	private BooleanExpression eqApproval(final String approval) {

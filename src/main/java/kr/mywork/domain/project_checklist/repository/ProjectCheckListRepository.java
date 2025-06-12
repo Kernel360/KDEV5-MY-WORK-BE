@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListCreateRequest;
+import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListSelectResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectStepCheckListCountResponse;
 
 public interface ProjectCheckListRepository {
