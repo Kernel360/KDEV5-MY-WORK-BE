@@ -2594,5 +2594,5 @@ VALUES
 -- 관리자 생성  회사 ID (01976356-dfbe-78af-942a-725910736950) 기준 user 10명
 INSERT INTO member(id,company_id,name,department,position,role,phone_number,email,password,deleted,birth_date,created_at,modified_at)
 VALUES
-    (UNHEX(REPLACE('0197635a-5227-70ef-9fcf-32cca2d430d1','-','')),UNHEX(REPLACE('01976356-dfbe-78af-942a-725910736950','-','')),'관리자','관리자','관리자','SYSTEM_ADMIN','010-0000-0001','admin','$2a$12$/pyeLcaZSOu5yQtbMEdNIeURzl21SbeShNoYWytaEiOosaduV.ebi',0,'1990-01-01',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+    (UNHEX(REPLACE('0197635a-5227-70ef-9fcf-32cca2d430d1','-','')),UNHEX(REPLACE('01976356-dfbe-78af-942a-725910736950','-','')),'관리자','관리자','관리자','SYSTEM_ADMIN','010-0000-0001','admin@example.com','$2a$12$KzBy1DR546BgrsnKYdY0EeMpOcxpIPbNCV3a635Oj0B7CbAy.CMaC',0,'1990-01-01',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 
