@@ -5,10 +5,10 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.uuid.Generators;
 
-import jakarta.transaction.Transactional;
 import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
@@ -103,6 +103,7 @@ public class PostService {
 		return result;
 	}
 
+	@Transactional(readOnly = true)
 	public Long countTotalPostsByCondition(UUID projectStepId, String keyword, Boolean deleted, UUID projectId,
 		String keywordType, String approval) {
 		Long totalCount;
@@ -118,11 +119,13 @@ public class PostService {
 		return totalCount;
 	}
 
+	@Transactional
 	public UUID deletePost(UUID postId) {
 		Post post = postRepository.findById(postId)
 			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
 
-		post.softDelete();
+		post.delete();
+
 		return post.getId();
 	}
 }
