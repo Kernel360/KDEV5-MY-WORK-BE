@@ -16,4 +16,6 @@ public interface ProjectCheckListRepository {
 
 	List<ProjectStepCheckListCountResponse> findProgressCountGroupByProjectStepIdAndApproval(
 		Collection<UUID> projectStepIds, String approval);
+
+	List<ProjectCheckListSelectResponse> findAllByProjectIdAndStepId(UUID projectId, UUID projectStepId);
 }

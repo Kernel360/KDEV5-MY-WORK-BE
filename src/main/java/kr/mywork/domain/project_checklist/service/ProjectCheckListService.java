@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.mywork.domain.project.errors.ProjectErrorType;
+import kr.mywork.domain.project.errors.ProjectNotFoundException;
+import kr.mywork.domain.project.model.Project;
+import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project_checklist.errors.ProjectCheckListErrorType;
 import kr.mywork.domain.project_checklist.errors.ProjectCheckListNotFoundException;
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
@@ -20,6 +24,7 @@ import kr.mywork.domain.project_checklist.service.dto.response.CheckListProjectS
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListApprovalResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListCreateResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListDetailResponse;
+import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListSelectResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListUpdateResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectStepCheckListCountResponse;
 import kr.mywork.domain.project_step.model.ProjectStep;
@@ -32,6 +37,7 @@ public class ProjectCheckListService {
 
 	private final ProjectCheckListRepository projectCheckListRepository;
 	private final ProjectStepRepository projectStepRepository;
+	private final ProjectRepository projectRepository;
 
 	@Transactional
 	public ProjectCheckListCreateResponse createProjectCheckList(
@@ -128,5 +134,14 @@ public class ProjectCheckListService {
 		}
 
 		return checkListProjectStepProgressResponses;
+	}
+
+	@Transactional
+	public List<ProjectCheckListSelectResponse> findAllByProjectIdAndProjectStepId(final UUID projectId,
+		final UUID projectStepId) {
+		final Project project = projectRepository.findById(projectId)
+			.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
+
+		return projectCheckListRepository.findAllByProjectIdAndStepId(project.getId(), projectStepId);
 	}
 }
