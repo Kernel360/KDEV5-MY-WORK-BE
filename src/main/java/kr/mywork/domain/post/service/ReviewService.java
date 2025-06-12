@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.mywork.domain.member.model.MemberRole;
 import kr.mywork.domain.post.errors.review.ReviewErrorType;
 import kr.mywork.domain.post.errors.review.ReviewNotFoundException;
 import kr.mywork.domain.post.model.Review;
@@ -43,9 +44,6 @@ public class ReviewService {
 	}
 
 	public ReviewModifyResponse modifyComment(final ReviewModifyRequest reviewModifyRequest) {
-		// TODO Project 유효성 검증 코드 추가 필요
-		// TODO 본인 수정 내용 추가
-
 		final Review review = reviewRepository.findById(reviewModifyRequest.reviewId())
 			.orElseThrow(() -> new ReviewNotFoundException(ReviewErrorType.REVIEW_NOT_FOUND));
 
