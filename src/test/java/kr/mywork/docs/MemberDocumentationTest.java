@@ -134,7 +134,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 		LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");
 
 		final MemberUpdateWebRequest memberUpdateWebRequest = new MemberUpdateWebRequest(memberId, companyId, "홍길동",
-			"개발팀", "사원", "DEV_ADMIN", "010-1234-5633", "emwi@naver.com", "1234", true, birthDate);
+			"개발팀", "사원", "DEV_ADMIN", "010-1234-5633", "emwi@naver.com", true, birthDate);
 
 		final String requestBody = objectMapper.writeValueAsString(memberUpdateWebRequest);
 

@@ -81,14 +81,20 @@ public class MemberService {
 	}
 
 	@Transactional
-	public UUID updateMember(MemberUpdateRequest memberUpdateRequest) {
-		Member member = memberRepository.findById(memberUpdateRequest.getId())
+	public UUID updateMember(final MemberUpdateRequest memberUpdateRequest) {
+		Member member = memberRepository.findById(memberUpdateRequest.id())
 			.orElseThrow(() -> new MemberIdNotFoundException(MemberErrorType.ID_NOT_FOUND));
 
-		String encodedPassword =passwordEncoder.encode(memberUpdateRequest.getPassword());
-		MemberUpdateRequest memberUpdateWithEncodedPassword = MemberUpdateRequest.setPasswordEncode(memberUpdateRequest,encodedPassword);
-
-		member.updateFrom(memberUpdateWithEncodedPassword);
+		member.updateFrom(
+			memberUpdateRequest.companyId(),
+			memberUpdateRequest.name(),
+			memberUpdateRequest.department(),
+			memberUpdateRequest.position(),
+			memberUpdateRequest.role(),
+			memberUpdateRequest.phoneNumber(),
+			memberUpdateRequest.email(),
+			memberUpdateRequest.birthday(),
+			memberUpdateRequest.deleted());
 
 		return member.getId();
 	}

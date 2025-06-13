@@ -12,7 +12,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
-import kr.mywork.domain.member.service.dto.request.MemberUpdateRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -88,16 +87,17 @@ public class Member {
 	}
 
 	//관리자용 회원정보 수정
-	public void updateFrom(MemberUpdateRequest memberUpdateRequest) {
-		this.companyId = memberUpdateRequest.getCompanyId();
-		this.name = memberUpdateRequest.getName();
-		this.department = memberUpdateRequest.getDepartment();
-		this.position = memberUpdateRequest.getPosition();
-		this.role = MemberRole.from(memberUpdateRequest.getRole());
-		this.phoneNumber = memberUpdateRequest.getPhoneNumber();
-		this.email = memberUpdateRequest.getEmail();
-		this.password = memberUpdateRequest.getPassword();
-		this.birthDate = memberUpdateRequest.getBirthday();
-		this.deleted = memberUpdateRequest.isDeleted();
+	public void updateFrom(final UUID companyId, final String name,
+		final String department, final String position, final String role, final String phoneNumber,
+		final String email, final LocalDateTime birthday, final boolean deleted) {
+		this.companyId = companyId;
+		this.name = name;
+		this.department = department;
+		this.position = position;
+		this.role = MemberRole.from(role);
+		this.phoneNumber = phoneNumber;
+		this.email = email;
+		this.birthDate = birthday;
+		this.deleted = deleted;
 	}
 }
