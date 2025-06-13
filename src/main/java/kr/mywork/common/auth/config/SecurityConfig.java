@@ -67,7 +67,8 @@ public class SecurityConfig {
 					.requestMatchers("/api/member/**").hasAnyRole(
 						MemberRole.DEV_ADMIN.name(),
 						MemberRole.CLIENT_ADMIN.name(),
-						MemberRole.SYSTEM_ADMIN.name())
+						MemberRole.SYSTEM_ADMIN.name(),
+						MemberRole.USER.name())
 					.requestMatchers("/api/member/company/**").hasAnyRole(
 						MemberRole.DEV_ADMIN.name(),
 						MemberRole.CLIENT_ADMIN.name(),

@@ -82,8 +82,8 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 		//given
 		final String accessToken = createSystemAccessToken();
 		final UUID companyId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
-		final LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");    
-    
+		final LocalDateTime birthDate = LocalDateTime.parse("2000-07-25T14:30:00");
+
 		final MemberCreateWebRequest memberCreateWebRequest = new MemberCreateWebRequest(companyId, "김두만", "개발", "부장",
 			"USER", "010-4040-5050", "eme@naver.com", birthDate);
 
@@ -269,6 +269,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				jsonPath("$.data").exists(), jsonPath("$.error").doesNotExist())
 			.andDo(document("member-password-change-success", memberPasswordChangeSuccessResource()));
 	}
+
 	private ResourceSnippet memberPasswordChangeSuccessResource() {
 		return resource(ResourceSnippetParameters.builder()
 			.tag("Member API")
@@ -281,13 +282,12 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 			.build());
 	}
 
-
 	@Test
-	@DisplayName("멤버의 프로젝트 목록 조회 성공")
+	@DisplayName("멤버의 본인의 프로젝트 상세 조회")
 	@Sql("classpath:sql/member-projects-get.sql")
 	void 멤버_프로젝트_목록_조회_성공() throws Exception {
 		//given
-		final String accessToken = createDevAdminAccessToken();
+		final String accessToken = createUserAccessToken(); // system admin 의 권한이 통과해야 함.
 		//when
 		final ResultActions result = mockMvc.perform(
 			get("/api/member/{memberId}/myProjects", UUID.fromString("6939d8be-1bf2-4f01-9189-12864e38d913"))
@@ -299,6 +299,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				jsonPath("$.data").exists(), jsonPath("$.error").doesNotExist())
 			.andDo(document("member-projects-get-success", memberProjectsGetSuccessResource()));
 	}
+
 	private ResourceSnippet memberProjectsGetSuccessResource() {
 		return resource(ResourceSnippetParameters.builder()
 			.tag("Member API")
