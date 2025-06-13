@@ -21,11 +21,11 @@ public class MemberUpdateWebRequest {
 	private final String phoneNumber;
 	private final String email;
 	private final boolean deleted;
-	private final LocalDateTime birthday;
+	private final LocalDateTime birthDate;
 
 	public MemberUpdateRequest toServiceDto() {
 		return new MemberUpdateRequest(
 			this.id, this.companyId, this.name, this.department, this.position,
-			this.role, this.phoneNumber, this.email, this.birthday, this.deleted);
+			this.role, this.phoneNumber, this.email, this.birthDate, this.deleted);
 	}
 }

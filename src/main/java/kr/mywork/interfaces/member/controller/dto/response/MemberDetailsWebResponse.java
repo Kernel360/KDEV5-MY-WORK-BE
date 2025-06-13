@@ -21,7 +21,7 @@ public record MemberDetailsWebResponse(
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime modifiedAt,
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime createdAt,
 	String contactPhoneNumber,
-	LocalDateTime birthday,
+	LocalDateTime birthDate,
 	List<MemberProjectInfoWebResponse> projects
 ) {
 
