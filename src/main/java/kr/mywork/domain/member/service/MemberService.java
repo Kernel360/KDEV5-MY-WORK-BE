@@ -93,7 +93,7 @@ public class MemberService {
 			memberUpdateRequest.role(),
 			memberUpdateRequest.phoneNumber(),
 			memberUpdateRequest.email(),
-			memberUpdateRequest.birthday(),
+			memberUpdateRequest.birthDate(),
 			memberUpdateRequest.deleted());
 
 		return member.getId();

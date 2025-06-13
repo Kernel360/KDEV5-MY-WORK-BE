@@ -243,7 +243,7 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 				fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description("멤버 수정일"),
 				fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("멤버 생성일"),
 				fieldWithPath("data.contactPhoneNumber").type(JsonFieldType.STRING).description("멤버 회사 연락처"),
-				fieldWithPath("data.birthday").type(JsonFieldType.STRING).description("멤버 생일"),
+				fieldWithPath("data.birthDate").type(JsonFieldType.STRING).description("멤버 생일"),
 				fieldWithPath("data.projects[].projectId").type(JsonFieldType.STRING).description("멤버 참여중인 프로젝트 아이디"),
 				fieldWithPath("data.projects[].projectName").type(JsonFieldType.STRING).description("멤버 참여중인 프로젝트 이름"),
 				fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))

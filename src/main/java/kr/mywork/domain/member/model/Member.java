@@ -89,7 +89,7 @@ public class Member {
 	//관리자용 회원정보 수정
 	public void updateFrom(final UUID companyId, final String name,
 		final String department, final String position, final String role, final String phoneNumber,
-		final String email, final LocalDateTime birthday, final boolean deleted) {
+		final String email, final LocalDateTime birthDate, final boolean deleted) {
 		this.companyId = companyId;
 		this.name = name;
 		this.department = department;
@@ -97,7 +97,7 @@ public class Member {
 		this.role = MemberRole.from(role);
 		this.phoneNumber = phoneNumber;
 		this.email = email;
-		this.birthDate = birthday;
+		this.birthDate = birthDate;
 		this.deleted = deleted;
 	}
 }
