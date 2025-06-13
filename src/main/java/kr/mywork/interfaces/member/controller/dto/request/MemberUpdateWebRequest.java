@@ -20,14 +20,12 @@ public class MemberUpdateWebRequest {
 	private final String role;
 	private final String phoneNumber;
 	private final String email;
-	private final String password;
 	private final boolean deleted;
 	private final LocalDateTime birthday;
 
 	public MemberUpdateRequest toServiceDto() {
 		return new MemberUpdateRequest(
 			this.id, this.companyId, this.name, this.department, this.position,
-			this.role, this.phoneNumber, this.email, this.password, this.birthday, this.deleted
-		);
+			this.role, this.phoneNumber, this.email, this.birthday, this.deleted);
 	}
 }
