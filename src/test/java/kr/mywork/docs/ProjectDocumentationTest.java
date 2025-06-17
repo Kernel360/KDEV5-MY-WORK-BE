@@ -12,7 +12,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +29,7 @@ import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
 import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectBulkDeleteWebRequest;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectDeleteWebRequest;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectUpdateWebRequest;
@@ -289,6 +292,58 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
+
+	@Test
+	@DisplayName("프로젝트 다건 삭제 성공")
+	@Sql("classpath:sql/project-bulk-delete.sql")
+	void 프로젝트_다건_삭제_성공() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+
+		// 삭제할 프로젝트 ID 두 개 예시
+		final ProjectBulkDeleteWebRequest request = new ProjectBulkDeleteWebRequest();
+		List<UUID> ids = List.of(
+			UUID.fromString("11111111-1111-1111-1111-111111111111"),
+			UUID.fromString("22222222-2222-2222-2222-222222222222")
+		);
+		// setter가 없다면 reflection 또는 생성자 등으로 값 세팅
+		Field idsField = ProjectBulkDeleteWebRequest.class.getDeclaredField("ids");
+		idsField.setAccessible(true);
+		idsField.set(request, ids);
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			delete("/api/projects/bulk")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(objectMapper.writeValueAsString(request))
+		);
+
+		// then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.result").value("SUCCESS"))
+			.andExpect(jsonPath("$.data.deletedIds").isArray())
+			.andDo(document("project-bulk-delete-success", projectBulkDeleteSuccessResource()));
+	}
+
+	private ResourceSnippet projectBulkDeleteSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project API")
+				.summary("프로젝트 다건 삭제 API")
+				.description("여러 프로젝트를 한 번에 삭제한다.")
+				.requestFields(
+					fieldWithPath("ids").type(JsonFieldType.ARRAY).description("삭제할 프로젝트 ID 리스트")
+				)
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.deletedIds").type(JsonFieldType.ARRAY).description("삭제된 프로젝트 ID 리스트"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보")
+				)
+				.build()
+		);
+	}
+
 
 	@Test
 	@DisplayName("프로젝트 목록 조회 성공")
