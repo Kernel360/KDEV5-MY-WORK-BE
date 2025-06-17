@@ -11,6 +11,6 @@ public enum ProjectErrorType {
 	PROJECT_ID_NOT_FOUND(ProjectErrorCode.ERROR_PROJECT02, "유효한 프로젝트 ID가 아닙니다."),
 	PROJECT_ASSIGN_NOT_FOUND(ProjectErrorCode.ERROR_PROJECT03, "프로젝트 할당을 찾을 수 없습니다.");
 
-	private final ProjectErrorCode code;
+	private final ProjectErrorCode errorCode;
 	private final String message;
 }
