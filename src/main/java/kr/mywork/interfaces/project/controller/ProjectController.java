@@ -26,6 +26,8 @@ import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectBulkDeleteWebRequest;
+import kr.mywork.interfaces.project.controller.dto.response.ProjectBulkDeleteWebResponse;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectDeleteWebRequest;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectUpdateWebRequest;
@@ -130,5 +132,14 @@ public class ProjectController {
 			projectMemberResponses);
 
 		return ApiResponse.success(projectMemberListWebResponse);
+	}
+
+	@DeleteMapping("/bulk")
+	public ApiResponse<ProjectBulkDeleteWebResponse> bulkDeleteProject(
+		@RequestBody @Valid final ProjectBulkDeleteWebRequest projectBulkDeleteWebRequest
+	) {
+		List<UUID> deletedIds = projectService.bulkDeleteProjects(projectBulkDeleteWebRequest.getIds());
+
+		return ApiResponse.success(new ProjectBulkDeleteWebResponse(deletedIds));
 	}
 }
