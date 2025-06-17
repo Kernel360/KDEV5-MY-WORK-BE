@@ -71,6 +71,19 @@ public class ProjectService {
 	}
 
 	@Transactional
+	public List<UUID> bulkDeleteProjects(List<UUID> projectIds) {
+		return projectIds.stream()
+			.map(id -> {
+				var project = projectRepository.findById(id)
+					.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
+				project.setDeleted(true);
+				return project.getId();
+			})
+			.toList();
+	}
+
+
+	@Transactional
 	public ProjectUpdateResponse updateProject(UUID projectId, ProjectUpdateRequest request) {
 		var project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
