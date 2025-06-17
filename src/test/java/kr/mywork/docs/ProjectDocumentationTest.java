@@ -344,6 +344,35 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 		);
 	}
 
+	@Test
+	@DisplayName("존재하지 않는 프로젝트 ID 다건 삭제 시 실패")
+	void 프로젝트_다건_삭제_비정상_케이스() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+
+		List<UUID> ids = List.of(
+			UUID.fromString("99999999-9999-9999-9999-999999999999")
+		);
+		ProjectBulkDeleteWebRequest request = new ProjectBulkDeleteWebRequest();
+		Field idsField = ProjectBulkDeleteWebRequest.class.getDeclaredField("ids");
+		idsField.setAccessible(true);
+		idsField.set(request, ids);
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			delete("/api/projects/bulk")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(objectMapper.writeValueAsString(request))
+		);
+
+		// then
+		result.andExpect(status().is4xxClientError())
+			.andExpect(jsonPath("$.result").value("ERROR"))
+			.andExpect(jsonPath("$.error").exists());
+	}
+
+
 
 	@Test
 	@DisplayName("프로젝트 목록 조회 성공")
