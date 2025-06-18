@@ -1,19 +1,13 @@
 package kr.mywork.docs;
 
-import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
-
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
+import com.epages.restdocs.apispec.ResourceSnippet;
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.member.controller.dto.request.MemberCreateWebRequest;
+import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
+import kr.mywork.interfaces.member.controller.dto.request.MemberUpdateWebRequest;
+import kr.mywork.interfaces.member.controller.dto.request.ResetPasswordWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -22,15 +16,16 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
-import com.epages.restdocs.apispec.ResourceSnippet;
-import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-import kr.mywork.common.api.support.response.ResultType;
-import kr.mywork.interfaces.member.controller.dto.request.MemberCreateWebRequest;
-import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
-import kr.mywork.interfaces.member.controller.dto.request.MemberUpdateWebRequest;
-import kr.mywork.interfaces.member.controller.dto.request.ResetPasswordWebRequest;
+import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class MemberDocumentationTest extends RestDocsDocumentation {
 
@@ -167,14 +162,12 @@ public class MemberDocumentationTest extends RestDocsDocumentation {
 	@Sql("classpath:sql/member-search.sql")
 	void 멤버_조회_성공() throws Exception {
 		//given
-		final String accessToken = createDevAdminAccessToken();
+		final String accessToken = createSystemAccessToken();
 
 		//when
 		final ResultActions result = mockMvc.perform(
 			get("/api/member")
 				.param("page","1")
-				.param("keyword","기획팀")
-				.param("keywordType","DEPARTMENT")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 		//then
