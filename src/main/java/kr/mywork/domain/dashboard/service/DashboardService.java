@@ -22,7 +22,7 @@ public class DashboardService {
 
 	public DashboardCountSummaryWebResponse getSummaryTotalCount(LoginMemberDetail loginMemberDetail) {
 
-		final String userType = loginMemberDetail.userType();
+		final String userType = loginMemberDetail.roleName();
 		final UUID companyId = loginMemberDetail.companyId();
 		final UUID memberId = loginMemberDetail.memberId();
 
