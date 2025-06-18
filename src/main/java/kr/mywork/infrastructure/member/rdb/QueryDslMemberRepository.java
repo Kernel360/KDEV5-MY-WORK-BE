@@ -1,24 +1,22 @@
 package kr.mywork.infrastructure.member.rdb;
 
-import static kr.mywork.domain.company.model.QCompany.company;
-import static kr.mywork.domain.member.model.QMember.member;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.springframework.stereotype.Repository;
-
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
 import kr.mywork.domain.project.model.QProjectMember;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static kr.mywork.domain.company.model.QCompany.company;
+import static kr.mywork.domain.member.model.QMember.member;
 
 @Repository
 @RequiredArgsConstructor
@@ -120,8 +118,6 @@ public class QueryDslMemberRepository implements MemberRepository {
 		BooleanBuilder builder = new BooleanBuilder();
 		final int offset = (page - 1) * memberPageSize;
 
-
-
 		builder.and(member.deleted.eq(false));
 		if (companyId != null) {builder.and(member.companyId.eq(companyId));}
 
@@ -151,6 +147,7 @@ public class QueryDslMemberRepository implements MemberRepository {
 			.from(member)
 			.leftJoin(company).on(member.companyId.eq(company.id))
 			.where(builder)
+			.orderBy(member.createdAt.desc())
 			.offset(offset)
 			.limit(memberPageSize)
 			.fetch();
