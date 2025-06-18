@@ -33,6 +33,6 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
 		final MemberDetails memberDetails = (MemberDetails)authentication.getPrincipal();
 
 		return new LoginMemberDetail(memberDetails.getId(), memberDetails.getName(), memberDetails.getCompanyId(),
-			memberDetails.getCompanyName());
+			memberDetails.getCompanyName(),memberDetails.getAuthorityAsStr());
 	}
 }
