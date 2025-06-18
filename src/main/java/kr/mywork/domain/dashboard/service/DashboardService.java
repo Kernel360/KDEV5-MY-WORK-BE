@@ -1,19 +1,18 @@
 package kr.mywork.domain.dashboard.service;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.dashboard.service.dto.response.DashboardCountSummaryResponse;
 import kr.mywork.domain.dashboard.service.errors.DashboardErrorType;
 import kr.mywork.domain.dashboard.service.errors.DashboardTypeNotFoundException;
 import kr.mywork.domain.dashboard.service.repository.DashboardRepository;
 import kr.mywork.domain.project.model.ProjectAssign;
 import kr.mywork.domain.project.model.ProjectMember;
-import kr.mywork.interfaces.dashboard.controller.dto.request.DashboardCountSummaryWebRequest;
 import kr.mywork.interfaces.dashboard.controller.dto.response.DashboardCountSummaryWebResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,18 +20,18 @@ public class DashboardService {
 
 	final DashboardRepository dashboardRepository;
 
-	public DashboardCountSummaryWebResponse getSummaryTotalCount(DashboardCountSummaryWebRequest webRequest) {
+	public DashboardCountSummaryWebResponse getSummaryTotalCount(LoginMemberDetail loginMemberDetail) {
 
-		final String userType = webRequest.userType();
-		final UUID companyId = webRequest.companyId();
-		final UUID memberId = webRequest.memberId();
+		final String userType = loginMemberDetail.userType();
+		final UUID companyId = loginMemberDetail.companyId();
+		final UUID memberId = loginMemberDetail.memberId();
 
-		if ("SYSTEMADMIN".equalsIgnoreCase(userType)) {
+		if ("ROLE_SYSTEM_ADMIN".equalsIgnoreCase(userType)) {
 			return getAdminSummary();
-		} else if (("DEVADMIN".equalsIgnoreCase(userType) || "CLIENTADMIN".equalsIgnoreCase(userType))
+		} else if (("ROLE_DEV_ADMIN".equalsIgnoreCase(userType) || "ROLE_CLIENT_ADMIN".equalsIgnoreCase(userType))
 			&& companyId != null) {
 			return getCompanyAdminSummary(companyId, userType);
-		} else if ("USER".equalsIgnoreCase(userType) && memberId != null) {
+		} else if ("ROLE_USER".equalsIgnoreCase(userType) && memberId != null) {
 			return getUserSummary(memberId);
 		} else {
 			throw new DashboardTypeNotFoundException(DashboardErrorType.TYPE_NOT_FOUND);
@@ -73,11 +72,11 @@ public class DashboardService {
 	}
 
 	private String extractCompanyAdminType(String userType) {
-		if (userType.equalsIgnoreCase("SYSTEMADMIN"))
+		if (userType.equalsIgnoreCase("ROLE_SYSTEM_ADMIN"))
 			return "system";
-		if (userType.equalsIgnoreCase("DEVADMIN"))
+		if (userType.equalsIgnoreCase("ROLE_DEV_ADMIN"))
 			return "dev";
-		if (userType.equalsIgnoreCase("CLIENTADMIN"))
+		if (userType.equalsIgnoreCase("ROLE_CLIENT_ADMIN"))
 			return "client";
 		return "user";
 	}
