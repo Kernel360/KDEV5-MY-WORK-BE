@@ -1,3 +1,9 @@
+---
+name: 🐞 Bug Report
+about: 버그 발생했을 떄 작성하는 이슈입니다.
+title: "[bug] "
+---
+
 # 🪜 1. Title
 
 - 제목에 관해 설명합니다.
