@@ -69,6 +69,15 @@ public class QueryDslProjectAssignRepository implements ProjectAssignRepository 
 			.fetch();
 	}
 
+	@Override
+	public List<UUID> findCompanyProjects(UUID companyId) {
+		return queryFactory
+			.select(projectAssign.projectId)
+			.from(projectAssign)
+			.where(projectAssign.devCompanyId.eq(companyId).or(projectAssign.clientCompanyId.eq(companyId)))
+			.fetch();
+	}
+
 	private BooleanExpression inCompanyTypeAndCompanyIds(final Collection<UUID> companyIds, final String companyType) {
 		if (CompanyType.DEV.name().equals(companyType)) {
 			return projectAssign.devCompanyId.in(companyIds);
