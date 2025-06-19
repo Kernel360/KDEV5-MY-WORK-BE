@@ -24,6 +24,7 @@ public class PostAttachment {
     @Getter
     private UUID id;
 
+    @Getter
     private UUID postId;
 
     @Column(length = 300)
