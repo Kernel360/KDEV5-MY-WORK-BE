@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
+import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
 
 public interface ProjectRepository {
 
@@ -23,4 +24,8 @@ public interface ProjectRepository {
 	List<Project> findAllByIdsAndStep(Collection<UUID> projectIds, String step, Integer page, Integer projectPageSize);
 
 	Long countTotalProjectsByNameAndStep(String keyword, String step);
+
+	List<Project> findPopularProjectsName(List<DashboardMostPostProjectResponse> mostPostProjectIds);
+
+
 }
