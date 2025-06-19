@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import kr.mywork.common.api.support.response.ApiResponse;
-import kr.mywork.domain.post.service.PostService;
+import kr.mywork.domain.post.service.PostAttachmentUploadService;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlIssueResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlReissueResponse;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlIssueWebRequest;
@@ -23,14 +23,14 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class PostAttachmentController {
 
-	private final PostService postService;
+	private final PostAttachmentUploadService postAttachmentUploadService;
 
 	@PostMapping("/posts/attachment/upload-url/issue")
 	public ApiResponse<PostAttachmentUploadUrlIssueWebResponse> issueUploadUrl(
 		@RequestBody @Valid PostAttachmentUploadUrlIssueWebRequest postAttachmentUploadUrlIssueWebRequest) {
 
 		final PostAttachmentUploadUrlIssueResponse postAttachmentUploadUrlIssueResponse =
-			postService.issuePostAttachmentUploadUrl(
+			postAttachmentUploadService.issuePostAttachmentUploadUrl(
 				postAttachmentUploadUrlIssueWebRequest.getPostId(),
 				postAttachmentUploadUrlIssueWebRequest.getFileName());
 
@@ -45,7 +45,7 @@ public class PostAttachmentController {
 		@RequestBody @Valid PostAttachmentUploadUrlReissueWebRequest postAttachmentUploadUrlIssueWebRequest) {
 
 		final PostAttachmentUploadUrlReissueResponse postAttachmentUploadUrlIssueResponse =
-			postService.reissuePostAttachmentUploadUrl(
+			postAttachmentUploadService.reissuePostAttachmentUploadUrl(
 				postAttachmentUploadUrlIssueWebRequest.getPostAttachmentId(),
 				postAttachmentUploadUrlIssueWebRequest.getFileName());
 
