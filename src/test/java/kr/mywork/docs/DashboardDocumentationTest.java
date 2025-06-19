@@ -66,5 +66,43 @@ public class DashboardDocumentationTest extends RestDocsDocumentation {
 				.build()
 		);
 	}
+	@Test
+	@DisplayName("가장 이슈있는 프로젝트")
+	@Sql("classpath:sql/dashboard-mostpost-top-five.sql")
+	void 대시보드_가장_게시글많은_프로젝트_조회_성공() throws Exception {
+		// given
+		final String accessToken = createSystemAccessToken();
+		// when
+		ResultActions result = mockMvc.perform(
+			get("/api/dashboard/popularProjects")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		//then
+		result.andExpectAll(
+			status().isOk(),
+			jsonPath("$.result").value(ResultType.SUCCESS.name()),
+			jsonPath("$.data").exists(),
+			jsonPath("$.error").doesNotExist()
+		).andDo(document("dashboard-most-post-top-five-success", topFviePostSuccessResource()));
+	}
+
+	private ResourceSnippet topFviePostSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Dashboard API")
+				.summary("가장 이슈있는 프로젝트 API")
+				.description("가장 게시글이 많은 프로젝트를 보여준다")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.projects[].projectId").type(JsonFieldType.STRING).description("프로젝트 ID"),
+					fieldWithPath("data.projects[].projectName").type(JsonFieldType.STRING).description("프로젝트명"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
 
 }
