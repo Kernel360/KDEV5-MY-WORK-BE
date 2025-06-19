@@ -66,4 +66,13 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 			.fetchFirst() != null;
 	}
 
+	@Override
+	public List<UUID> findMemberProjects(UUID memberId) {
+		return queryFactory
+			.select(projectMember.projectId)
+			.from(projectMember)
+			.where(projectMember.memberId.eq(memberId))
+			.fetch();
+	}
+
 }

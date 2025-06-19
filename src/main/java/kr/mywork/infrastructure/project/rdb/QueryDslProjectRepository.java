@@ -18,6 +18,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.repository.ProjectRepository;
+import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -111,6 +112,18 @@ public class QueryDslProjectRepository implements ProjectRepository {
 			.from(project)
 			.where(eqDeleted(false), containsProjectName(name), eqProjectStep(step))
 			.fetchOne();
+	}
+
+	@Override
+	public List<Project> findPopularProjectsName(List<DashboardMostPostProjectResponse> projectIds) {
+		List<UUID> ids = projectIds.stream()
+			.map(DashboardMostPostProjectResponse::projectId)
+			.toList();
+
+		return queryFactory
+			.selectFrom(project)
+			.where(project.id.in(ids))
+			.fetch();
 	}
 
 	private BooleanExpression eqProjectStep(final String step) {
