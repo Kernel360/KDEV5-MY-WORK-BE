@@ -1,5 +1,6 @@
 package kr.mywork.domain.post.service;
 
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,10 +14,13 @@ import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
 import kr.mywork.domain.post.model.Post;
+import kr.mywork.domain.post.model.PostAttachment;
+import kr.mywork.domain.post.repository.PostAttachmentRepository;
 import kr.mywork.domain.post.repository.PostIdRepository;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
+import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlIssueResponse;
 import kr.mywork.domain.post.service.dto.response.PostDetailResponse;
 import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
 import kr.mywork.domain.post.service.dto.response.PostUpdateResponse;
@@ -40,6 +44,8 @@ public class PostService {
 	private final PostIdRepository postIdRepository;
 	private final ProjectStepRepository projectStepRepository;
 	private final ProjectRepository projectRepository;
+	private final PostAttachmentRepository postAttachmentRepository;
+	private final PostAttachmentFileHandler postAttachmentFileHandler;
 
 	@Transactional
 	public UUID createPostId() {
@@ -128,4 +134,19 @@ public class PostService {
 
 		return post.getId();
 	}
+
+	@Transactional
+	public PostAttachmentUploadUrlIssueResponse issuePostAttachmentUploadUrl(final UUID postId, final String fileName) {
+		final Post savedPost = postRepository.findById(postId)
+			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
+
+		final URL uploadUrl = postAttachmentFileHandler.createUploadUrl(postId, fileName);
+
+		// TODO 업로드 파일 크기, 확장자, 첨부 파일 갯수 (3개) 검토 필요
+		final PostAttachment postAttachment = PostAttachment.inactivePostAttachment(savedPost.getId(), fileName);
+		postAttachmentRepository.save(postAttachment);
+
+		return new PostAttachmentUploadUrlIssueResponse(postAttachment.getId(), uploadUrl.toString());
+	}
+
 }
