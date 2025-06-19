@@ -23,4 +23,12 @@ public interface ProjectRepository {
 	List<Project> findAllByIdsAndStep(Collection<UUID> projectIds, String step, Integer page, Integer projectPageSize);
 
 	Long countTotalProjectsByNameAndStep(String keyword, String step);
+
+	List<Project> findAllNearDeadlineProjects(int page, int pageSize);
+
+	List<Project> findAllNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, int page, int pageSize);
+
+	Long countNearDeadlineProjects();
+
+	Long countNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds);
 }

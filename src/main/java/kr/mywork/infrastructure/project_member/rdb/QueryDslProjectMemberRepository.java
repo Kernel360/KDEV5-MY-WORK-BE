@@ -66,4 +66,14 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 			.fetchFirst() != null;
 	}
 
+	@Override
+	public List<ProjectMember> findAllByMemberId(UUID memberId) {
+		return queryFactory
+			.selectFrom(projectMember)
+			.where(projectMember.memberId.eq(memberId)
+				.and(projectMember.deleted.isFalse()))
+			.fetch();
+	}
+
+
 }

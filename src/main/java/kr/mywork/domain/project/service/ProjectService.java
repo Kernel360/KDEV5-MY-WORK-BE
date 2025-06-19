@@ -1,5 +1,7 @@
 package kr.mywork.domain.project.service;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.Company;
@@ -23,14 +26,17 @@ import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
 import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.model.ProjectAssign;
+import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project.repository.ProjectAssignRepository;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
+import kr.mywork.domain.project.service.dto.response.NearDeadlineProjectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
+import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -44,10 +50,14 @@ public class ProjectService {
 	@Value("${project.page.size}")
 	private int projectPageSize;
 
+	@Value("5")
+	private int dashboardPageSize;
+
 	private final ProjectRepository projectRepository;
 	private final ProjectAssignRepository projectAssignRepository;
 	private final CompanyRepository companyRepository;
 	private final MemberRepository memberRepository;
+	private final ProjectMemberRepository projectMemberRepository;
 
 	@Transactional
 	public UUID createProject(ProjectCreateRequest request) {
@@ -287,4 +297,80 @@ public class ProjectService {
 
 		return memberProjectList;
 	}
+
+	@Transactional(readOnly = true)
+	public List<NearDeadlineProjectResponse> findNearDeadlineProjectsByLoginMember(
+		final int page,
+		final LoginMemberDetail loginMemberDetail
+	) {
+		final String userType = loginMemberDetail.userType();
+
+		if ("ROLE_SYSTEM_ADMIN".equals(userType)) {
+			final List<Project> projects = projectRepository.findAllNearDeadlineProjects(page, dashboardPageSize);
+			return projects.stream()
+				.map(this::toResponseWithDday)
+				.toList();
+		}
+
+		if ("ROLE_CLIENT_ADMIN".equals(userType) || "ROLE_DEV_ADMIN".equals(userType)) {
+			final UUID companyId = loginMemberDetail.companyId();
+			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId);
+			final List<UUID> projectIds = assigns.stream()
+				.map(ProjectAssign::getProjectId)
+				.distinct()
+				.toList();
+
+			final List<Project> projects = projectRepository.findAllNearDeadlineProjectsByProjectIds(projectIds, page, dashboardPageSize);
+			return projects.stream()
+				.map(this::toResponseWithDday)
+				.toList();
+		}
+
+		final UUID memberId = loginMemberDetail.memberId();
+		final List<ProjectMember> projectMembers = projectMemberRepository.findAllByMemberId(memberId);
+		final List<UUID> projectIds = projectMembers.stream()
+			.map(ProjectMember::getProjectId)
+			.distinct()
+			.toList();
+
+		final List<Project> projects = projectRepository.findAllNearDeadlineProjectsByProjectIds(projectIds, page, dashboardPageSize);
+		return projects.stream()
+			.map(this::toResponseWithDday)
+			.toList();
+	}
+
+	private NearDeadlineProjectResponse toResponseWithDday(Project project) {
+		int dday = Math.max(0, (int) ChronoUnit.DAYS.between(LocalDate.now(), project.getEndAt().toLocalDate()));
+		return NearDeadlineProjectResponse.of(project.getId(), project.getName(), project.getEndAt(), dday);
+	}
+
+	@Transactional(readOnly = true)
+	public Long countNearDeadlineProjectsByLoginMember(final LoginMemberDetail loginMemberDetail) {
+		final String userType = loginMemberDetail.userType();
+
+		if ("ROLE_SYSTEM_ADMIN".equals(userType)) {
+			return projectRepository.countNearDeadlineProjects();
+		}
+
+		if ("ROLE_CLIENT_ADMIN".equals(userType) || "ROLE_DEV_ADMIN".equals(userType)) {
+			final UUID companyId = loginMemberDetail.companyId();
+			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId);
+			final List<UUID> projectIds = assigns.stream()
+				.map(ProjectAssign::getProjectId)
+				.distinct()
+				.toList();
+
+			return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds);
+		}
+
+		final UUID memberId = loginMemberDetail.memberId();
+		final List<ProjectMember> projectMembers = projectMemberRepository.findAllByMemberId(memberId);
+		final List<UUID> projectIds = projectMembers.stream()
+			.map(ProjectMember::getProjectId)
+			.distinct()
+			.toList();
+
+		return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds);
+	}
+
 }

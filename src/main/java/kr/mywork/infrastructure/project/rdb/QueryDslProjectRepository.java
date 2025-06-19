@@ -3,6 +3,8 @@ package kr.mywork.infrastructure.project.rdb;
 import static kr.mywork.domain.project.model.QProject.project;
 import static kr.mywork.domain.project.model.QProjectMember.projectMember;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -112,6 +114,74 @@ public class QueryDslProjectRepository implements ProjectRepository {
 			.where(eqDeleted(false), containsProjectName(name), eqProjectStep(step))
 			.fetchOne();
 	}
+
+	@Override
+	public List<Project> findAllNearDeadlineProjects(final int page, final int size) {
+		final int offset = (page - 1) * size;
+		final LocalDate today = LocalDate.now();
+
+		return queryFactory
+			.selectFrom(project)
+			.where(
+				project.deleted.isFalse(),
+				project.endAt.between(today.atStartOfDay(), today.plusDays(5).atTime(23, 59, 59))
+			)
+			.orderBy(project.endAt.asc())
+			.offset(offset)
+			.limit(size)
+			.fetch();
+	}
+
+	@Override
+	public List<Project> findAllNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, int page, int pageSize) {
+		final int offset = (page - 1) * pageSize;
+		return queryFactory
+			.selectFrom(project)
+			.where(
+				project.id.in(projectIds)
+					.and(project.deleted.isFalse())
+					.and(project.endAt.goe(LocalDateTime.now()))
+			)
+			.orderBy(project.endAt.asc())
+			.offset(offset)
+			.limit(pageSize)
+			.fetch();
+	}
+
+	@Override
+	public Long countNearDeadlineProjects() {
+		final LocalDate today = LocalDate.now();
+
+		return queryFactory
+			.select(project.count())
+			.from(project)
+			.where(
+				project.deleted.isFalse(),
+				project.endAt.between(today.atStartOfDay(), today.plusDays(5).atTime(23, 59, 59))
+			)
+			.fetchOne();
+	}
+
+
+	@Override
+	public Long countNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds) {
+		if (projectIds == null || projectIds.isEmpty()) {
+			return 0L;
+		}
+
+		final LocalDate today = LocalDate.now();
+
+		return queryFactory
+			.select(project.count())
+			.from(project)
+			.where(
+				project.id.in(projectIds),
+				project.deleted.isFalse(),
+				project.endAt.between(today.atStartOfDay(), today.plusDays(5).atTime(23, 59, 59))
+			)
+			.fetchOne();
+	}
+
 
 	private BooleanExpression eqProjectStep(final String step) {
 		if (step == null) {
