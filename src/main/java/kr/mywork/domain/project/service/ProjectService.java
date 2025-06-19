@@ -19,6 +19,7 @@ import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.model.CompanyType;
 import kr.mywork.domain.company.repository.CompanyRepository;
 import kr.mywork.domain.member.model.Member;
+import kr.mywork.domain.member.model.MemberRole;
 import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.errors.ProjectAssignNotFoundException;
@@ -303,16 +304,16 @@ public class ProjectService {
 		final int page,
 		final LoginMemberDetail loginMemberDetail
 	) {
-		final String userType = loginMemberDetail.userType();
+		final String userType = loginMemberDetail.roleName();
 
-		if ("ROLE_SYSTEM_ADMIN".equals(userType)) {
+		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(userType)) {
 			final List<Project> projects = projectRepository.findAllNearDeadlineProjects(page, dashboardPageSize);
 			return projects.stream()
 				.map(this::toResponseWithDday)
 				.toList();
 		}
 
-		if ("ROLE_CLIENT_ADMIN".equals(userType) || "ROLE_DEV_ADMIN".equals(userType)) {
+		if (MemberRole.CLIENT_ADMIN.getRoleName().equals(userType) || MemberRole.DEV_ADMIN.getRoleName().equals(userType)) {
 			final UUID companyId = loginMemberDetail.companyId();
 			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId);
 			final List<UUID> projectIds = assigns.stream()
@@ -346,13 +347,13 @@ public class ProjectService {
 
 	@Transactional(readOnly = true)
 	public Long countNearDeadlineProjectsByLoginMember(final LoginMemberDetail loginMemberDetail) {
-		final String userType = loginMemberDetail.userType();
+		final String userType = loginMemberDetail.roleName();
 
-		if ("ROLE_SYSTEM_ADMIN".equals(userType)) {
+		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(userType)) {
 			return projectRepository.countNearDeadlineProjects();
 		}
 
-		if ("ROLE_CLIENT_ADMIN".equals(userType) || "ROLE_DEV_ADMIN".equals(userType)) {
+		if (MemberRole.CLIENT_ADMIN.getRoleName().equals(userType) || MemberRole.DEV_ADMIN.getRoleName().equals(userType)) {
 			final UUID companyId = loginMemberDetail.companyId();
 			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId);
 			final List<UUID> projectIds = assigns.stream()

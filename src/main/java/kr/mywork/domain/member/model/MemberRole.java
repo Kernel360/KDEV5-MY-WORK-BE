@@ -1,11 +1,11 @@
 package kr.mywork.domain.member.model;
 
-import java.util.Arrays;
-
 import kr.mywork.domain.member.errors.MemberErrorType;
 import kr.mywork.domain.member.errors.MemberTypeNotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -30,5 +30,9 @@ public enum MemberRole {
 			.filter(memberRole -> memberRole.name().equals(value))
 			.findAny()
 			.orElseThrow(() -> new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND));
+	}
+
+	public boolean isSameRoleName(final String roleName) {
+		return this.roleName.equals(roleName);
 	}
 }

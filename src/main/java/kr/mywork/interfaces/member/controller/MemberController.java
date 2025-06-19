@@ -1,23 +1,12 @@
 package kr.mywork.interfaces.member.controller;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.common.auth.components.annotation.LoginMember;
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
+import kr.mywork.domain.member.model.MemberRole;
 import kr.mywork.domain.member.service.MemberService;
 import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
 import kr.mywork.domain.member.service.dto.request.MemberUpdateRequest;
@@ -28,16 +17,13 @@ import kr.mywork.interfaces.member.controller.dto.request.MemberCreateWebRequest
 import kr.mywork.interfaces.member.controller.dto.request.MemberDeleteWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.MemberUpdateWebRequest;
 import kr.mywork.interfaces.member.controller.dto.request.ResetPasswordWebRequest;
-import kr.mywork.interfaces.member.controller.dto.response.MemberCreateWebResponse;
-import kr.mywork.interfaces.member.controller.dto.response.MemberDeleteWebResponse;
-import kr.mywork.interfaces.member.controller.dto.response.MemberDetailsWebResponse;
-import kr.mywork.interfaces.member.controller.dto.response.MemberListWebResponse;
-import kr.mywork.interfaces.member.controller.dto.response.MemberProjectInfoWebResponse;
-import kr.mywork.interfaces.member.controller.dto.response.MemberProjectsListWebResponse;
-import kr.mywork.interfaces.member.controller.dto.response.MemberSelectWebResponse;
-import kr.mywork.interfaces.member.controller.dto.response.MemberUpdateWebResponse;
-import kr.mywork.interfaces.member.controller.dto.response.ResetPasswordWebResponse;
+import kr.mywork.interfaces.member.controller.dto.response.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,99 +31,104 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class MemberController {
 
-	private static final String MEMBER_SEARCH_TYPE = "^(NAME|EMAIL|POSITION|DEPARTMENT|PHONENUMBER|)$";
-	private final MemberService memberService;
-	private final ProjectService projectService;
+    private static final String MEMBER_SEARCH_TYPE = "^(NAME|EMAIL|POSITION|DEPARTMENT|PHONENUMBER|)$";
+    private final MemberService memberService;
+    private final ProjectService projectService;
 
-	@PostMapping
-	public ApiResponse<MemberCreateWebResponse> memberCreateWebResponseApiResponse(
-		@RequestBody final MemberCreateWebRequest memberCreateWebRequest) {
+    @PostMapping
+    public ApiResponse<MemberCreateWebResponse> memberCreateWebResponseApiResponse(
+            @RequestBody final MemberCreateWebRequest memberCreateWebRequest) {
 
-		final MemberCreateRequest memberCreateRequest = memberCreateWebRequest.toServiceDto();
+        final MemberCreateRequest memberCreateRequest = memberCreateWebRequest.toServiceDto();
 
-		final UUID createdMemberId = memberService.createMember(memberCreateRequest);
+        final UUID createdMemberId = memberService.createMember(memberCreateRequest);
 
-		final MemberCreateWebResponse memberCreateWebResponse = new MemberCreateWebResponse(createdMemberId);
+        final MemberCreateWebResponse memberCreateWebResponse = new MemberCreateWebResponse(createdMemberId);
 
-		return ApiResponse.success(memberCreateWebResponse);
-	}
+        return ApiResponse.success(memberCreateWebResponse);
+    }
 
-	@DeleteMapping
-	public ApiResponse<MemberDeleteWebResponse> deleteMember(
-		@RequestBody MemberDeleteWebRequest memberDeleteWebRequest) {
-		final UUID memberId = memberService.deleteMember(memberDeleteWebRequest.memberId());
+    @DeleteMapping
+    public ApiResponse<MemberDeleteWebResponse> deleteMember(
+            @RequestBody MemberDeleteWebRequest memberDeleteWebRequest) {
+        final UUID memberId = memberService.deleteMember(memberDeleteWebRequest.memberId());
 
-		MemberDeleteWebResponse memberDeleteWebResponse = new MemberDeleteWebResponse(memberId);
+        MemberDeleteWebResponse memberDeleteWebResponse = new MemberDeleteWebResponse(memberId);
 
-		return ApiResponse.success(memberDeleteWebResponse);
-	}
+        return ApiResponse.success(memberDeleteWebResponse);
+    }
 
-	@PutMapping
-	public ApiResponse<MemberUpdateWebResponse> updateMember(
-		@RequestBody MemberUpdateWebRequest memberUpdateWebRequest) {
-		final MemberUpdateRequest memberUpdateRequest = memberUpdateWebRequest.toServiceDto();
+    @PutMapping
+    public ApiResponse<MemberUpdateWebResponse> updateMember(
+            @RequestBody MemberUpdateWebRequest memberUpdateWebRequest) {
+        final MemberUpdateRequest memberUpdateRequest = memberUpdateWebRequest.toServiceDto();
 
-		final UUID updatedId = memberService.updateMember(memberUpdateRequest);
+        final UUID updatedId = memberService.updateMember(memberUpdateRequest);
 
-		final MemberUpdateWebResponse memberUpdateWebResponse = new MemberUpdateWebResponse(updatedId);
+        final MemberUpdateWebResponse memberUpdateWebResponse = new MemberUpdateWebResponse(updatedId);
 
-		return ApiResponse.success(memberUpdateWebResponse);
-	}
+        return ApiResponse.success(memberUpdateWebResponse);
+    }
 
-	@GetMapping
-	public ApiResponse<MemberListWebResponse> findMembersByOffset(
-		@RequestParam(name = "page") @Min(value = 1, message = "{invalid.page-size}") final int page,
-		@RequestParam(name = "keyword", required = false) final String keyword,
-		@RequestParam(name = "keywordType", required = false) @Pattern(regexp = MEMBER_SEARCH_TYPE, message = "{member-search-type}") final String keywordType,
-		@RequestParam(name = "companyId", required = false) final UUID companyId
-	) {
-		final List<MemberSelectResponse> memberSelectResponses = memberService.findMembersBySearchWithPaging(page,
-			keyword, keywordType, companyId);
-		final long totalCount = memberService.countTotalmembersByCondition(keyword, keywordType, companyId);
+    @GetMapping
+    public ApiResponse<MemberListWebResponse> findMembersByOffset(
+            @RequestParam(name = "page") @Min(value = 1, message = "{invalid.page-size}") final int page,
+            @RequestParam(name = "keyword", required = false) final String keyword,
+            @RequestParam(name = "keywordType", required = false) @Pattern(regexp = MEMBER_SEARCH_TYPE, message = "{member-search-type}") final String keywordType,
+            @LoginMember LoginMemberDetail memberDetails) {
 
-		List<MemberSelectWebResponse> memberSelectWebResponses = memberSelectResponses.stream()
-			.map(MemberSelectWebResponse::from)
-			.toList();
+        final UUID companyId = MemberRole.SYSTEM_ADMIN.isSameRoleName(memberDetails.roleName()) ?
+                null : memberDetails.companyId();
 
-		return ApiResponse.success(new MemberListWebResponse(memberSelectWebResponses, totalCount));
-	}
+        final List<MemberSelectResponse> memberSelectResponses = memberService.findMembersBySearchWithPaging(
+                page, keyword, keywordType, companyId);
 
-	@GetMapping("/{memberId}")
-	public ApiResponse<MemberDetailsWebResponse> getMemberDetail(@PathVariable("memberId") final UUID memberId) {
-		MemberDetailResponse memberDetailResponse = memberService.findMemberDetailByMemberId(memberId);
+        final long totalCount = memberService.countTotalmembersByCondition(keyword, keywordType, companyId);
 
-		List<MemberProjectInfoResponse> memberProjectInfoResponse = projectService.findProjectsAssignedMember(memberId);
+        List<MemberSelectWebResponse> memberSelectWebResponses = memberSelectResponses.stream()
+                .map(MemberSelectWebResponse::from)
+                .toList();
 
-		List<MemberProjectInfoWebResponse> memberAssignProjectWebResponses = memberProjectInfoResponse.stream()
-			.map(MemberProjectInfoWebResponse::from)
-			.toList();
+        return ApiResponse.success(new MemberListWebResponse(memberSelectWebResponses, totalCount));
+    }
 
-		MemberDetailsWebResponse memberDetailsWebResponse = MemberDetailsWebResponse.from(memberDetailResponse,
-			memberAssignProjectWebResponses);
+    @GetMapping("/{memberId}")
+    public ApiResponse<MemberDetailsWebResponse> getMemberDetail(@PathVariable("memberId") final UUID memberId) {
+        MemberDetailResponse memberDetailResponse = memberService.findMemberDetailByMemberId(memberId);
 
-		return ApiResponse.success(memberDetailsWebResponse);
-	}
-	@PostMapping("/resetPassword")
-	public ApiResponse<ResetPasswordWebResponse> resetMemberPassword(
-		@RequestBody ResetPasswordWebRequest resetPasswordWebRequest
-	){
-		final UUID memberId = memberService.resetMemberPassword(resetPasswordWebRequest);
+        List<MemberProjectInfoResponse> memberProjectInfoResponse = projectService.findProjectsAssignedMember(memberId);
 
-		ResetPasswordWebResponse resetPasswordWebResponse = new ResetPasswordWebResponse(memberId);
+        List<MemberProjectInfoWebResponse> memberAssignProjectWebResponses = memberProjectInfoResponse.stream()
+                .map(MemberProjectInfoWebResponse::from)
+                .toList();
 
-		return ApiResponse.success(resetPasswordWebResponse);
-	}
+        MemberDetailsWebResponse memberDetailsWebResponse = MemberDetailsWebResponse.from(memberDetailResponse,
+                memberAssignProjectWebResponses);
 
-	@GetMapping("/{memberId}/myProjects")
-	public ApiResponse<MemberProjectsListWebResponse> getMemberProjectInfo(@PathVariable("memberId") final UUID memberId) {
+        return ApiResponse.success(memberDetailsWebResponse);
+    }
 
-		List<MemberProjectInfoResponse> memberProjectInfoResponse = projectService.findProjectsAssignedMember(memberId);
+    @PostMapping("/resetPassword")
+    public ApiResponse<ResetPasswordWebResponse> resetMemberPassword(
+            @RequestBody ResetPasswordWebRequest resetPasswordWebRequest
+    ) {
+        final UUID memberId = memberService.resetMemberPassword(resetPasswordWebRequest);
 
-		List<MemberProjectInfoWebResponse> memberAssignProjectWebResponses = memberProjectInfoResponse.stream()
-			.map(MemberProjectInfoWebResponse::from)
-			.toList();
+        ResetPasswordWebResponse resetPasswordWebResponse = new ResetPasswordWebResponse(memberId);
 
-		MemberProjectsListWebResponse memberProjectsListWebResponse = new MemberProjectsListWebResponse(memberAssignProjectWebResponses);
-		return ApiResponse.success(memberProjectsListWebResponse);
-	}
+        return ApiResponse.success(resetPasswordWebResponse);
+    }
+
+    @GetMapping("/{memberId}/myProjects")
+    public ApiResponse<MemberProjectsListWebResponse> getMemberProjectInfo(@PathVariable("memberId") final UUID memberId) {
+
+        List<MemberProjectInfoResponse> memberProjectInfoResponse = projectService.findProjectsAssignedMember(memberId);
+
+        List<MemberProjectInfoWebResponse> memberAssignProjectWebResponses = memberProjectInfoResponse.stream()
+                .map(MemberProjectInfoWebResponse::from)
+                .toList();
+
+        MemberProjectsListWebResponse memberProjectsListWebResponse = new MemberProjectsListWebResponse(memberAssignProjectWebResponses);
+        return ApiResponse.success(memberProjectsListWebResponse);
+    }
 }

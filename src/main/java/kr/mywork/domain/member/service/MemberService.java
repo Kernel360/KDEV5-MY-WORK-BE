@@ -1,21 +1,7 @@
 package kr.mywork.domain.member.service;
 
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
-import kr.mywork.domain.member.errors.EmailAlreadyExistsException;
-import kr.mywork.domain.member.errors.MemberErrorType;
-import kr.mywork.domain.member.errors.MemberIdNotFoundException;
-import kr.mywork.domain.member.errors.MemberNotFoundException;
-import kr.mywork.domain.member.errors.PasswordFailException;
+import kr.mywork.domain.member.errors.*;
 import kr.mywork.domain.member.model.Member;
 import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.member.service.dto.request.MemberCreateRequest;
@@ -24,6 +10,15 @@ import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
 import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
 import kr.mywork.interfaces.member.controller.dto.request.ResetPasswordWebRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -105,9 +100,8 @@ public class MemberService {
 	}
 
 	@Transactional
-	public List<MemberSelectResponse> findMembersBySearchWithPaging(final int page, String keyword,
-		String keywordType,UUID companyId) {
-
+	public List<MemberSelectResponse> findMembersBySearchWithPaging(final int page, final String keyword,
+		final String keywordType, final UUID companyId) {
 		return memberRepository.findMembersBySearchWithPaging(page, memberPageSize, keyword, keywordType,companyId);
 	}
 

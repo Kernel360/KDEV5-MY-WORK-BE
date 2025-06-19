@@ -50,12 +50,12 @@ public class DashboardController {
 		final long totalCount =
 			projectService.countNearDeadlineProjectsByLoginMember(loginMemberDetail);
 
-		final List<NearDeadlineProjectWebResponse> webResponses = NearDeadlineProjectResponse.stream()
+		final List<NearDeadlineProjectWebResponse> nearDeadlineProjectWebResponses = NearDeadlineProjectResponse.stream()
 			.map(NearDeadlineProjectWebResponse::fromServiceResponse)
 			.toList();
 
 		final NearDeadlineProjectListWebResponse response =
-			new NearDeadlineProjectListWebResponse(webResponses, totalCount);
+			new NearDeadlineProjectListWebResponse(nearDeadlineProjectWebResponses, totalCount);
 
 		return ApiResponse.success(response);
 	}
