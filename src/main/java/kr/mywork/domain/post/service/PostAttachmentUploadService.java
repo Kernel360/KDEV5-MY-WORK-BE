@@ -12,6 +12,7 @@ import kr.mywork.domain.post.model.Post;
 import kr.mywork.domain.post.model.PostAttachment;
 import kr.mywork.domain.post.repository.PostAttachmentRepository;
 import kr.mywork.domain.post.repository.PostRepository;
+import kr.mywork.domain.post.service.dto.response.PostAttachmentActiveResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlIssueResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlReissueResponse;
 import kr.mywork.domain.post.service.errors.PostAttachmentAlreadyUploadException;
@@ -55,6 +56,17 @@ public class PostAttachmentUploadService {
 		final URL uploadUrl = postAttachmentFileHandler.createUploadUrl(postAttachment.getId(), fileName);
 
 		return new PostAttachmentUploadUrlReissueResponse(postAttachmentId, uploadUrl.toString());
+	}
+
+	@Transactional
+	public PostAttachmentActiveResponse updatePostAttachmentActive(final UUID postAttachmentId, final Boolean active) {
+
+		final PostAttachment postAttachment = postAttachmentRepository.findById(postAttachmentId)
+			.orElseThrow(() -> new PostAttachmentNotFoundException(PostErrorType.ATTACHMENT_NOT_FOUND));
+
+		postAttachment.updateActive(active);
+
+		return new PostAttachmentActiveResponse(postAttachmentId, postAttachment.isActive());
 	}
 
 }
