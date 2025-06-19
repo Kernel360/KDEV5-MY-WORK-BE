@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.post.service.PostAttachmentUploadService;
+import kr.mywork.domain.post.service.dto.response.PostAttachmentActiveResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlIssueResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlReissueResponse;
+import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentActiveWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlIssueWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlReissueWebRequest;
+import kr.mywork.interfaces.post.controller.dto.response.PostAttachmentActiveWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostAttachmentUploadUrlIssueWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostAttachmentUploadUrlReissueWebResponse;
 import lombok.RequiredArgsConstructor;
@@ -54,4 +57,16 @@ public class PostAttachmentController {
 			postAttachmentUploadUrlIssueWebRequest.getFileName()));
 	}
 
+	@PostMapping("/posts/attachment/active")
+	public ApiResponse<PostAttachmentActiveWebResponse> activePostAttachment(
+		@RequestBody @Valid PostAttachmentActiveWebRequest postAttachmentActiveWebRequest) {
+
+		final PostAttachmentActiveResponse postAttachmentActiveResponse = postAttachmentUploadService.updatePostAttachmentActive(
+			postAttachmentActiveWebRequest.getPostAttachmentId(),
+			postAttachmentActiveWebRequest.getActive());
+
+		return ApiResponse.success(new PostAttachmentActiveWebResponse(
+			postAttachmentActiveResponse.postAttachmentId(),
+			postAttachmentActiveResponse.active()));
+	}
 }
