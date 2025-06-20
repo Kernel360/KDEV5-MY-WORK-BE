@@ -1,15 +1,5 @@
 package kr.mywork.domain.project.service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
@@ -33,13 +23,18 @@ import kr.mywork.domain.project.repository.ProjectAssignRepository;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
-import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
+import kr.mywork.domain.project.service.dto.response.*;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -300,7 +295,7 @@ public class ProjectService {
 	}
 
 	@Transactional
-	public List<DashboardPopularProjectsResponse> getPopularProjects(LoginMemberDetail memberDetail) {
+	public List<DashboardPopularProjectsResponse> getMostPostProjectsTopFive(LoginMemberDetail memberDetail) {
 		final String memberRole = memberDetail.roleName();
 		//가져온 프로젝트들의 ID에 이름을 과 순서를 매칭 해주는 메소드 [ buildPopularResponse ]
 		if(MemberRole.SYSTEM_ADMIN.isSameRoleName(memberRole)){
@@ -308,13 +303,13 @@ public class ProjectService {
 		}
 		if(MemberRole.CLIENT_ADMIN.isSameRoleName(memberRole) || MemberRole.DEV_ADMIN.isSameRoleName(memberRole)){
 			final UUID companyId = memberDetail.companyId(); //회사 기준으로 -> 프로젝트 ID들 가져와야함.
-			final List<UUID> companyProjectIds = projectAssignRepository.findCompanyProjects(companyId);
+			final List<UUID> companyProjectIds = projectAssignRepository.findCompanyProjectsByCompanyId(companyId,memberRole);
 
 			return buildPopularResponse(postRepository.findMostPostProjectTopFive(companyProjectIds));
 		}
 		if(MemberRole.USER.isSameRoleName(memberRole)){
 			UUID memberId = memberDetail.memberId(); //멤버 아이디 기준으로 프로젝트 ID를 가져와야함
-			final List<UUID> memberProjectIds = projectMemberRepository.findMemberProjects(memberId);
+			final List<UUID> memberProjectIds = projectMemberRepository.findProjectIdsByMemberId(memberId);
 
 			return buildPopularResponse(postRepository.findMostPostProjectTopFive(memberProjectIds));
 		}
@@ -322,8 +317,11 @@ public class ProjectService {
 
 	}
 	private List<DashboardPopularProjectsResponse> buildPopularResponse(List<DashboardMostPostProjectResponse> mostPostProjects) {
+		List<UUID> ids = mostPostProjects.stream()
+				.map(DashboardMostPostProjectResponse::projectId)
+				.toList();
 		//프로젝트들의 ID 이름을 가져온다.
-		List<Project> popularProjects = projectRepository.findPopularProjectsName(mostPostProjects);
+		List<Project> popularProjects = projectRepository.findProjectsNameById(ids);
 		//리스트를 맵형태로 전환
 		Map<UUID, Project> projectMap = popularProjects.stream()
 			.collect(Collectors.toMap(Project::getId, p -> p));

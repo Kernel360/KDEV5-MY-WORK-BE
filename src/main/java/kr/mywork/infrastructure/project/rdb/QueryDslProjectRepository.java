@@ -1,25 +1,22 @@
 package kr.mywork.infrastructure.project.rdb;
 
-import static kr.mywork.domain.project.model.QProject.project;
-import static kr.mywork.domain.project.model.QProjectMember.projectMember;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
+import kr.mywork.domain.project.model.Project;
+import kr.mywork.domain.project.repository.ProjectRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-
-import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
-import kr.mywork.domain.project.model.Project;
-import kr.mywork.domain.project.repository.ProjectRepository;
-import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
-import lombok.RequiredArgsConstructor;
+import static kr.mywork.domain.project.model.QProject.project;
+import static kr.mywork.domain.project.model.QProjectMember.projectMember;
 
 @Repository
 @RequiredArgsConstructor
@@ -115,14 +112,10 @@ public class QueryDslProjectRepository implements ProjectRepository {
 	}
 
 	@Override
-	public List<Project> findPopularProjectsName(List<DashboardMostPostProjectResponse> projectIds) {
-		List<UUID> ids = projectIds.stream()
-			.map(DashboardMostPostProjectResponse::projectId)
-			.toList();
-
+	public List<Project> findProjectsNameById(List<UUID> mostPostProjectIds) {
 		return queryFactory
 			.selectFrom(project)
-			.where(project.id.in(ids))
+			.where(project.id.in(mostPostProjectIds))
 			.fetch();
 	}
 
