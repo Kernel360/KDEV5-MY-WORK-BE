@@ -1,5 +1,6 @@
 package kr.mywork.interfaces.dashboard.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.validation.constraints.Min;
@@ -44,11 +45,14 @@ public class DashboardController {
 		@RequestParam(name = "page") @Min(value = 1, message = "{invalid.page-size}") final int page,
 		@LoginMember final LoginMemberDetail loginMemberDetail
 	) {
+
+		LocalDate today = LocalDate.now();
+
 		final List<NearDeadlineProjectResponse> NearDeadlineProjectResponse =
-			projectService.findNearDeadlineProjectsByLoginMember(page, loginMemberDetail);
+			projectService.findNearDeadlineProjectsByLoginMember(page, loginMemberDetail, today);
 
 		final long totalCount =
-			projectService.countNearDeadlineProjectsByLoginMember(loginMemberDetail);
+			projectService.countNearDeadlineProjectsByLoginMember(loginMemberDetail, today);
 
 		final List<NearDeadlineProjectWebResponse> nearDeadlineProjectWebResponses = NearDeadlineProjectResponse.stream()
 			.map(NearDeadlineProjectWebResponse::fromServiceResponse)

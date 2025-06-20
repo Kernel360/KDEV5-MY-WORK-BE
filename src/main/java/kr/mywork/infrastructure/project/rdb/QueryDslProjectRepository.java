@@ -116,15 +116,14 @@ public class QueryDslProjectRepository implements ProjectRepository {
 	}
 
 	@Override
-	public List<Project> findAllNearDeadlineProjects(final int page, final int size) {
+	public List<Project> findAllNearDeadlineProjects(final int page, final int size, final LocalDate baseDate) {
 		final int offset = (page - 1) * size;
-		final LocalDate today = LocalDate.now();
 
 		return queryFactory
 			.selectFrom(project)
 			.where(
 				project.deleted.isFalse(),
-				project.endAt.between(today.atStartOfDay(), today.plusDays(5).atTime(23, 59, 59))
+				project.endAt.between(baseDate.atStartOfDay(), baseDate.plusDays(5).atTime(23, 59, 59))
 			)
 			.orderBy(project.endAt.asc())
 			.offset(offset)
@@ -149,35 +148,30 @@ public class QueryDslProjectRepository implements ProjectRepository {
 	}
 
 	@Override
-	public Long countNearDeadlineProjects() {
-		final LocalDate today = LocalDate.now();
-
+	public Long countNearDeadlineProjects(LocalDate baseDate) {
 		return queryFactory
 			.select(project.count())
 			.from(project)
 			.where(
 				project.deleted.isFalse(),
-				project.endAt.between(today.atStartOfDay(), today.plusDays(5).atTime(23, 59, 59))
+				project.endAt.between(baseDate.atStartOfDay(), baseDate.plusDays(5).atTime(23, 59, 59))
 			)
 			.fetchOne();
 	}
 
 
 	@Override
-	public Long countNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds) {
+	public Long countNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, LocalDate baseDate) {
 		if (projectIds == null || projectIds.isEmpty()) {
 			return 0L;
 		}
-
-		final LocalDate today = LocalDate.now();
-
 		return queryFactory
 			.select(project.count())
 			.from(project)
 			.where(
 				project.id.in(projectIds),
 				project.deleted.isFalse(),
-				project.endAt.between(today.atStartOfDay(), today.plusDays(5).atTime(23, 59, 59))
+				project.endAt.between(baseDate.atStartOfDay(), baseDate.plusDays(5).atTime(23, 59, 59))
 			)
 			.fetchOne();
 	}

@@ -1,5 +1,6 @@
 package kr.mywork.domain.project.repository;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -24,11 +25,11 @@ public interface ProjectRepository {
 
 	Long countTotalProjectsByNameAndStep(String keyword, String step);
 
-	List<Project> findAllNearDeadlineProjects(int page, int pageSize);
+	List<Project> findAllNearDeadlineProjects(int page, int pageSize, LocalDate baseDate);
 
 	List<Project> findAllNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, int page, int pageSize);
 
-	Long countNearDeadlineProjects();
+	Long countNearDeadlineProjects(LocalDate baseDate);
 
-	Long countNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds);
+	Long countNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, LocalDate baseDate);
 }

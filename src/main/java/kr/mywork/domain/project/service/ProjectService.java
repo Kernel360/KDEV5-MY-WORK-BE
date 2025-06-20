@@ -302,12 +302,13 @@ public class ProjectService {
 	@Transactional(readOnly = true)
 	public List<NearDeadlineProjectResponse> findNearDeadlineProjectsByLoginMember(
 		final int page,
-		final LoginMemberDetail loginMemberDetail
+		final LoginMemberDetail loginMemberDetail,
+		final LocalDate baseDate
 	) {
 		final String userType = loginMemberDetail.roleName();
 
 		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(userType)) {
-			final List<Project> projects = projectRepository.findAllNearDeadlineProjects(page, dashboardPageSize);
+			final List<Project> projects = projectRepository.findAllNearDeadlineProjects(page, dashboardPageSize, baseDate);
 			return projects.stream()
 				.map(this::toResponseWithDday)
 				.toList();
@@ -346,11 +347,11 @@ public class ProjectService {
 	}
 
 	@Transactional(readOnly = true)
-	public Long countNearDeadlineProjectsByLoginMember(final LoginMemberDetail loginMemberDetail) {
+	public Long countNearDeadlineProjectsByLoginMember(final LoginMemberDetail loginMemberDetail, final LocalDate baseDate) {
 		final String userType = loginMemberDetail.roleName();
 
 		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(userType)) {
-			return projectRepository.countNearDeadlineProjects();
+			return projectRepository.countNearDeadlineProjects(baseDate);
 		}
 
 		if (MemberRole.CLIENT_ADMIN.getRoleName().equals(userType) || MemberRole.DEV_ADMIN.getRoleName().equals(userType)) {
@@ -361,7 +362,7 @@ public class ProjectService {
 				.distinct()
 				.toList();
 
-			return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds);
+			return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds, baseDate);
 		}
 
 		final UUID memberId = loginMemberDetail.memberId();
@@ -371,7 +372,7 @@ public class ProjectService {
 			.distinct()
 			.toList();
 
-		return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds);
+		return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds, baseDate);
 	}
 
 }
