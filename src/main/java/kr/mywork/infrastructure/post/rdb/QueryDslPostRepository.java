@@ -1,20 +1,8 @@
 package kr.mywork.infrastructure.post.rdb;
 
-import static kr.mywork.domain.post.model.QPost.*;
-import static kr.mywork.domain.project_step.model.QProjectStep.*;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Repository;
-
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import kr.mywork.domain.post.model.Post;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
@@ -22,6 +10,15 @@ import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
 import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
 import kr.mywork.domain.project_step.model.ProjectStep;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static kr.mywork.domain.post.model.QPost.post;
+import static kr.mywork.domain.project_step.model.QProjectStep.projectStep;
 
 @Repository
 @RequiredArgsConstructor
@@ -138,12 +135,6 @@ public class QueryDslPostRepository implements PostRepository {
 
 	@Override
 	public List<DashboardMostPostProjectResponse> findMostPostProjectTopFive(@Nullable List<UUID> limitedProjectIds) {
-		BooleanBuilder condition = new BooleanBuilder();
-		condition.and(post.deleted.eq(false));
-
-		if (limitedProjectIds != null && !limitedProjectIds.isEmpty()) {
-			condition.and(projectStep.projectId.in(limitedProjectIds));
-		}
 
 		return queryFactory
 			.select(Projections.constructor(DashboardMostPostProjectResponse.class,
@@ -152,11 +143,18 @@ public class QueryDslPostRepository implements PostRepository {
 				))
 			.from(post)
 			.join(projectStep).on(post.projectStepId.eq(projectStep.id))
-			.where(condition)
+			.where(
+					post.deleted.eq(false),
+					isInLimitedProjects(limitedProjectIds)
+			)
 			.groupBy(projectStep.projectId)
 			.orderBy(post.id.count().desc())
 			.limit(5)
 			.fetch();
+	}
+
+	private BooleanExpression isInLimitedProjects(@Nullable List<UUID> limitedProjectIds) {
+		return (limitedProjectIds != null && !limitedProjectIds.isEmpty()) ? projectStep.projectId.in(limitedProjectIds) : null;
 	}
 
 	@Override
