@@ -1,6 +1,7 @@
 package kr.mywork.domain.project.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public interface ProjectRepository {
 
 	List<Project> findAllNearDeadlineProjects(int page, int pageSize, LocalDate baseDate);
 
-	List<Project> findAllNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, int page, int pageSize);
+	List<Project> findAllNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, int page, int pageSize, LocalDateTime now);
 
 	Long countNearDeadlineProjects(LocalDate baseDate);
 

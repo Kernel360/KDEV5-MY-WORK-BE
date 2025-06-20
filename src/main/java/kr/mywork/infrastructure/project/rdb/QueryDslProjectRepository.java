@@ -132,14 +132,14 @@ public class QueryDslProjectRepository implements ProjectRepository {
 	}
 
 	@Override
-	public List<Project> findAllNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, int page, int pageSize) {
+	public List<Project> findAllNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, int page, int pageSize, LocalDateTime now) {
 		final int offset = (page - 1) * pageSize;
 		return queryFactory
 			.selectFrom(project)
 			.where(
 				project.id.in(projectIds)
 					.and(project.deleted.isFalse())
-					.and(project.endAt.goe(LocalDateTime.now()))
+					.and(project.endAt.goe(now))
 			)
 			.orderBy(project.endAt.asc())
 			.offset(offset)

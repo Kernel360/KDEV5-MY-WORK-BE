@@ -1,6 +1,7 @@
 package kr.mywork.domain.project.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
@@ -306,6 +307,7 @@ public class ProjectService {
 		final LocalDate baseDate
 	) {
 		final String userType = loginMemberDetail.roleName();
+		final LocalDateTime now = baseDate.atStartOfDay();
 
 		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(userType)) {
 			final List<Project> projects = projectRepository.findAllNearDeadlineProjects(page, dashboardPageSize, baseDate);
@@ -322,7 +324,7 @@ public class ProjectService {
 				.distinct()
 				.toList();
 
-			final List<Project> projects = projectRepository.findAllNearDeadlineProjectsByProjectIds(projectIds, page, dashboardPageSize);
+			final List<Project> projects = projectRepository.findAllNearDeadlineProjectsByProjectIds(projectIds, page, dashboardPageSize, now);
 			return projects.stream()
 				.map(this::toResponseWithDday)
 				.toList();
@@ -335,7 +337,7 @@ public class ProjectService {
 			.distinct()
 			.toList();
 
-		final List<Project> projects = projectRepository.findAllNearDeadlineProjectsByProjectIds(projectIds, page, dashboardPageSize);
+		final List<Project> projects = projectRepository.findAllNearDeadlineProjectsByProjectIds(projectIds, page, dashboardPageSize, now);
 		return projects.stream()
 			.map(this::toResponseWithDday)
 			.toList();
