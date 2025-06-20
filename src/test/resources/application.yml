@@ -9,6 +9,13 @@ spring:
     username: root
     password: cooper2025
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  cloud:
+    aws:
+      s3:
+        region: us-east-1 # TODO 운영용은 별도로 선언
+      credentials:
+        access-key: test # TODO 운영용은 별도로 선언
+        secret-key: test # TODO 운영용은 별도로 선언
 company:
   page:
     size: 10
