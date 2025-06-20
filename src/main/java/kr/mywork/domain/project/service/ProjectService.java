@@ -360,7 +360,6 @@ public class ProjectService {
 			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId, memberRole);
 			final List<UUID> projectIds = assigns.stream()
 				.map(ProjectAssign::getProjectId)
-				.distinct()
 				.toList();
 
 			return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds, baseDate);
