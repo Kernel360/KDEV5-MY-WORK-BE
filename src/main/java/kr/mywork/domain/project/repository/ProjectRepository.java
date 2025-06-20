@@ -1,13 +1,12 @@
 package kr.mywork.domain.project.repository;
 
+import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
+import kr.mywork.domain.project.model.Project;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
-import kr.mywork.domain.project.model.Project;
-import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
 
 public interface ProjectRepository {
 
@@ -25,7 +24,7 @@ public interface ProjectRepository {
 
 	Long countTotalProjectsByNameAndStep(String keyword, String step);
 
-	List<Project> findPopularProjectsName(List<DashboardMostPostProjectResponse> mostPostProjectIds);
+	List<Project> findProjectsNameById(List<UUID> mostPostProjectIds);
 
 
 }
