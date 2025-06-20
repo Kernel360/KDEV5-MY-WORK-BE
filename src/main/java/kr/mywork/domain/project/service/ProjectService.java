@@ -316,7 +316,7 @@ public class ProjectService {
 
 		if (MemberRole.CLIENT_ADMIN.getRoleName().equals(userType) || MemberRole.DEV_ADMIN.getRoleName().equals(userType)) {
 			final UUID companyId = loginMemberDetail.companyId();
-			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId);
+			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId, userType);
 			final List<UUID> projectIds = assigns.stream()
 				.map(ProjectAssign::getProjectId)
 				.distinct()
@@ -348,15 +348,16 @@ public class ProjectService {
 
 	@Transactional(readOnly = true)
 	public Long countNearDeadlineProjectsByLoginMember(final LoginMemberDetail loginMemberDetail, final LocalDate baseDate) {
-		final String userType = loginMemberDetail.roleName();
+		final String memberRole = loginMemberDetail.roleName();
 
-		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(userType)) {
+		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(memberRole)) {
 			return projectRepository.countNearDeadlineProjects(baseDate);
 		}
 
-		if (MemberRole.CLIENT_ADMIN.getRoleName().equals(userType) || MemberRole.DEV_ADMIN.getRoleName().equals(userType)) {
+		if (MemberRole.CLIENT_ADMIN.getRoleName().equals(memberRole) || MemberRole.DEV_ADMIN.getRoleName().equals(
+			memberRole)) {
 			final UUID companyId = loginMemberDetail.companyId();
-			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId);
+			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId, memberRole);
 			final List<UUID> projectIds = assigns.stream()
 				.map(ProjectAssign::getProjectId)
 				.distinct()

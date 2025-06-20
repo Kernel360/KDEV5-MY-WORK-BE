@@ -20,6 +20,6 @@ public interface ProjectAssignRepository {
 
 	List<ProjectAssign> findAllByCompanyIdsAndType(final Collection<UUID> companyIds, final String companyType);
 
-	List<ProjectAssign> findAllByCompanyId(UUID companyId);
+	List<ProjectAssign> findAllByCompanyId(UUID companyId, String memberRole);
 
 }

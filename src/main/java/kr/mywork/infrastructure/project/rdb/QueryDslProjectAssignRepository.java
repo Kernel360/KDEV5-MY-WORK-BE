@@ -15,6 +15,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.mywork.domain.company.model.CompanyType;
+import kr.mywork.domain.member.errors.MemberErrorType;
+import kr.mywork.domain.member.errors.MemberTypeNotFoundException;
+import kr.mywork.domain.member.model.MemberRole;
 import kr.mywork.domain.project.model.ProjectAssign;
 import kr.mywork.domain.project.repository.ProjectAssignRepository;
 import kr.mywork.domain.project.service.dto.response.ProjectAssignResponse;
@@ -82,13 +85,20 @@ public class QueryDslProjectAssignRepository implements ProjectAssignRepository 
 	}
 
 	@Override
-	public List<ProjectAssign> findAllByCompanyId(UUID companyId) {
+	public List<ProjectAssign> findAllByCompanyId(UUID companyId, String memberRole) {
 		return queryFactory
 			.selectFrom(projectAssign)
-			.where(
-				projectAssign.devCompanyId.eq(companyId)
-					.or(projectAssign.clientCompanyId.eq(companyId))
-			)
+			.where(companyFilter(companyId, memberRole))
 			.fetch();
 	}
+
+	private BooleanExpression companyFilter(UUID companyId, String memberRole) {
+		if (MemberRole.CLIENT_ADMIN.isSameRoleName(memberRole)) {
+			return projectAssign.clientCompanyId.eq(companyId);
+		} else if (MemberRole.DEV_ADMIN.isSameRoleName(memberRole)) {
+			return projectAssign.devCompanyId.eq(companyId);
+		}
+		throw new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND);
+	}
+
 }
