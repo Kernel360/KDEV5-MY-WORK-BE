@@ -1,12 +1,5 @@
 package kr.mywork.interfaces.dashboard.controller;
 
-import java.util.List;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.common.auth.components.annotation.LoginMember;
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
@@ -17,6 +10,12 @@ import kr.mywork.interfaces.dashboard.controller.dto.response.DashboardCountSumm
 import kr.mywork.interfaces.dashboard.controller.dto.response.DashboardPopularProjectListWebResponse;
 import kr.mywork.interfaces.dashboard.controller.dto.response.DashboardPopularProjectWebResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,11 +36,11 @@ public class DashboardController {
 		return ApiResponse.success(dashboardCountSummaryWebResponse);
 
 	}
-	@GetMapping("/popularProjects")
-	public    ApiResponse<DashboardPopularProjectListWebResponse> getPopularProjects(
+	@GetMapping("/popular-projects")
+	public    ApiResponse<DashboardPopularProjectListWebResponse> getMostPostProjectsTopFive(
 		@LoginMember final LoginMemberDetail memberDetail
 	){
-		final List<DashboardPopularProjectsResponse> popularProjects = projectService.getPopularProjects(memberDetail);
+		final List<DashboardPopularProjectsResponse> popularProjects = projectService.getMostPostProjectsTopFive(memberDetail);
 
 		final List<DashboardPopularProjectWebResponse> webResponse = popularProjects.stream()
 			.map(DashboardPopularProjectWebResponse::from)
