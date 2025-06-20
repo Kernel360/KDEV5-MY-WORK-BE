@@ -18,6 +18,9 @@ member:
 post:
   page:
     size: 10
+  upload:
+    bucket-name: mywork-upload-bucket
+    duration: 3m
 project:
   page:
     size: 10
