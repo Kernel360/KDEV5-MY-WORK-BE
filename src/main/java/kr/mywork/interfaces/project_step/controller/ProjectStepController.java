@@ -2,10 +2,12 @@ package kr.mywork.interfaces.project_step.controller;
 
 import jakarta.validation.Valid;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.project_step.serivce.ProjectStepService;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepCreateRequest;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepUpdateRequest;
 import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepGetResponse;
+import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepPostTotalCountResponse;
 import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepUpdateResponse;
 import kr.mywork.interfaces.post.controller.dto.response.ProjectStepsGetWebResponse;
 import kr.mywork.interfaces.project_step.dto.request.ProjectStepsCreateWebRequest;
@@ -13,6 +15,7 @@ import kr.mywork.interfaces.project_step.dto.request.ProjectStepsUpdateWebReques
 import kr.mywork.interfaces.project_step.dto.response.ProjectStepUpdateWebResponse;
 import kr.mywork.interfaces.project_step.dto.response.ProjectStepsCreateWebResponse;
 import kr.mywork.interfaces.project_step.dto.response.ProjectStepsUpdateWebResponse;
+import kr.mywork.interfaces.project_step.dto.response.ProjectStepsWithPostTotalCountWebResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +29,7 @@ import java.util.UUID;
 public class ProjectStepController {
 
 	private final ProjectStepService projectStepService;
+	private	final PostService postService;
 
 	@PostMapping("/api/projects/steps")
 	public ApiResponse<ProjectStepsCreateWebResponse> createProjectSteps(
@@ -62,5 +66,17 @@ public class ProjectStepController {
 		final ProjectStepsGetWebResponse projectStepGetWebResponse = new ProjectStepsGetWebResponse(projectStepGetResponses);
 
 		return ApiResponse.success(projectStepGetWebResponse);
+	}
+	@GetMapping("/api/projects/{projectId}/steps-with-count")
+	public ApiResponse<ProjectStepsWithPostTotalCountWebResponse> getProjectStepsWithCount(
+		@PathVariable(name="projectId") UUID projectId
+	){
+		final List<ProjectStepGetResponse> projectStepGetResponses = projectStepService.getProjectSteps(projectId);
+
+		final List<ProjectStepPostTotalCountResponse> projectStepsWithPostTotalCountResponses = postService.getProjectStepsWithPostTotalCount(projectStepGetResponses);
+
+		final ProjectStepsWithPostTotalCountWebResponse projectStepsWithCountWebResponse = new ProjectStepsWithPostTotalCountWebResponse(projectStepsWithPostTotalCountResponses);
+
+		return ApiResponse.success(projectStepsWithCountWebResponse);
 	}
 }
