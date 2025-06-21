@@ -7,6 +7,7 @@ import java.util.UUID;
 import kr.mywork.domain.post.model.Post;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
+import kr.mywork.domain.post.service.dto.response.PostTotalCountInStepResponse;
 import kr.mywork.domain.project_step.model.ProjectStep;
 
 public interface PostRepository {
@@ -25,4 +26,6 @@ public interface PostRepository {
 	Long countTotalPostsByProjectCondition(List<ProjectStep> projectSteps, String keyword, Boolean deleted, UUID projectId, String keywordType, String approval);
 
 	Long countTotalPostsByProjectStepCondition(UUID projectStepId, String keyword, Boolean deleted, UUID projectId, String keywordType, String approval);
+
+	List<PostTotalCountInStepResponse> findPostCountGroupedByProjectStepId(List<UUID> projectStepIds);
 }

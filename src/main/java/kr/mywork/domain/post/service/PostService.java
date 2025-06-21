@@ -1,7 +1,9 @@
 package kr.mywork.domain.post.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
 import kr.mywork.domain.post.service.dto.response.PostDetailResponse;
 import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
+import kr.mywork.domain.post.service.dto.response.PostTotalCountInStepResponse;
 import kr.mywork.domain.post.service.dto.response.PostUpdateResponse;
 import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
@@ -27,6 +30,8 @@ import kr.mywork.domain.project_step.errors.ProjectStepErrorType;
 import kr.mywork.domain.project_step.errors.ProjectStepNotFoundException;
 import kr.mywork.domain.project_step.model.ProjectStep;
 import kr.mywork.domain.project_step.repository.ProjectStepRepository;
+import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepGetResponse;
+import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepPostTotalCountResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -127,5 +132,28 @@ public class PostService {
 		post.delete();
 
 		return post.getId();
+	}
+	@Transactional
+	public List<ProjectStepPostTotalCountResponse> getProjectStepsWithPostTotalCount(List<ProjectStepGetResponse> noneCountProjectSteps){
+		final List<UUID> projectStepIds = noneCountProjectSteps.stream()
+			.map(ProjectStepGetResponse::projectStepId)
+			.toList();
+
+		final List<PostTotalCountInStepResponse> getPostTotalCount = postRepository.findPostCountGroupedByProjectStepId(projectStepIds);
+
+		Map<UUID, Long> postCountMap = getPostTotalCount.stream()
+			.collect(Collectors.toMap(
+				PostTotalCountInStepResponse::projectStepId,
+				PostTotalCountInStepResponse::totalCount
+			));
+
+		return noneCountProjectSteps.stream()
+			.map(step -> new ProjectStepPostTotalCountResponse(
+				step.projectStepId(),
+				step.title(),
+				step.orderNum(),
+				postCountMap.getOrDefault(step.projectStepId(), 0L)
+			))
+			.toList();
 	}
 }
