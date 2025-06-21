@@ -67,6 +67,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
+    testImplementation ("org.testcontainers:localstack:1.19.0")
 
     // Spring Security + JWT 인증/인가 설정
     implementation 'org.springframework.boot:spring-boot-starter-security'

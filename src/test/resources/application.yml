@@ -28,6 +28,7 @@ post:
   upload:
     bucket-name: mywork-upload-bucket
     duration: 3m
+    endpoint: http://localhost:4566
 project:
   page:
     size: 10
