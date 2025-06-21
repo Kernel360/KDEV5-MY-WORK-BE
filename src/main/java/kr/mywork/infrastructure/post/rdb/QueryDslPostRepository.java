@@ -8,6 +8,7 @@ import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
 import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
+import kr.mywork.domain.post.service.dto.response.PostTotalCountInStepResponse;
 import kr.mywork.domain.project_step.model.ProjectStep;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
@@ -215,5 +216,17 @@ public class QueryDslPostRepository implements PostRepository {
 		}
 
 		return post.approval.eq(approval);
+	}
+	@Override
+	public List<PostTotalCountInStepResponse> findPostCountGroupedByProjectStepId(List<UUID> projectStepIds) {
+		return jpaQueryFactory.select(Projections.constructor(
+				PostTotalCountInStepResponse.class,
+				post.projectStepId,
+				post.count()
+			))
+			.from(post)
+			.where(post.projectStepId.in(projectStepIds))
+			.groupBy(post.projectStepId)
+			.fetch();
 	}
 }
