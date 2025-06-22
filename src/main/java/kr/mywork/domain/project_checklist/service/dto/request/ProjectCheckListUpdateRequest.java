@@ -12,4 +12,6 @@ public class ProjectCheckListUpdateRequest {
 	private UUID id;
 
 	private String title;
+
+	private String content;
 }
