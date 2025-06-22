@@ -26,18 +26,16 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
+import io.awspring.cloud.s3.S3Template;
 import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentActiveWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlIssueWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlReissueWebRequest;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 public class PostUploadDocumentation extends RestDocsDocumentation {
 
 	@Autowired
-	private S3Client s3Client;
+	private S3Template s3Template;
 
 	@Value("${post.upload.bucket-name}")
 	private String bucketName;
@@ -201,9 +199,7 @@ public class PostUploadDocumentation extends RestDocsDocumentation {
 		final String key = String.format("%s/%s", postId, fileName);
 		final File file = new File("src/test/resources/test_files/gradle.jpeg");
 		try (FileInputStream inputStream = new FileInputStream(file)) {
-			s3Client.putObject(
-				PutObjectRequest.builder().bucket(bucketName).key(key).build(),
-				RequestBody.fromInputStream(inputStream, file.length()));
+			s3Template.upload(bucketName, key, inputStream);
 		}
 
 		// when
