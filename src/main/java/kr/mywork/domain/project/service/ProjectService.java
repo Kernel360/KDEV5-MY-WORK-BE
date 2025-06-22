@@ -31,6 +31,7 @@ import kr.mywork.domain.project.model.ProjectAssign;
 import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project.repository.ProjectAssignRepository;
 import kr.mywork.domain.project.repository.ProjectRepository;
+import kr.mywork.domain.project.service.dto.request.NearDeadlineProjectRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
 import kr.mywork.domain.project.service.dto.response.NearDeadlineProjectResponse;
@@ -303,10 +304,10 @@ public class ProjectService {
 	@Transactional(readOnly = true)
 	public List<NearDeadlineProjectResponse> findNearDeadlineProjectsByLoginMember(
 		final int page,
-		final LoginMemberDetail loginMemberDetail,
+		final NearDeadlineProjectRequest nearDeadlineProjectRequest,
 		final LocalDate baseDate
 	) {
-		final String userType = loginMemberDetail.roleName();
+		final String userType = nearDeadlineProjectRequest.getMemberRole();
 		final LocalDateTime now = baseDate.atStartOfDay();
 
 		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(userType)) {
@@ -317,7 +318,7 @@ public class ProjectService {
 		}
 
 		if (MemberRole.CLIENT_ADMIN.getRoleName().equals(userType) || MemberRole.DEV_ADMIN.getRoleName().equals(userType)) {
-			final UUID companyId = loginMemberDetail.companyId();
+			final UUID companyId = nearDeadlineProjectRequest.getCompanyId();
 			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId, userType);
 			final List<UUID> projectIds = assigns.stream()
 				.map(ProjectAssign::getProjectId)
@@ -330,7 +331,7 @@ public class ProjectService {
 				.toList();
 		}
 
-		final UUID memberId = loginMemberDetail.memberId();
+		final UUID memberId = nearDeadlineProjectRequest.getMemberId();
 		final List<ProjectMember> projectMembers = projectMemberRepository.findAllByMemberId(memberId);
 		final List<UUID> projectIds = projectMembers.stream()
 			.map(ProjectMember::getProjectId)
@@ -349,8 +350,8 @@ public class ProjectService {
 	}
 
 	@Transactional(readOnly = true)
-	public Long countNearDeadlineProjectsByLoginMember(final LoginMemberDetail loginMemberDetail, final LocalDate baseDate) {
-		final String memberRole = loginMemberDetail.roleName();
+	public Long countNearDeadlineProjectsByLoginMember(final NearDeadlineProjectRequest nearDeadlineProjectRequest, final LocalDate baseDate) {
+		final String memberRole = nearDeadlineProjectRequest.getMemberRole();
 
 		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(memberRole)) {
 			return projectRepository.countNearDeadlineProjects(baseDate);
@@ -358,7 +359,7 @@ public class ProjectService {
 
 		if (MemberRole.CLIENT_ADMIN.getRoleName().equals(memberRole) || MemberRole.DEV_ADMIN.getRoleName().equals(
 			memberRole)) {
-			final UUID companyId = loginMemberDetail.companyId();
+			final UUID companyId = nearDeadlineProjectRequest.getCompanyId();
 			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId, memberRole);
 			final List<UUID> projectIds = assigns.stream()
 				.map(ProjectAssign::getProjectId)
@@ -367,7 +368,7 @@ public class ProjectService {
 			return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds, baseDate);
 		}
 
-		final UUID memberId = loginMemberDetail.memberId();
+		final UUID memberId = nearDeadlineProjectRequest.getMemberId();
 		final List<ProjectMember> projectMembers = projectMemberRepository.findAllByMemberId(memberId);
 		final List<UUID> projectIds = projectMembers.stream()
 			.map(ProjectMember::getProjectId)

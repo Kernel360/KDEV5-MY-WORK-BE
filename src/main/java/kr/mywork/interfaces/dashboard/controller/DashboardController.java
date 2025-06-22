@@ -9,6 +9,7 @@ import kr.mywork.common.auth.components.annotation.LoginMember;
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.dashboard.service.DashboardService;
 import kr.mywork.domain.project.service.ProjectService;
+import kr.mywork.domain.project.service.dto.request.NearDeadlineProjectRequest;
 import kr.mywork.domain.project.service.dto.response.NearDeadlineProjectResponse;
 import kr.mywork.interfaces.dashboard.controller.dto.response.DashboardCountSummaryWebResponse;
 import kr.mywork.interfaces.dashboard.controller.dto.response.NearDeadlineProjectWebResponse;
@@ -48,11 +49,17 @@ public class DashboardController {
 
 		LocalDate today = LocalDate.now();
 
+		NearDeadlineProjectRequest nearDeadlineProjectWebRequest = new NearDeadlineProjectRequest(
+			loginMemberDetail.memberId(),
+			loginMemberDetail.companyId(),
+			loginMemberDetail.roleName()
+		);
+
 		final List<NearDeadlineProjectResponse> NearDeadlineProjectResponse =
-			projectService.findNearDeadlineProjectsByLoginMember(page, loginMemberDetail, today);
+			projectService.findNearDeadlineProjectsByLoginMember(page, nearDeadlineProjectWebRequest, today);
 
 		final long totalCount =
-			projectService.countNearDeadlineProjectsByLoginMember(loginMemberDetail, today);
+			projectService.countNearDeadlineProjectsByLoginMember(nearDeadlineProjectWebRequest, today);
 
 		final List<NearDeadlineProjectWebResponse> nearDeadlineProjectWebResponses = NearDeadlineProjectResponse.stream()
 			.map(NearDeadlineProjectWebResponse::fromServiceResponse)
