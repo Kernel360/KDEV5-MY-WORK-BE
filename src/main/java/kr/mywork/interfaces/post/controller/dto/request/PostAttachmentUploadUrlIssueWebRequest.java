@@ -16,6 +16,6 @@ public class PostAttachmentUploadUrlIssueWebRequest {
 	private final UUID postId;
 
 	@Length(min = 1, max = 200)
-	private String fileName;
+	private final String fileName;
 
 }
