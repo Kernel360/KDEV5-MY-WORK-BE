@@ -3,15 +3,20 @@ package kr.mywork.docs;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -25,8 +30,17 @@ import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentActiveWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlIssueWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlReissueWebRequest;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 public class PostUploadDocumentation extends RestDocsDocumentation {
+
+	@Autowired
+	private S3Client s3Client;
+
+	@Value("${post.upload.bucket-name}")
+	private String bucketName;
 
 	@Test
 	@DisplayName("파일 업로드 URL 발급 성공")
@@ -167,6 +181,59 @@ public class PostUploadDocumentation extends RestDocsDocumentation {
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.postAttachmentId").type(JsonFieldType.STRING).description("게시글 첨부파일 ID"),
 					fieldWithPath("data.active").type(JsonFieldType.BOOLEAN).description("게시글 첨부파일 활성화 여부"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("파일 다운로드 URL 발급 성공")
+	@Sql("classpath:sql/post-attachment-download.sql")
+	void 파일_다운로드_URL_발급_성공() throws Exception {
+		// given
+		final String accessToken = createUserAccessToken();
+
+		final UUID postId = UUID.fromString("019790da-3d89-7d84-b5e1-b5bb8109dc02");
+		final UUID postAttachmentId = UUID.fromString("019790db-3830-768d-83ea-a57eeee6bbfc");
+
+		// 샘플 파일 업로드
+		final String fileName = "gradle.jpeg";
+		final String key = String.format("%s/%s", postId, fileName);
+		final File file = new File("src/test/resources/test_files/gradle.jpeg");
+		try (FileInputStream inputStream = new FileInputStream(file)) {
+			s3Client.putObject(
+				PutObjectRequest.builder().bucket(bucketName).key(key).build(),
+				RequestBody.fromInputStream(inputStream, file.length()));
+		}
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			get("/api/posts/attachment/download-url?postAttachmentId={postAttachmentId}", postAttachmentId.toString())
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("post-attachment-download-url-success", postAttachmentDownloadUrlResource()));
+	}
+
+	private ResourceSnippet postAttachmentDownloadUrlResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Post API")
+				.summary("게시글 파일 다운로드 URL 발급 API")
+				.description("게시글 파일 다운로드 URL을 발급한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.postAttachmentId").type(JsonFieldType.STRING).description("게시글 첨부파일 ID"),
+					fieldWithPath("data.downloadUrl").type(JsonFieldType.STRING).description("첨부파일 다운로드 URL"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
