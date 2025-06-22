@@ -11,7 +11,7 @@ VALUES (UUID_TO_BIN('019790da-3d89-7d84-b5e1-b5bb8109dc02'),
         NOW(),
         NOW());
 
-insert into post_attachment (id, post_id, path, active, deleted, created_at, modified_at)
+insert into post_attachment (id, post_id, file_name, active, deleted, created_at, modified_at)
 values (UUID_TO_BIN('019790db-3830-768d-83ea-a57eeee6bbfc'),
         UUID_TO_BIN('019790da-3d89-7d84-b5e1-b5bb8109dc02'),
         'mywork-image.jpg',

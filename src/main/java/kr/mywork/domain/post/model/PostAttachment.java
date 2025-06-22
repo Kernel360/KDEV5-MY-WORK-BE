@@ -17,18 +17,17 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class PostAttachment {
 
     @Id
     @UnixTimeOrderedUuidGeneratedValue
-    @Getter
     private UUID id;
 
-    @Getter
     private UUID postId;
 
     @Column(length = 300)
-    private String path;
+    private String fileName;
 
     @Column(nullable = false)
     private Boolean deleted;
@@ -43,9 +42,9 @@ public class PostAttachment {
     @ColumnDefault("0")
     private Boolean active;
 
-    private PostAttachment(final UUID postId, final String path, final Boolean deleted, final Boolean active) {
+    private PostAttachment(final UUID postId, final String fileName, final Boolean deleted, final Boolean active) {
         this.postId = postId;
-        this.path = path;
+        this.fileName = fileName;
         this.deleted = deleted;
         this.active = active;
     }
@@ -65,5 +64,9 @@ public class PostAttachment {
 
     public void updateActive(final Boolean active) {
         this.active = active;
+    }
+
+    public String getFilePath() {
+        return String.format("%s/%s", this.postId, this.fileName);
     }
 }
