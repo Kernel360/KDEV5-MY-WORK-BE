@@ -12,12 +12,15 @@ public class ProjectCheckListCreateWebResponse {
 
 	private String title;
 
+	private String content;
+
 	private UUID projectStepId;
 
 	private String approval;
 
 	public ProjectCheckListCreateWebResponse(ProjectCheckListCreateResponse projectCheckListCreateResponse) {
 		this.title = projectCheckListCreateResponse.title();
+		this.content = projectCheckListCreateResponse.content();
 		this.projectStepId = projectCheckListCreateResponse.projectStepId();
 		this.approval = projectCheckListCreateResponse.approval();
 	}

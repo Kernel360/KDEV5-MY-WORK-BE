@@ -20,7 +20,11 @@ public class ProjectCheckListUpdateWebRequest {
 	@Size(min = 1, max = 100)
 	private String title;
 
+	@NotBlank
+	@Size(min = 1, max = 500)
+	private String content;
+
 	public ProjectCheckListUpdateRequest toServiceDto() {
-		return new ProjectCheckListUpdateRequest(this.id, this.title);
+		return new ProjectCheckListUpdateRequest(this.id, this.title, this.content);
 	}
 }
