@@ -3,7 +3,7 @@ package kr.mywork.interfaces.dashboard.controller;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.common.auth.components.annotation.LoginMember;
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
-import kr.mywork.domain.dashboard.service.DashboardService;
+import kr.mywork.domain.dashboard.service.dto.response.DashboardCountSummaryResponse;
 import kr.mywork.domain.dashboard.service.dto.response.DashboardPopularProjectsResponse;
 import kr.mywork.domain.project.service.ProjectService;
 import kr.mywork.interfaces.dashboard.controller.dto.response.DashboardCountSummaryWebResponse;
@@ -23,15 +23,15 @@ import java.util.List;
 @Validated
 public class DashboardController {
 
-	private final DashboardService dashboardService;
 	private final ProjectService projectService;
 
-	@GetMapping("/totalSummery")
+	@GetMapping("/total-summery")
 	public ApiResponse<DashboardCountSummaryWebResponse> getDashboardTotalCount(
 			@LoginMember LoginMemberDetail loginMemberDetail) {
 
-		final DashboardCountSummaryWebResponse dashboardCountSummaryWebResponse = dashboardService.getSummaryTotalCount(
-				loginMemberDetail);
+		final DashboardCountSummaryResponse dashboardCountSummaryResponse = projectService.getSummaryTotalCount(loginMemberDetail);
+
+		final DashboardCountSummaryWebResponse dashboardCountSummaryWebResponse = DashboardCountSummaryWebResponse.from(dashboardCountSummaryResponse);
 
 		return ApiResponse.success(dashboardCountSummaryWebResponse);
 
