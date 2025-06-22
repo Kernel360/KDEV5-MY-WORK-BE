@@ -3,6 +3,7 @@ package kr.mywork.infrastructure.project.rdb;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Nullable;
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.repository.ProjectRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -148,5 +150,45 @@ public class QueryDslProjectRepository implements ProjectRepository {
 			return null;
 		}
 		return project.deleted.eq(deleted);
+	}
+	@Override
+	public Long getSummaryProjectTotalCount(@Nullable List<UUID> projectIds) {
+		return queryFactory.select(project.count())
+				.from(project)
+				.where(
+						projectAccessConditionByIds(projectIds),
+						project.deleted.isFalse()
+						)
+				.fetchOne();
+	}
+	@Override
+	public Long getSummaryInProgressProjectTotalCount(@Nullable List<UUID> projectIds,LocalDateTime now) {
+		return queryFactory.select(project.count())
+				.from(project)
+				.where(
+						projectAccessConditionByIds(projectIds),
+						project.deleted.isFalse(),
+						project.startAt.before(now),
+						project.endAt.after(now)
+				)
+				.fetchOne();
+	}
+	@Override
+	public Long getSummaryCompletedProjectTotalCount(@Nullable List<UUID> projectIds, LocalDateTime now) {
+		return queryFactory.select(project.count())
+				.from(project)
+				.where(
+						projectAccessConditionByIds(projectIds),
+						project.deleted.isFalse(),
+						project.endAt.before(now)
+				)
+				.fetchOne();
+	}
+	private BooleanExpression projectAccessConditionByIds(@Nullable List<UUID> projectIds) {
+
+		if (projectIds != null && !projectIds.isEmpty()) {
+			return project.id.in(projectIds);
+		}
+		return null;
 	}
 }

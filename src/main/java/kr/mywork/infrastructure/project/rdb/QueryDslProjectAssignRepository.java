@@ -78,6 +78,15 @@ public class QueryDslProjectAssignRepository implements ProjectAssignRepository 
 			.where(companyFilter(companyId,memberRole))
 			.fetch();
 	}
+
+	@Override
+	public List<ProjectAssign> getCompanyAdminProjectIds(UUID companyId, String userType) {
+		return queryFactory
+				.selectFrom(projectAssign)
+				.where(companyFilter(companyId, userType))
+				.fetch();
+	}
+
 	private BooleanExpression companyFilter(UUID companyId, String memberRole) {
 		if(MemberRole.CLIENT_ADMIN.isSameRoleName(memberRole)){
 			return projectAssign.clientCompanyId.eq(companyId);

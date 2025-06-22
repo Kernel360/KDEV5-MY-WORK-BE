@@ -72,5 +72,11 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 			.where(projectMember.memberId.eq(memberId))
 			.fetch();
 	}
-
+	@Override
+	public List<ProjectMember> getUserProjectIds(UUID memberId) {
+		return queryFactory
+				.selectFrom(projectMember)
+				.where(projectMember.memberId.eq(memberId))
+				.fetch();
+	}
 }
