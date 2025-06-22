@@ -5,4 +5,5 @@ public enum PostErrorCode {
 	ERROR_POST02,
 	ERROR_POST03,
 	ERROR_POST04,
+	ERROR_POST05,
 }

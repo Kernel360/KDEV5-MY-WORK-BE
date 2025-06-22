@@ -62,6 +62,10 @@ public class PostAttachment {
         return this.active;
     }
 
+    public boolean isInactive() {
+        return !this.active;
+    }
+
     public void updateActive(final Boolean active) {
         this.active = active;
     }

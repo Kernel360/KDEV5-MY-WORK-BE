@@ -1,6 +1,7 @@
 package kr.mywork.domain.post.service;
 
 import java.net.URL;
+import java.time.Duration;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -13,9 +14,11 @@ import kr.mywork.domain.post.model.PostAttachment;
 import kr.mywork.domain.post.repository.PostAttachmentRepository;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentActiveResponse;
+import kr.mywork.domain.post.service.dto.response.PostAttachmentDownloadResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlIssueResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlReissueResponse;
 import kr.mywork.domain.post.service.errors.PostAttachmentAlreadyUploadException;
+import kr.mywork.domain.post.service.errors.PostAttachmentInactiveException;
 import kr.mywork.domain.post.service.errors.PostAttachmentNotFoundException;
 import kr.mywork.domain.post.uploader.PostAttachmentFileHandler;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +70,21 @@ public class PostAttachmentUploadService {
 		postAttachment.updateActive(active);
 
 		return new PostAttachmentActiveResponse(postAttachmentId, postAttachment.isActive());
+	}
+
+	@Transactional
+	public PostAttachmentDownloadResponse issueDownloadUrl(final UUID postAttachmentId) {
+		final PostAttachment postAttachment = postAttachmentRepository.findById(postAttachmentId)
+			.orElseThrow(() -> new PostAttachmentNotFoundException(PostErrorType.ATTACHMENT_NOT_FOUND));
+
+		if (postAttachment.isInactive()) {
+			throw new PostAttachmentInactiveException(PostErrorType.ATTACHMENT_INACTIVE);
+		}
+
+		final URL downloadUrl = postAttachmentFileHandler.issueDownloadUrl(postAttachment.getFilePath(),
+			Duration.ofMinutes(3));
+
+		return new PostAttachmentDownloadResponse(postAttachment.getId(), downloadUrl.toString());
 	}
 
 }
