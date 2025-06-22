@@ -28,14 +28,10 @@ public class DashboardDocumentationTest extends RestDocsDocumentation {
 	void 대쉬보드_써머리_총갯수_조회_성공() throws Exception {
 		// given
 		final String accessToken = createSystemAccessToken();
-		final DashboardCountSummaryWebRequest dashboardCountSummaryWebRequest =
-			new DashboardCountSummaryWebRequest("SYSTEMADMIN",null,null);
-		final String requestBody = objectMapper.writeValueAsString(dashboardCountSummaryWebRequest);
 
 		// when
 		ResultActions result = mockMvc.perform(
-			get("/api/dashboard/totalSummery")
-				.content(requestBody)
+			get("/api/dashboard/total-summery")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
