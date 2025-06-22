@@ -13,4 +13,5 @@ public interface ProjectMemberRepository {
 	Optional<ProjectMember> findByMemberIdAndProjectId(UUID memberId,UUID projectId);
 	boolean existsByMemberIdAndProjectIdAndDeleted(UUID memberId, UUID projectId, boolean deleted);
 	List<UUID> findProjectIdsByMemberId(UUID memberId);
+	List<ProjectMember> getUserProjectIds(UUID memberId);
 }

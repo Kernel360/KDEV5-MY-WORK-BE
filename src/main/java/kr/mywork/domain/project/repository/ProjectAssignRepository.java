@@ -21,4 +21,6 @@ public interface ProjectAssignRepository {
 	List<ProjectAssign> findAllByCompanyIdsAndType(final Collection<UUID> companyIds, final String companyType);
 
 	List<UUID> findCompanyProjectsByCompanyId(final UUID companyId ,String memberRole);
+
+	List<ProjectAssign> getCompanyAdminProjectIds(UUID companyId, String userType);
 }

@@ -6,7 +6,10 @@ import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.model.CompanyType;
 import kr.mywork.domain.company.repository.CompanyRepository;
+import kr.mywork.domain.dashboard.service.dto.response.DashboardCountSummaryResponse;
 import kr.mywork.domain.dashboard.service.dto.response.DashboardPopularProjectsResponse;
+import kr.mywork.domain.dashboard.service.errors.DashboardErrorType;
+import kr.mywork.domain.dashboard.service.errors.DashboardTypeNotFoundException;
 import kr.mywork.domain.member.errors.MemberErrorType;
 import kr.mywork.domain.member.errors.MemberTypeNotFoundException;
 import kr.mywork.domain.member.model.Member;
@@ -19,6 +22,7 @@ import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
 import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.model.ProjectAssign;
+import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project.repository.ProjectAssignRepository;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
@@ -30,6 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -333,4 +338,46 @@ public class ProjectService {
 			})
 			.toList();
 	}
+	public DashboardCountSummaryResponse getSummaryTotalCount(LoginMemberDetail loginMemberDetail) {
+
+		final String userType = loginMemberDetail.roleName();
+		final UUID companyId = loginMemberDetail.companyId();
+		final UUID memberId = loginMemberDetail.memberId();
+
+		if (MemberRole.SYSTEM_ADMIN.isSameRoleName(userType)) {
+
+			return fetchProjectSummaryByProjectIds(null);
+
+		} else if (MemberRole.DEV_ADMIN.isSameRoleName(userType) || MemberRole.CLIENT_ADMIN.isSameRoleName(userType)
+				&& companyId != null) {
+
+			final List<UUID> projectIds = projectAssignRepository.getCompanyAdminProjectIds(companyId, userType).stream()
+					.map(ProjectAssign::getProjectId)
+					.toList();
+
+			return fetchProjectSummaryByProjectIds(projectIds);
+
+		} else if (MemberRole.USER.isSameRoleName(userType) && memberId != null) {
+
+			final List<UUID> projectIds = projectMemberRepository.getUserProjectIds(memberId).stream()
+					.map(ProjectMember::getProjectId)
+					.toList();
+
+			return fetchProjectSummaryByProjectIds(projectIds);
+
+		} else {
+			throw new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND);
+		}
+	}
+
+	private DashboardCountSummaryResponse fetchProjectSummaryByProjectIds(List<UUID> projectIds){
+		LocalDateTime now = LocalDateTime.now();
+
+		Long totalCount = projectRepository.getSummaryProjectTotalCount(projectIds);
+		Long inProgressCount = projectRepository.getSummaryInProgressProjectTotalCount(projectIds, now);
+		Long completedCount = projectRepository.getSummaryCompletedProjectTotalCount(projectIds, now);
+
+		return new DashboardCountSummaryResponse(totalCount, inProgressCount, completedCount);
+	}
+
 }
