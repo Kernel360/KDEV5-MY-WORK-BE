@@ -28,4 +28,10 @@ public class S3PostAttachmentFileHandler implements PostAttachmentFileHandler {
 		final String filePath = String.format("%s/%s", postId, fileName);
 		return s3Template.createSignedPutURL(bucketName, filePath, presignedDuration);
 	}
+
+	@Override
+	public URL issueDownloadUrl(final String filePath, final Duration duration) {
+		final String key = filePath.replaceFirst("^/", "");
+		return s3Template.createSignedGetURL(bucketName, key, duration);
+	}
 }
