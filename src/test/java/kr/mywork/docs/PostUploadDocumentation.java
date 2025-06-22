@@ -9,8 +9,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
@@ -33,12 +31,6 @@ import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlI
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlReissueWebRequest;
 
 public class PostUploadDocumentation extends RestDocsDocumentation {
-
-	@Autowired
-	private S3Template s3Template;
-
-	@Value("${post.upload.bucket-name}")
-	private String bucketName;
 
 	@Test
 	@DisplayName("파일 업로드 URL 발급 성공")
@@ -191,16 +183,7 @@ public class PostUploadDocumentation extends RestDocsDocumentation {
 		// given
 		final String accessToken = createUserAccessToken();
 
-		final UUID postId = UUID.fromString("019790da-3d89-7d84-b5e1-b5bb8109dc02");
 		final UUID postAttachmentId = UUID.fromString("019790db-3830-768d-83ea-a57eeee6bbfc");
-
-		// 샘플 파일 업로드
-		final String fileName = "gradle.jpeg";
-		final String key = String.format("%s/%s", postId, fileName);
-		final File file = new File("src/test/resources/test_files/gradle.jpeg");
-		try (FileInputStream inputStream = new FileInputStream(file)) {
-			s3Template.upload(bucketName, key, inputStream);
-		}
 
 		// when
 		final ResultActions result = mockMvc.perform(
