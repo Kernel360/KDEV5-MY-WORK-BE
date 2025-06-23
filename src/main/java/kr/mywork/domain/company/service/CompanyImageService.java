@@ -16,6 +16,7 @@ import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.model.CompanyId;
 import kr.mywork.domain.company.repository.CompanyIdRepository;
 import kr.mywork.domain.company.repository.CompanyRepository;
+import kr.mywork.domain.company.service.dto.response.CompanyImageDeleteResponse;
 import kr.mywork.domain.company.service.dto.response.CompanyImageDownloadUrlIssueResponse;
 import kr.mywork.domain.company.service.dto.response.CompanyImageUploadUrlIssueResponse;
 import kr.mywork.domain.company.uploader.CompanyImageFileHandler;
@@ -64,5 +65,30 @@ public class CompanyImageService {
 		final URL downloadUrl = companyImageFileHandler.issueDownloadUrl(company.getFilePath(), Duration.ofMinutes(3));
 
 		return new CompanyImageDownloadUrlIssueResponse(company.getId(), downloadUrl.toString());
+	}
+
+	@Transactional
+	public CompanyImageDeleteResponse deleteImage(final UUID companyId) {
+		final Optional<Company> companyOptional = companyRepository.findById(companyId);
+
+		return companyOptional.map(this::deleteLogoImage)
+			.orElseGet(() -> deleteNewLogoImage(companyId));
+	}
+
+	private CompanyImageDeleteResponse deleteLogoImage(final Company company) {
+		companyImageFileHandler.deleteImage(company.getId());
+
+		final boolean deleted = company.deleteImage();
+
+		return new CompanyImageDeleteResponse(company.getId(), deleted);
+	}
+
+	private CompanyImageDeleteResponse deleteNewLogoImage(final UUID companyId) {
+		final CompanyId issuedCompanyId = companyIdRepository.findById(companyId)
+			.orElseThrow(() -> new CompanyIdNotFoundException(CompanyErrorType.ID_NOT_FOUND));
+
+		companyImageFileHandler.deleteImage(issuedCompanyId.getId());
+
+		return new CompanyImageDeleteResponse(issuedCompanyId.getId(), true);
 	}
 }
