@@ -99,4 +99,11 @@ public class QueryDslProjectAssignRepository implements ProjectAssignRepository 
 		return null;
 	}
 
+	@Override
+	public List<ProjectAssign> findAllByCompanyId(UUID companyId, String memberRole) {
+		return queryFactory
+			.selectFrom(projectAssign)
+			.where(companyFilter(companyId, memberRole))
+			.fetch();
+	}
 }
