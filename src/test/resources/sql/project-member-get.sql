@@ -60,7 +60,7 @@ INSERT INTO member (
          );
 
 -- 할당 멤버
-INSERT INTO project_member (id, project_id, member_id, manager, deleted, created_at)
+INSERT INTO project_member (id, project_id, member_id, manager, deleted, created_at, modified_at)
 VALUES
     (
         UUID_TO_BIN('01974f20-3bbe-7d0d-a27e-097667886779'),
@@ -68,6 +68,7 @@ VALUES
         UUID_TO_BIN('51a58807-bf20-4160-b4e0-edabba6df8f9'),
         0,
         0,
+        NOW(),
         NOW()
     ),
     (
@@ -76,5 +77,6 @@ VALUES
         UUID_TO_BIN('346cdf98-f47b-4d13-bbe4-bd3d0ea48504'),
         0,
         0,
+        NOW(),
         NOW()
     );
