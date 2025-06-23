@@ -6,9 +6,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
+import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
 import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
 import kr.mywork.domain.project.model.Project;
@@ -38,14 +43,17 @@ public class ProjectCheckListService {
 	private final ProjectCheckListRepository projectCheckListRepository;
 	private final ProjectStepRepository projectStepRepository;
 	private final ProjectRepository projectRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public ProjectCheckListCreateResponse createProjectCheckList(
-		ProjectCheckListCreateRequest projectCheckListRequest) {
+		ProjectCheckListCreateRequest projectCheckListRequest, LoginMemberDetail loginMemberDetail) {
 
 		//TODO 프로젝트 단계 존재하는지 체크해야함.
 
 		ProjectCheckList projectCheckList = projectCheckListRepository.save(projectCheckListRequest);
+
+		eventPublisher.publishEvent(new CreateEventObject(projectCheckList, loginMemberDetail));
 
 		return ProjectCheckListCreateResponse.from(projectCheckList);
 
@@ -62,33 +70,46 @@ public class ProjectCheckListService {
 
 	@Transactional
 	public ProjectCheckListUpdateResponse updateProjectCheckList(
-		ProjectCheckListUpdateRequest projectCheckListUpdateRequest) {
+		ProjectCheckListUpdateRequest projectCheckListUpdateRequest, LoginMemberDetail loginMemberDetail) {
 		ProjectCheckList projectCheckList = projectCheckListRepository.findById(projectCheckListUpdateRequest.getId())
 			.orElseThrow(
 				() -> new ProjectCheckListNotFoundException(ProjectCheckListErrorType.PROJECT_CHECK_LIST_NOT_FOUND));
 
+		ProjectCheckList before = ProjectCheckList.copyOf(projectCheckList);
+
 		projectCheckList.update(projectCheckListUpdateRequest);
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, projectCheckList, loginMemberDetail));
+
 		return ProjectCheckListUpdateResponse.from(projectCheckList);
 	}
 
 	@Transactional
-	public UUID deleteProjectCheckList(UUID checkListId) {
+	public UUID deleteProjectCheckList(UUID checkListId, LoginMemberDetail loginMemberDetail) {
 		ProjectCheckList projectCheckList = projectCheckListRepository.findById(checkListId)
 			.orElseThrow(
 				() -> new ProjectCheckListNotFoundException(ProjectCheckListErrorType.PROJECT_CHECK_LIST_NOT_FOUND));
 
 		projectCheckList.softDelete();
+
+		eventPublisher.publishEvent(new DeleteEventObject(projectCheckList, loginMemberDetail));
+
 		return projectCheckList.getId();
 	}
 
 	@Transactional
 	public ProjectCheckListApprovalResponse approvalProjectCheckList(
-		ProjectCheckListApprovalRequest projectCheckListApprovalRequest) {
+		ProjectCheckListApprovalRequest projectCheckListApprovalRequest, LoginMemberDetail loginMemberDetail) {
 		ProjectCheckList projectCheckList = projectCheckListRepository.findById(projectCheckListApprovalRequest.getId())
 			.orElseThrow(
 				() -> new ProjectCheckListNotFoundException(ProjectCheckListErrorType.PROJECT_CHECK_LIST_NOT_FOUND));
 
+		ProjectCheckList before = ProjectCheckList.copyOf(projectCheckList);
+
 		projectCheckList.changeApproval(projectCheckListApprovalRequest);
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, projectCheckList, loginMemberDetail));
+
 		return ProjectCheckListApprovalResponse.from(projectCheckList);
 	}
 

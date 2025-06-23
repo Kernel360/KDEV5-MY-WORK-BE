@@ -4,11 +4,16 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.uuid.Generators;
 
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
+import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyIdNotFoundException;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
@@ -31,6 +36,7 @@ public class CompanyService {
 
 	private final CompanyRepository companyRepository;
 	private final CompanyIdRepository companyIdRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public UUID createCompanyId() {
@@ -39,30 +45,40 @@ public class CompanyService {
 	}
 
 	@Transactional
-	public UUID createCompany(final CompanyCreateRequest companyCreateRequest) {
+	public UUID createCompany(final CompanyCreateRequest companyCreateRequest, LoginMemberDetail loginMemberDetail) {
 		companyIdRepository.findById(companyCreateRequest.getId())
 			.orElseThrow(() -> new CompanyIdNotFoundException(CompanyErrorType.ID_NOT_FOUND));
 
 		final Company savedCompany = companyRepository.save(companyCreateRequest);
+
+		eventPublisher.publishEvent(new CreateEventObject(savedCompany, loginMemberDetail));
+
 		return savedCompany.getId();
 	}
 
 	@Transactional
-	public UUID deleteCompany(final UUID companyId) {
+	public UUID deleteCompany(final UUID companyId, LoginMemberDetail loginMemberDetail) {
 		Company company = companyRepository.findById(companyId)
 			.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
 
 		company.setDeleted(true);
 
+		eventPublisher.publishEvent(new DeleteEventObject(company, loginMemberDetail));
+
 		return company.getId();
 	}
 
 	@Transactional
-	public UUID updateCompany(CompanyUpdateRequest companyUpdateRequest) {
+	public UUID updateCompany(CompanyUpdateRequest companyUpdateRequest, LoginMemberDetail loginMemberDetail) {
 		Company company = companyRepository.findById(companyUpdateRequest.getId())
 			.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
 
+		Company before = Company.copyOf(company);
+
 		company.updateFrom(companyUpdateRequest);
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, company, loginMemberDetail));
+
 		return company.getId();
 	}
 

@@ -6,11 +6,16 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.uuid.Generators;
 
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
+import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
 import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
@@ -44,6 +49,7 @@ public class PostService {
 	private final PostIdRepository postIdRepository;
 	private final ProjectStepRepository projectStepRepository;
 	private final ProjectRepository projectRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public UUID createPostId() {
@@ -52,20 +58,26 @@ public class PostService {
 	}
 
 	@Transactional
-	public UUID createPost(PostCreateRequest postCreateRequest) {
+	public UUID createPost(PostCreateRequest postCreateRequest, LoginMemberDetail loginMemberDetail) {
 		postIdRepository.findById(postCreateRequest.getId())
 			.orElseThrow(() -> new PostIdNotFoundException(PostErrorType.ID_NOT_FOUND));
 
 		final Post savedPost = postRepository.save(postCreateRequest);
+
+		eventPublisher.publishEvent(new CreateEventObject(savedPost, loginMemberDetail));
+
 		return savedPost.getId();
 	}
 
 	@Transactional
-	public PostUpdateResponse updatePost(PostUpdateRequest postUpdateRequest) {
+	public PostUpdateResponse updatePost(PostUpdateRequest postUpdateRequest, LoginMemberDetail loginMemberDetail) {
 		Post post = postRepository.findById(postUpdateRequest.getId())
 			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
 
+		Post before = Post.copyOf(post);
 		post.update(postUpdateRequest);
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, post, loginMemberDetail));
 		return PostUpdateResponse.from(post);
 	}
 
@@ -124,11 +136,13 @@ public class PostService {
 	}
 
 	@Transactional
-	public UUID deletePost(UUID postId) {
+	public UUID deletePost(UUID postId, LoginMemberDetail loginMemberDetail) {
 		Post post = postRepository.findById(postId)
 			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
 
 		post.delete();
+
+		eventPublisher.publishEvent(new DeleteEventObject(post, loginMemberDetail));
 
 		return post.getId();
 	}

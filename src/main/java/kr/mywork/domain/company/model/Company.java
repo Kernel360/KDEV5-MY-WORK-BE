@@ -74,6 +74,20 @@ public class Company {
 		this.logoImagePath = logoImagePath;
 	}
 
+	public static Company copyOf(Company company) {
+		return new Company(
+			company.id,
+			company.name,
+			company.detail,
+			company.businessNumber,
+			company.address,
+			company.type.toString(),
+			company.contactPhoneNumber,
+			company.contactEmail,
+			company.logoImagePath
+		);
+	}
+
 	public void updateFrom(CompanyUpdateRequest companyUpdateRequest) {
 		this.id = companyUpdateRequest.getId();
 		this.name = companyUpdateRequest.getName();

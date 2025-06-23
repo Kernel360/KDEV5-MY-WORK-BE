@@ -10,11 +10,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
-import kr.mywork.common.auth.components.dto.LoginMemberDetail;
+import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.Company;
@@ -39,13 +42,13 @@ import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.NearDeadlineProjectRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
+import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
 import kr.mywork.domain.project.service.dto.response.NearDeadlineProjectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
-import kr.mywork.domain.project.service.dto.response.*;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -68,9 +71,10 @@ public class ProjectService {
 	private final MemberRepository memberRepository;
 	private final PostRepository postRepository;
 	private final ProjectMemberRepository projectMemberRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
-	public UUID createProject(ProjectCreateRequest request) {
+	public UUID createProject(ProjectCreateRequest request, LoginMemberDetail loginMemberDetail) {
 
 		final Project savedProject = projectRepository.save(
 			new Project(request.name(), request.startAt(), request.endAt(), request.step(), request.detail()));
@@ -78,24 +82,34 @@ public class ProjectService {
 		projectAssignRepository.save(
 			new ProjectAssign(savedProject.getId(), request.devCompanyId(), request.clientCompanyId()));
 
+		eventPublisher.publishEvent(new CreateEventObject(savedProject, loginMemberDetail));
+
 		return savedProject.getId();
 	}
 
 	@Transactional
-	public UUID deleteProject(UUID projectId) {
+	public UUID deleteProject(UUID projectId, LoginMemberDetail loginMemberDetail) {
 		var project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
 
 		project.setDeleted(true);
+
+		eventPublisher.publishEvent(new DeleteEventObject(project, loginMemberDetail));
+
 		return project.getId();
 	}
 
 	@Transactional
-	public ProjectUpdateResponse updateProject(UUID projectId, ProjectUpdateRequest request) {
+	public ProjectUpdateResponse updateProject(UUID projectId, ProjectUpdateRequest request, LoginMemberDetail loginMemberDetail) {
 		var project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
 
+		Project before = Project.copyOf(project);
+
 		project.updateFrom(request);
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, project, loginMemberDetail));
+
 		return ProjectUpdateResponse.from(project);
 	}
 

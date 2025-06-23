@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,6 +39,9 @@ public class ProjectCheckList {
 	@CreationTimestamp
 	private LocalDateTime createdAt;
 
+	@UpdateTimestamp
+	private LocalDateTime modifiedAt;
+
 	@NotNull
 	private Boolean deleted;
 
@@ -46,6 +50,18 @@ public class ProjectCheckList {
 		this.projectStepId = projectStepId;
 		this.approval = approval;
 		this.deleted = false;
+	}
+
+	public static ProjectCheckList copyOf(ProjectCheckList projectCheckList) {
+		return new ProjectCheckList(
+			projectCheckList.id,
+			projectCheckList.title,
+			projectCheckList.projectStepId,
+			projectCheckList.approval,
+			projectCheckList.createdAt,
+			projectCheckList.modifiedAt,
+			projectCheckList.deleted
+		);
 	}
 
 	public void update(ProjectCheckListUpdateRequest projectCheckListUpdateRequest) {
