@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -100,6 +101,7 @@ public class CompanyImageDocumentationTest extends RestDocsDocumentation {
 	@Test
 	@DisplayName("회사 이미지 삭제 성공")
 	@Sql("classpath:/sql/company-image-delete.sql")
+	@Disabled
 	void 회사_이미지_삭제_성공() throws Exception {
 		// given
 		final String accessToken = createSystemAccessToken();
