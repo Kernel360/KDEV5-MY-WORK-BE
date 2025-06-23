@@ -1,16 +1,6 @@
 package kr.mywork.domain.post.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.uuid.Generators;
-
 import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
@@ -30,9 +20,17 @@ import kr.mywork.domain.project_step.errors.ProjectStepErrorType;
 import kr.mywork.domain.project_step.errors.ProjectStepNotFoundException;
 import kr.mywork.domain.project_step.model.ProjectStep;
 import kr.mywork.domain.project_step.repository.ProjectStepRepository;
-import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepGetResponse;
+import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepDetailRequest;
 import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepPostTotalCountResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -134,9 +132,9 @@ public class PostService {
 		return post.getId();
 	}
 	@Transactional
-	public List<ProjectStepPostTotalCountResponse> getProjectStepsWithPostTotalCount(List<ProjectStepGetResponse> noneCountProjectSteps){
+	public List<ProjectStepPostTotalCountResponse> getProjectStepsWithPostTotalCount(List<ProjectStepDetailRequest> noneCountProjectSteps){
 		final List<UUID> projectStepIds = noneCountProjectSteps.stream()
-			.map(ProjectStepGetResponse::projectStepId)
+			.map(ProjectStepDetailRequest::projectStepId)
 			.toList();
 
 		final List<PostTotalCountInStepResponse> getPostTotalCount = postRepository.findPostCountGroupedByProjectStepId(projectStepIds);

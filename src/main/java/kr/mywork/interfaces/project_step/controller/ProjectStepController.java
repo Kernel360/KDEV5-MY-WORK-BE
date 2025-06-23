@@ -1,21 +1,11 @@
 package kr.mywork.interfaces.project_step.controller;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.validation.Valid;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.project_step.serivce.ProjectStepService;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepCreateRequest;
+import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepDetailRequest;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepUpdateRequest;
 import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepGetResponse;
 import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepPostTotalCountResponse;
@@ -28,6 +18,11 @@ import kr.mywork.interfaces.project_step.dto.response.ProjectStepsCreateWebRespo
 import kr.mywork.interfaces.project_step.dto.response.ProjectStepsUpdateWebResponse;
 import kr.mywork.interfaces.project_step.dto.response.ProjectStepsWithPostTotalCountWebResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -79,7 +74,11 @@ public class ProjectStepController {
 	){
 		final List<ProjectStepGetResponse> projectStepGetResponses = projectStepService.getProjectSteps(projectId);
 
-		final List<ProjectStepPostTotalCountResponse> projectStepsWithPostTotalCountResponses = postService.getProjectStepsWithPostTotalCount(projectStepGetResponses);
+		final List<ProjectStepDetailRequest> projectStepRequests = projectStepGetResponses.stream()
+				.map(ProjectStepDetailRequest::from)
+				.toList();
+
+		final List<ProjectStepPostTotalCountResponse> projectStepsWithPostTotalCountResponses = postService.getProjectStepsWithPostTotalCount(projectStepRequests);
 
 		final ProjectStepsWithPostTotalCountWebResponse projectStepsWithCountWebResponse = new ProjectStepsWithPostTotalCountWebResponse(projectStepsWithPostTotalCountResponses);
 
