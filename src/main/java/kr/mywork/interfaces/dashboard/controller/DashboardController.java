@@ -25,7 +25,7 @@ public class DashboardController {
 
 	private final ProjectService projectService;
 
-	@GetMapping("/total-summery")
+	@GetMapping("/total-summary")
 	public ApiResponse<DashboardCountSummaryWebResponse> getDashboardTotalCount(
 			@LoginMember LoginMemberDetail loginMemberDetail) {
 

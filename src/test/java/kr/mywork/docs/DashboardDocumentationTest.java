@@ -3,7 +3,6 @@ package kr.mywork.docs;
 import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import kr.mywork.common.api.support.response.ResultType;
-import kr.mywork.interfaces.dashboard.controller.dto.request.DashboardCountSummaryWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +23,7 @@ public class DashboardDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("대쉬보드 summery total 갯수 조회")
-	@Sql("classpath:sql/dashboard-summery-count.sql")
+	@Sql("classpath:sql/dashboard-summary-count.sql")
 	void 대쉬보드_써머리_총갯수_조회_성공() throws Exception {
 		// given
 		final String accessToken = createSystemAccessToken();
