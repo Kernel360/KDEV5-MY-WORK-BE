@@ -2,6 +2,7 @@ package kr.mywork.domain.company.service;
 
 import java.net.URL;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyIdNotFoundException;
+import kr.mywork.domain.company.errors.CompanyImageAlreadyExistException;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.model.CompanyId;
@@ -24,10 +26,28 @@ import lombok.RequiredArgsConstructor;
 public class CompanyImageService {
 
 	private final CompanyIdRepository companyIdRepository;
+	private final CompanyRepository companyRepository;
 	private final CompanyImageFileHandler companyImageFileHandler;
 
 	@Transactional(readOnly = true)
 	public CompanyImageUploadUrlIssueResponse issueCompanyImageUploadUrl(final UUID companyId, final String fileName) {
+		final Optional<Company> companyOptional = companyRepository.findById(companyId);
+
+		return companyOptional.map(company -> uploadCompanyImage(fileName, company))
+			.orElseGet(() -> uploadNewCompanyImage(companyId, fileName));
+	}
+
+	private CompanyImageUploadUrlIssueResponse uploadCompanyImage(final String fileName, final Company company) {
+		if (company.existsImage()) {
+			throw new CompanyImageAlreadyExistException(CompanyErrorType.COMPANY_IMAGE_EXIST);
+		}
+
+		final URL uploadUrl = companyImageFileHandler.createUploadUrl(company.getId(), fileName);
+			return new CompanyImageUploadUrlIssueResponse(company.getId(), uploadUrl.toString());
+	}
+
+	private CompanyImageUploadUrlIssueResponse uploadNewCompanyImage(final UUID companyId, final String fileName) {
+
 		final CompanyId issuedCompanyId = companyIdRepository.findById(companyId)
 			.orElseThrow(() -> new CompanyIdNotFoundException(CompanyErrorType.ID_NOT_FOUND));
 
