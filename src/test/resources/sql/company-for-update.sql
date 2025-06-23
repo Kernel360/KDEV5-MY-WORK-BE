@@ -11,7 +11,7 @@ INSERT INTO company (
     type,
     contact_phone_number,
     contact_email,
-    logo_image_path,
+    file_name,
     created_at,
     modified_at,
     deleted
@@ -24,7 +24,7 @@ INSERT INTO company (
      'DEV',
      '02-1234-5678',
      'test@company.com',
-     '/image/url',
+     'image.url',
      NOW(),
      NOW(),
      FALSE

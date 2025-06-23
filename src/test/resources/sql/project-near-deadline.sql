@@ -1,18 +1,18 @@
 -- 회사 (개발사, 고객사)
 INSERT INTO company (
     id, name, contact_email, business_number, address, contact_phone_number,
-    created_at, modified_at, type, logo_image_path, detail, deleted
+    created_at, modified_at, type, file_name, detail, deleted
 )
 VALUES
     (
         UNHEX(REPLACE('019759dd-378a-7590-9bd4-b204a064a120', '-', '')),
         '개발사', 'dev@example.com', '123-45-67890', '서울시 강남구', '02-1234-5678',
-        NOW(), NOW(), 'DEV', '/logo/dev.png', '개발사입니다.', 0
+        NOW(), NOW(), 'DEV', 'dev.png', '개발사입니다.', 0
     ),
     (
         UNHEX(REPLACE('019759de-4cdf-70e6-a0c9-3188cac11476', '-', '')),
         '고객사', 'client@example.com', '987-65-43210', '서울시 서초구', '02-8765-4321',
-        NOW(), NOW(), 'CLIENT', '/logo/client.png', '고객사입니다.', 0
+        NOW(), NOW(), 'CLIENT', 'client.png', '고객사입니다.', 0
     );
 
 -- 프로젝트

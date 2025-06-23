@@ -43,7 +43,7 @@ public class MemberDetailService implements UserDetailsService {
 				new SimpleGrantedAuthority(member.getRole().getRoleName()),
 				member.getCompanyId(),
 				company.getName(),
-				company.getLogoImagePath(),
+				company.getFileName(),
 				company.getType().name());
 		} catch (MemberNotFoundException | CompanyNotFoundException exception) {
 			log.warn("exception name: {}, message: {}", exception.getClass().getName(), exception.getMessage());

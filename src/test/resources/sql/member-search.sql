@@ -9,7 +9,7 @@ INSERT INTO company (
     address,
     contact_email,
     detail,
-    logo_image_path,
+    file_name,
     type
 ) VALUES (
              0,
