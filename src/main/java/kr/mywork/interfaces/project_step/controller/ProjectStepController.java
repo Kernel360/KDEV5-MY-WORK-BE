@@ -5,6 +5,7 @@ import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.project_step.serivce.ProjectStepService;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepCreateRequest;
+import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepDetailRequest;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepUpdateRequest;
 import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepGetResponse;
 import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepPostTotalCountResponse;
@@ -73,7 +74,11 @@ public class ProjectStepController {
 	){
 		final List<ProjectStepGetResponse> projectStepGetResponses = projectStepService.getProjectSteps(projectId);
 
-		final List<ProjectStepPostTotalCountResponse> projectStepsWithPostTotalCountResponses = postService.getProjectStepsWithPostTotalCount(projectStepGetResponses);
+		final List<ProjectStepDetailRequest> projectStepRequests = projectStepGetResponses.stream()
+				.map(ProjectStepDetailRequest::from)
+				.toList();
+
+		final List<ProjectStepPostTotalCountResponse> projectStepsWithPostTotalCountResponses = postService.getProjectStepsWithPostTotalCount(projectStepRequests);
 
 		final ProjectStepsWithPostTotalCountWebResponse projectStepsWithCountWebResponse = new ProjectStepsWithPostTotalCountWebResponse(projectStepsWithPostTotalCountResponses);
 

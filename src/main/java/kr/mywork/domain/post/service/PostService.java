@@ -30,8 +30,9 @@ import kr.mywork.domain.project_step.errors.ProjectStepErrorType;
 import kr.mywork.domain.project_step.errors.ProjectStepNotFoundException;
 import kr.mywork.domain.project_step.model.ProjectStep;
 import kr.mywork.domain.project_step.repository.ProjectStepRepository;
+import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepDetailRequest;
+import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepPostTotalCountResponse;
 import lombok.RequiredArgsConstructor;
-
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -133,9 +134,9 @@ public class PostService {
 	}
 
 	@Transactional
-	public List<ProjectStepPostTotalCountResponse> getProjectStepsWithPostTotalCount(List<ProjectStepGetResponse> noneCountProjectSteps){
+	public List<ProjectStepPostTotalCountResponse> getProjectStepsWithPostTotalCount(List<ProjectStepDetailRequest> noneCountProjectSteps){
 		final List<UUID> projectStepIds = noneCountProjectSteps.stream()
-			.map(ProjectStepGetResponse::projectStepId)
+			.map(ProjectStepDetailRequest::projectStepId)
 			.toList();
 
 		final List<PostTotalCountInStepResponse> getPostTotalCount = postRepository.findPostCountGroupedByProjectStepId(projectStepIds);
