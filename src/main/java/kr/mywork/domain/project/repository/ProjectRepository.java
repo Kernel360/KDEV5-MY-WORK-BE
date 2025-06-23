@@ -36,5 +36,5 @@ public interface ProjectRepository {
 
 	List<Project> findProjectsNameById(List<UUID> mostPostProjectIds);
 
-
+	List<Project> findProjectsByIds(List<UUID> projectIds);
 }
