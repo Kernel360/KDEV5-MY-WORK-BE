@@ -1,19 +1,5 @@
 package kr.mywork.domain.project.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
@@ -39,14 +25,21 @@ import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.NearDeadlineProjectRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
-import kr.mywork.domain.project.service.dto.response.NearDeadlineProjectResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
-import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import kr.mywork.domain.project.service.dto.response.*;
+import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -424,5 +417,39 @@ public class ProjectService {
 
 		return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds, baseDate);
 	}
+	@Transactional
+	public List<MyProjectSelectResponse> findProjectsByLoginMember(LoginMemberDetail loginMemberDetail){
+		String memberRole = loginMemberDetail.roleName();
+		UUID companyId = loginMemberDetail.companyId();
+		final List<Project> myProjects;
 
+		// dev,client Admin
+		if(MemberRole.CLIENT_ADMIN.isSameRoleName(memberRole) ||
+				MemberRole.DEV_ADMIN.isSameRoleName(memberRole)){
+
+			final List<UUID> projectIds = projectAssignRepository.findCompanyProjectsByCompanyId(companyId,memberRole);
+
+			 myProjects =  projectRepository.findProjectsByIds(projectIds);
+
+		// user
+		}else if (MemberRole.USER.isSameRoleName(memberRole)){
+
+			final List<UUID> projectIds = projectMemberRepository.findProjectIdsByMemberId(loginMemberDetail.memberId());
+
+			myProjects =  projectRepository.findProjectsByIds(projectIds);
+
+		}else{
+			throw new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND);
+		}
+
+		return myProjects.stream()
+				.map(project -> MyProjectSelectResponse.of(
+						project.getId(),
+						project.getName(),
+						project.getDetail(),
+						project.getStartAt(),
+						project.getEndAt()
+				))
+				.toList();
+	}
 }
