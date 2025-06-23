@@ -29,6 +29,8 @@ spring:
 company:
   page:
     size: 10
+  upload:
+    duration: 3m
 member:
   page:
     size: 10
