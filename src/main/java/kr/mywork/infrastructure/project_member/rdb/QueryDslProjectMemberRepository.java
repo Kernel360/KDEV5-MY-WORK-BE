@@ -1,21 +1,19 @@
 package kr.mywork.infrastructure.project_member.rdb;
 
-import static kr.mywork.domain.member.model.QMember.member;
-import static kr.mywork.domain.project.model.QProjectMember.projectMember;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.mywork.domain.project.model.ProjectMember;
+import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
+import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
-
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-
-import kr.mywork.domain.project.model.ProjectMember;
-import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
-import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
-import lombok.RequiredArgsConstructor;
+import static kr.mywork.domain.member.model.QMember.member;
+import static kr.mywork.domain.project.model.QProjectMember.projectMember;
 
 @Repository
 @RequiredArgsConstructor
@@ -64,6 +62,15 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 				.and(projectMember.projectId.eq(projectId)))
 			.limit(1)
 			.fetchFirst() != null;
+	}
+
+	@Override
+	public List<UUID> findProjectIdsByMemberId(UUID memberId) {
+		return queryFactory
+			.select(projectMember.projectId)
+			.from(projectMember)
+			.where(projectMember.memberId.eq(memberId))
+			.fetch();
 	}
 
 	@Override

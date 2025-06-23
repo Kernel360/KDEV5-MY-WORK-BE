@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.repository.ProjectRepository;
@@ -176,6 +175,14 @@ public class QueryDslProjectRepository implements ProjectRepository {
 			.fetchOne();
 	}
 
+
+	@Override
+	public List<Project> findProjectsNameById(List<UUID> mostPostProjectIds) {
+		return queryFactory
+			.selectFrom(project)
+			.where(project.id.in(mostPostProjectIds))
+			.fetch();
+	}
 
 	private BooleanExpression eqProjectStep(final String step) {
 		if (step == null) {
