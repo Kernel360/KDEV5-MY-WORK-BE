@@ -150,7 +150,7 @@ VALUES
  NOW());
 
 --- 개발사 데이터
-INSERT INTO company (id, name, contact_phone_number, business_number, address, contact_email, detail, logo_image_path, type, deleted, created_at, modified_at)
+INSERT INTO company (id, name, contact_phone_number, business_number, address, contact_email, detail, file_name, type, deleted, created_at, modified_at)
 VALUES
 -- 개발사01
 (UNHEX(REPLACE('01975f65-a5f0-7867-8224-57f8725c8221','-','')),
@@ -217,7 +217,7 @@ VALUES
  '개발사 이름16', '02-1234-5616', '123-45-67816', '서울특별시 강남구 테헤란로 138, 16층', 'contact16@devcompany.com', '웹 개발 전문 개발사입니다16', NULL, 'DEV', 0, NOW(), NOW());
 
 --- 고객사 데이터
-INSERT INTO company (id, name, contact_phone_number, business_number, address, contact_email, detail, logo_image_path, type, deleted, created_at, modified_at)
+INSERT INTO company (id, name, contact_phone_number, business_number, address, contact_email, detail, file_name, type, deleted, created_at, modified_at)
 VALUES
 -- 고객사01
 (UNHEX(REPLACE('01975f65-a5f0-7130-8d02-e52ddc218c10','-','')),

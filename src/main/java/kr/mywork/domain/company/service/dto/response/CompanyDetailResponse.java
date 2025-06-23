@@ -19,7 +19,7 @@ public record CompanyDetailResponse(UUID id, String name, String detail, String 
 			company.getType().name(),
 			company.getContactPhoneNumber(),
 			company.getContactEmail(),
-			company.getLogoImagePath(), // TODO host name 을 가져오는 로직 필요
+			company.getFileName(), // TODO host name 을 가져오는 로직 필요
 			company.getCreatedAt(),
 			company.getModifiedAt()
 		);

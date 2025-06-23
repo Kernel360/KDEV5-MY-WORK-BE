@@ -1,6 +1,6 @@
 INSERT INTO company (
     id, name, detail, business_number, address, type,
-    contact_phone_number, contact_email, logo_image_path, created_at, modified_at, deleted
+    contact_phone_number, contact_email, file_name, created_at, modified_at, deleted
 ) VALUES (
              UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
              '테스트 회사',
@@ -10,7 +10,7 @@ INSERT INTO company (
              'DEV',
              '010-0000-0000',
              'company@example.com',
-             '/images/logo.png',
+             'logo.png',
              NOW(),
              NOW(),
              false

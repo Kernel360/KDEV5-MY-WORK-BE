@@ -1,5 +1,5 @@
 -- 회사
-INSERT INTO company (id, name, contact_email, business_number, address, contact_phone_number, created_at, modified_at, type, logo_image_path, deleted, detail)
+INSERT INTO company (id, name, contact_email, business_number, address, contact_phone_number, created_at, modified_at, type, file_name, deleted, detail)
 VALUES (UUID_TO_BIN('6939d8be-1bf2-4f01-9189-12864e38d913'),
         '테스트 회사',
         'testcompany@example.com',
@@ -8,7 +8,7 @@ VALUES (UUID_TO_BIN('6939d8be-1bf2-4f01-9189-12864e38d913'),
         '02-1234-5678',
         NOW(), NOW(),
         'DEV',
-        '/path/to/logo.png',
+        'logo.png',
         0,
         '테스트 회사 상세 정보');
 

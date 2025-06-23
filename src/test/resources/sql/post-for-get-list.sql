@@ -17,7 +17,7 @@ VALUES
      false);
 
 INSERT INTO company (id, name, detail, business_number, address, type,
-                     contact_phone_number, contact_email, logo_image_path,
+                     contact_phone_number, contact_email, file_name,
                      created_at, modified_at, deleted)
 VALUES (UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
         '마이워크',
@@ -27,7 +27,7 @@ VALUES (UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
         'SYSTEM',
         '010-1234-5678',
         'info@mywork.com',
-        '/images/logo.png',
+        'logo.png',
         NOW(), NOW(), FALSE);
 
 
@@ -46,7 +46,7 @@ INSERT INTO company (id,
                      type,
                      contact_phone_number,
                      contact_email,
-                     logo_image_path,
+                     file_name,
                      created_at,
                      modified_at,
                      deleted)
@@ -58,7 +58,7 @@ VALUES (UNHEX(REPLACE('1234a9a9-90b6-9898-a9dc-92c9861aa98c', '-', '')),
         'CLIENT',
         '02-1234-5678',
         'client@company.com',
-        '/image/url/1234a9a9-90b6-9898-a9dc-92c9861aa98c',
+        '1234a9a9-90b6-9898-a9dc-92c9861aa98c.png',
         NOW(),
         NOW(),
         FALSE),
