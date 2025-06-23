@@ -27,4 +27,10 @@ public class S3CompanyImageFileHandler implements CompanyImageFileHandler {
 		final String filePath = String.format("%s/%s", companyId, fileName);
 		return s3Template.createSignedPutURL(bucketName, filePath, presignedDuration);
 	}
+
+	@Override
+	public URL issueDownloadUrl(final String filePath, final Duration duration) {
+		final String key = filePath.replaceFirst("^/", "");
+		return s3Template.createSignedGetURL(bucketName, key, duration);
+	}
 }
