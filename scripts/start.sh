@@ -9,4 +9,4 @@ if [ -n "$PID" ]; then
 fi
 
 # 백그라운드에서 실행
-nohup java -jar $JAR_PATH --spring.profiles.active=prod --spring.config.additional-location=file:/home/ec2-user/config/application-prod.yml > /home/ec2-user/deploy/nohup.out 2>&1 &
+nohup java -jar $JAR_PATH --spring.profiles.active=prod --spring.config.location=file:/home/ec2-user/config/application-prod.yml > /home/ec2-user/deploy/nohup.out 2>&1 &
