@@ -59,7 +59,7 @@ class ProjectStepControllerTest {
 	@DisplayName("프로젝트 단계 목록 생성 성공")
 	void 프로젝트_단계_목록_생성_성공() throws Exception {
 		// given
-		when(projectStepService.saveAll(any(), any())).thenReturn(7);
+		when(projectStepService.saveAll(any(), any(), any())).thenReturn(7);
 
 		final UUID projectId = UUID.fromString("0197207e-7331-7000-946b-a29a79a82424");
 
@@ -93,7 +93,7 @@ class ProjectStepControllerTest {
 	void 프로젝트_단계_목록_유효하지_않은_입력값_실패(
 		final UUID projectId, final List<ProjectStepCreateWebRequest> projectStepCreateWebRequests) throws Exception {
 		// given
-		when(projectStepService.saveAll(any(), any())).thenReturn(7);
+		when(projectStepService.saveAll(any(), any(), any())).thenReturn(7);
 
 		final ProjectStepsCreateWebRequest projectStepsCreateWebRequest = new ProjectStepsCreateWebRequest(
 			projectId, projectStepCreateWebRequests);
@@ -137,7 +137,7 @@ class ProjectStepControllerTest {
 	void 프로젝트_단계_수정_유효하지_않은_입력값_실패(
 		final UUID projectId, final List<ProjectStepUpdateWebRequest> projectStepUpdateWebRequests) throws Exception {
 		// given
-		when(projectStepService.updateProjectSteps(any(), any()))
+		when(projectStepService.updateProjectSteps(any(), any(), any()))
 			.thenReturn(List.of(
 				new ProjectStepUpdateResponse(UUID.fromString("01972e99-c314-7e8e-817f-7933e74a76a3"), "기획_수정", 1),
 				new ProjectStepUpdateResponse(UUID.fromString("01972e9a-6282-78bc-98e6-51f7fcd9cad8"), "개발_수정", 2),

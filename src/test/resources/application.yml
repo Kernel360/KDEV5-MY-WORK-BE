@@ -35,6 +35,9 @@ project:
 review:
   page:
     size: 10
+activityLog:
+  page:
+    size: 10
 dashboard:
   page:
     size: 5
