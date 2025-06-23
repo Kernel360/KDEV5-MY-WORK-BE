@@ -90,8 +90,8 @@ public class Company {
 		return String.format("/%s/%s", id, fileName);
 	}
 
-	public boolean isImageEmpty() {
-		return this.fileName == null || this.fileName.isEmpty();
+	public boolean existsImage() {
+		return !(this.fileName == null || this.fileName.isEmpty());
 	}
 
 }
