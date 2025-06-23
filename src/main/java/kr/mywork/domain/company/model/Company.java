@@ -10,6 +10,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import kr.mywork.domain.company.errors.CompanyErrorType;
+import kr.mywork.domain.company.errors.CompanyImageEmptyException;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -94,4 +96,12 @@ public class Company {
 		return !(this.fileName == null || this.fileName.isEmpty());
 	}
 
+	public boolean deleteImage() {
+		if (this.fileName == null) {
+			throw new CompanyImageEmptyException(CompanyErrorType.COMPANY_IMAGE_EMPTY);
+		}
+
+		this.fileName = null;
+		return true;
+	}
 }

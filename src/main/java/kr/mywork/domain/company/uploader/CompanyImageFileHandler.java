@@ -7,4 +7,5 @@ import java.util.UUID;
 public interface CompanyImageFileHandler {
 	URL createUploadUrl(UUID companyId, String fileName);
 	URL issueDownloadUrl(String filePath, Duration duration);
+	void deleteImage(UUID companyId);
 }
