@@ -1,7 +1,14 @@
 package kr.mywork.infrastructure.project.rdb;
 
-import static kr.mywork.domain.project.model.QProject.project;
-import static kr.mywork.domain.project.model.QProjectMember.projectMember;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
+import kr.mywork.domain.project.model.Project;
+import kr.mywork.domain.project.repository.ProjectRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,16 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
-import kr.mywork.domain.project.model.Project;
-import kr.mywork.domain.project.repository.ProjectRepository;
-import lombok.RequiredArgsConstructor;
+import static kr.mywork.domain.project.model.QProject.project;
+import static kr.mywork.domain.project.model.QProjectMember.projectMember;
 
 @Repository
 @RequiredArgsConstructor
@@ -182,6 +181,15 @@ public class QueryDslProjectRepository implements ProjectRepository {
 			.selectFrom(project)
 			.where(project.id.in(mostPostProjectIds))
 			.fetch();
+	}
+
+
+	@Override
+	public List<Project> findProjectsByIds(List<UUID> projectIds) {
+		return queryFactory
+				.selectFrom(project)
+				.where(project.id.in(projectIds))
+				.fetch();
 	}
 
 	private BooleanExpression eqProjectStep(final String step) {
