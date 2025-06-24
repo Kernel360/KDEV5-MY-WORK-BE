@@ -33,6 +33,8 @@ public class Post {
 	@Column(length = 30)
 	private String authorName;
 
+	private UUID authorId;
+
 	@Column(length = 500)
 	private String content;
 
@@ -48,12 +50,13 @@ public class Post {
 	private LocalDateTime createdAt;
 
 	public Post(final UUID id, final UUID projectStepId, final String title, final String companyName,
-		final String authorName, final String content, String approval, Boolean deleted) {
+		final String authorName, final UUID authorId, final String content, String approval, Boolean deleted) {
 		this.id = id;
 		this.projectStepId = projectStepId;
 		this.title = title;
 		this.companyName = companyName;
 		this.authorName = authorName;
+		this.authorId = authorId;
 		this.content = content;
 		this.approval = approval;
 		this.deleted = deleted;
@@ -75,6 +78,7 @@ public class Post {
 			post.title,
 			post.companyName,
 			post.authorName,
+			post.authorId,
 			post.content,
 			post.approval,
 			post.deleted);

@@ -64,7 +64,7 @@ public class PostController {
 		@RequestBody @Valid final PostCreateWebRequest postCreateWebRequest,
 		@LoginMember LoginMemberDetail loginMemberDetail) {
 
-		final PostCreateRequest postCreateRequest = postCreateWebRequest.toServiceDto(projectId);
+		final PostCreateRequest postCreateRequest = postCreateWebRequest.toServiceDto(projectId, loginMemberDetail.memberId());
 
 		final UUID createdPostId = postService.createPost(postCreateRequest, loginMemberDetail);
 

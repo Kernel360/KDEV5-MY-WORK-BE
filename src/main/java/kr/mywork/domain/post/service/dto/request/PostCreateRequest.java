@@ -22,6 +22,8 @@ public class PostCreateRequest {
 
 	private final String authorName;
 
+	private final UUID authorId;
+
 	private final String content;
 
 	private final String approval;
@@ -30,7 +32,7 @@ public class PostCreateRequest {
 
 	public Post toEntity() {
 		return new Post(this.getId(), this.getProjectStepId(), this.getTitle(),
-			this.getCompanyName(), this.getAuthorName(), this.getContent(),
+			this.getCompanyName(), this.getAuthorName(), this.getAuthorId(), this.getContent(),
 			this.getApproval(), this.getDeleted());
 	}
 }
