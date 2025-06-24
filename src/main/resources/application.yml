@@ -25,7 +25,9 @@ spring:
       credentials:
         access-key: test # TODO 운영용은 별도로 선언
         secret-key: test # TODO 운영용은 별도로 선언
-
+  output:
+    ansi:
+      enabled: never
 company:
   page:
     size: 10
@@ -60,3 +62,10 @@ jwt:
   refresh-token:
     private-key: 408a96ae4affd8bce03d11385d9a8dfbd4c0cbc9c5a83675864192dbb50eaa965acf2ef84e60bb1a38798f612caed4f383466a4be14957bf87370b62be71c2e1
     expiration: 86400000
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
