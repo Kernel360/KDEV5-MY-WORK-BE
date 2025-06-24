@@ -4,5 +4,5 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record ProjectCheckListSelectResponse(
-	UUID id, String checkListName, String checkListContent, String approval, String projectStepName, LocalDateTime createdAt) {
+	UUID id, String authorName, String title, String content, String approval, String projectStepName, LocalDateTime createdAt) {
 }
