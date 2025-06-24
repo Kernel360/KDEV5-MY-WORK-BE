@@ -52,7 +52,7 @@ public class ProjectCheckListController {
 		@LoginMember LoginMemberDetail loginMemberDetail
 	) {
 
-		ProjectCheckListCreateRequest projectCheckListCreateRequest = projectCheckListCreateWebRequest.toServiceDto();
+		ProjectCheckListCreateRequest projectCheckListCreateRequest = projectCheckListCreateWebRequest.toServiceDto(loginMemberDetail);
 
 		ProjectCheckListCreateResponse projectCheckListCreateResponse = projectCheckListService.createProjectCheckList(
 			projectCheckListCreateRequest, loginMemberDetail);
