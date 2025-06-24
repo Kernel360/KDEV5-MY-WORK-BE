@@ -31,7 +31,7 @@ public class CheckListHistory {
     @Column(nullable = false)
     private String approval;
 
-    @Column(length = 500)
+    @Column(length = 200)
     private String content;
 
     @CreationTimestamp
@@ -50,5 +50,10 @@ public class CheckListHistory {
     public static CheckListHistory CreationHistory(final UUID checkListId, final String companyName,
         final String authorName, final String approval) {
         return new CheckListHistory(checkListId, companyName, authorName, approval, CREATED_MESSAGE);
+    }
+
+    public static CheckListHistory updateHistory(final UUID checkListId, final String companyName,
+        final String authorName, final String approval, String content) {
+        return new CheckListHistory(checkListId, companyName, authorName, approval, content);
     }
 }
