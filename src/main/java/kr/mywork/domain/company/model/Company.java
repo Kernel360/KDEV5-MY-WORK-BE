@@ -86,7 +86,7 @@ public class Company {
 			company.type.toString(),
 			company.contactPhoneNumber,
 			company.contactEmail,
-			company.logoImagePath
+			company.fileName
 		);
 	}
 
