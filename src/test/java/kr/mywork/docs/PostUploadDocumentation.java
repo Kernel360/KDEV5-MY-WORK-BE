@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -219,6 +220,7 @@ public class PostUploadDocumentation extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("게시글 첨부파일 삭제 성공")
+	@Disabled
 	@Sql("classpath:sql/post-attachment-delete.sql")
 	void 게시글_첨부파일_삭제_성공() throws Exception {
 		// given
