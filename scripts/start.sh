@@ -8,5 +8,9 @@ if [ -n "$PID" ]; then
   kill -9 $PID
 fi
 
+mkdir -p ../log/info
+mkdir -p ../log/warn
+mkdir -p ../log/error
+
 # 백그라운드에서 실행
 nohup java -jar $JAR_PATH --spring.profiles.active=prod --spring.config.location=file:/home/ec2-user/config/application-prod.yml > /home/ec2-user/deploy/nohup.out 2>&1 &
