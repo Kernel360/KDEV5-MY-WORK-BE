@@ -226,8 +226,8 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 		final String accessToken = createSystemAccessToken();
 		final UUID checkListId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
 
-		final ProjectCheckListApprovalWebRequest projectCheckListApprovalWebRequest = new ProjectCheckListApprovalWebRequest(
-			checkListId, "APPROVED");
+		final ProjectCheckListApprovalWebRequest projectCheckListApprovalWebRequest =
+			new ProjectCheckListApprovalWebRequest(checkListId, "APPROVED", "승인한 내용");
 
 		final String requestBody = objectMapper.writeValueAsString(projectCheckListApprovalWebRequest);
 
@@ -363,7 +363,8 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.projectCheckLists[].checkListName").type(JsonFieldType.STRING)
 						.description("체크리스트 명"),
-					fieldWithPath("data.projectCheckLists[].checkListContent").type(JsonFieldType.STRING).description("체크리스트 내용"),
+					fieldWithPath("data.projectCheckLists[].checkListContent").type(JsonFieldType.STRING)
+						.description("체크리스트 내용"),
 					fieldWithPath("data.projectCheckLists[].approval").type(JsonFieldType.STRING).description("승인 여부"),
 					fieldWithPath("data.projectCheckLists[].projectStepName").type(JsonFieldType.STRING)
 						.description("프로젝트 단계명"),
