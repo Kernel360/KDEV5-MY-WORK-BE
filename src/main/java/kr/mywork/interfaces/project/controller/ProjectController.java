@@ -30,7 +30,8 @@ import java.util.stream.Collectors;
 public class ProjectController {
 
 	private static final String PROJECT_SEARCH_KEYWORD_TYPE = "^(PROJECT_NAME|DEV_COMPANY_NAME|CLIENT_COMPANY_NAME)$";
-	private static final String PROJECT_STEP_TYPE = "^(NOT_STARTED|IN_PROGRESS|PAUSED|COMPLETED)$";
+	//private static final String PROJECT_STEP_TYPE = "^(NOT_STARTED|IN_PROGRESS|PAUSED|COMPLETED)$";
+	private static final String PROJECT_STEP_TYPE = "^(CONTRACT|IN_PROGRESS|PAYMENT|COMPLETED)$";
 
 	private final ProjectService projectService;
 
