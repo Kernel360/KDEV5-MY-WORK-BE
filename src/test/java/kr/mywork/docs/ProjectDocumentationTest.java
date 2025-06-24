@@ -142,7 +142,8 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 			"IN_PROGRESS",
 			"서비스 개발 프로젝트입니다.",
 			UUID.fromString("019759dd-378a-7590-9bd4-b204a064a120"),
-			UUID.fromString("019759de-4cdf-70e6-a0c9-3188cac11476")
+			UUID.fromString("019759de-4cdf-70e6-a0c9-3188cac11476"),
+			200L
 		);
 
 		// when
@@ -174,7 +175,8 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 						.description("프로젝트 단계 (NOT_STARTED, IN_PROGRESS, PAUSED, COMPLETED)"),
 					fieldWithPath("detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
 					fieldWithPath("devCompanyId").type(JsonFieldType.STRING).description("개발사 UUID"),
-					fieldWithPath("clientCompanyId").type(JsonFieldType.STRING).description("클라이언트 UUID"))
+					fieldWithPath("clientCompanyId").type(JsonFieldType.STRING).description("클라이언트 UUID"),
+					fieldWithPath("projectAmount").type(JsonFieldType.NUMBER).description("프로젝트 결제 가격"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.id").type(JsonFieldType.STRING).description("생성된 프로젝트 ID"),
@@ -198,7 +200,8 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 			LocalDateTime.of(2025, 11, 30, 18, 0),
 			"COMPLETED",
 			"프로젝트가 완료되었습니다.",
-			false);
+			false,
+			100L);
 
 		// when
 		final ResultActions result = mockMvc.perform(
