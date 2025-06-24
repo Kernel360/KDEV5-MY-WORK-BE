@@ -13,7 +13,7 @@ VALUES (UUID_TO_BIN('6939d8be-1bf2-4f01-9189-12864e38d913'),
         '테스트 회사 상세 정보');
 
 -- 프로젝트
-INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted)
+INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted,project_amount)
 VALUES (UUID_TO_BIN('01974f0b-5c7a-7fa2-9aba-1323490b77e9'),
         '테스트 프로젝트',
         NOW(),
@@ -22,6 +22,7 @@ VALUES (UUID_TO_BIN('01974f0b-5c7a-7fa2-9aba-1323490b77e9'),
         NOW(),
         NOW(),
         '테스트용 프로젝트입니다',
+        0,
         0);
 
 -- 멤버추가

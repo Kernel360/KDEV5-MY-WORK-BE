@@ -18,13 +18,13 @@ VALUES
 -- 프로젝트
 INSERT INTO project (
     deleted, created_at, end_at, modified_at, start_at,
-    id, name, step, detail
+    id, name, step, detail,project_amount
 )
 VALUES
     (
         0, NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY), NOW(), NOW(),
         UNHEX(REPLACE('01aaffdd-1111-2222-3333-444455556666', '-', '')),
-        '마감 임박 프로젝트', 'IN_PROGRESS', '마감 임박 테스트용 프로젝트입니다.'
+        '마감 임박 프로젝트', 'IN_PROGRESS', '마감 임박 테스트용 프로젝트입니다.',100
     );
 
 -- 프로젝트-회사 할당 정보

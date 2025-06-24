@@ -1,4 +1,4 @@
-INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted)
+INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted,project_amount)
 VALUES (UUID_TO_BIN('0196f7a6-10b6-7123-a2dc-32c3861ea55e'),
         '고객사 개발 프로젝트',
         NOW(),
@@ -7,6 +7,7 @@ VALUES (UUID_TO_BIN('0196f7a6-10b6-7123-a2dc-32c3861ea55e'),
         NOW(),
         NOW(),
         '고객사의 웹페이지를 구성해주는 프로젝트입니다',
+        0,
         0);
 
 

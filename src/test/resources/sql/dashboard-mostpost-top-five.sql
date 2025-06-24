@@ -1,8 +1,8 @@
-INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted)
+INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted,project_amount)
 VALUES
-    (UNHEX(REPLACE('0197893a-ad34-734c-97d7-2e0dd6429247', '-', '')), 'ERP 시스템', NOW(), NOW(), '기획', NOW(), NOW(), 'ERP 프로젝트입니다.', 0),
-    (UNHEX(REPLACE('0197893a-ad34-7936-a45c-8abf499013ae', '-', '')), '스마트 팩토리', NOW(), NOW(), '설계', NOW(), NOW(), '스마트 팩토리 구현', 0),
-    (UNHEX(REPLACE('0197893a-ad34-7fbc-8898-1e3908a63f16', '-', '')), '이커머스 플랫폼', NOW(), NOW(), '개발', NOW(), NOW(), '이커머스 구축', 0);
+    (UNHEX(REPLACE('0197893a-ad34-734c-97d7-2e0dd6429247', '-', '')), 'ERP 시스템', NOW(), NOW(), '기획', NOW(), NOW(), 'ERP 프로젝트입니다.', 0,100),
+    (UNHEX(REPLACE('0197893a-ad34-7936-a45c-8abf499013ae', '-', '')), '스마트 팩토리', NOW(), NOW(), '설계', NOW(), NOW(), '스마트 팩토리 구현', 0,0),
+    (UNHEX(REPLACE('0197893a-ad34-7fbc-8898-1e3908a63f16', '-', '')), '이커머스 플랫폼', NOW(), NOW(), '개발', NOW(), NOW(), '이커머스 구축', 0,100);
 
 
 INSERT INTO project_step (id, project_id, title, order_num, created_at)

@@ -86,7 +86,8 @@ INSERT INTO project (
     created_at,
     modified_at,
     detail,
-    deleted
+    deleted,
+    project_amount
 ) VALUES (
              UNHEX(REPLACE('01975454-e57b-7df5-acb8-598c64aaf54e', '-', '')),                  -- 또는 '2f1a6b3e-7d0e-4ef0-8c9e-0fc0f3d5b2a3' 등 수동 UUID
              '프로젝트 이름',
@@ -96,7 +97,8 @@ INSERT INTO project (
              CURRENT_TIMESTAMP,
              CURRENT_TIMESTAMP,
              '이 프로젝트는 백엔드 시스템 개발을 위한 것입니다.',
-             false
+             false,
+             0
          );
 
 -- 프로젝트 단계 생성
