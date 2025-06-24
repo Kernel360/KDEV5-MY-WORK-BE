@@ -43,7 +43,7 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 		final UUID projectStepId = UUID.fromString("01991f58-8a6a-7a18-8cfe-1f2bfa6a5e01"); // UUID ver7
 
 		final ProjectCheckListCreateWebRequest projectCheckListCreateWebRequest = new ProjectCheckListCreateWebRequest(
-			"체크리스트 제목", devCompanyId, "대기");
+			"체크리스트 제목", "체크리스트 내용", devCompanyId, "대기");
 
 		final String requestBody = objectMapper.writeValueAsString(projectCheckListCreateWebRequest);
 
@@ -76,6 +76,7 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.title").type(JsonFieldType.STRING).description("체크리스트 제목"),
+					fieldWithPath("data.content").type(JsonFieldType.STRING).description("체크리스트 내용"),
 					fieldWithPath("data.projectStepId").type(JsonFieldType.STRING).description("프로젝트 단계 id"),
 					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
@@ -118,6 +119,7 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.title").type(JsonFieldType.STRING).description("체크리스트 제목"),
+					fieldWithPath("data.content").type(JsonFieldType.STRING).description("체크리스트 내용"),
 					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
@@ -133,7 +135,7 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 		final UUID checkListId = UUID.fromString("0196f7a6-10b6-7123-a2dc-32c3861ea55e"); // UUID ver7
 
 		final ProjectCheckListUpdateWebRequest projectCheckListUpdateWebRequest = new ProjectCheckListUpdateWebRequest(
-			checkListId, "체크리스트 제목");
+			checkListId, "체크리스트 제목", "체크리스트 내용");
 
 		final String requestBody = objectMapper.writeValueAsString(projectCheckListUpdateWebRequest);
 
@@ -167,6 +169,7 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.id").type(JsonFieldType.STRING).description("체크리스트 id"),
 					fieldWithPath("data.title").type(JsonFieldType.STRING).description("체크리스트 제목"),
+					fieldWithPath("data.content").type(JsonFieldType.STRING).description("체크리스트 내용"),
 					fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일자"),
 					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
@@ -258,6 +261,7 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.id").type(JsonFieldType.STRING).description("체크리스트 id"),
 					fieldWithPath("data.title").type(JsonFieldType.STRING).description("체크리스트 제목"),
+					fieldWithPath("data.content").type(JsonFieldType.STRING).description("체크리스트 내용"),
 					fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일자"),
 					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
@@ -359,6 +363,7 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.projectCheckLists[].checkListName").type(JsonFieldType.STRING)
 						.description("체크리스트 명"),
+					fieldWithPath("data.projectCheckLists[].checkListContent").type(JsonFieldType.STRING).description("체크리스트 내용"),
 					fieldWithPath("data.projectCheckLists[].approval").type(JsonFieldType.STRING).description("승인 여부"),
 					fieldWithPath("data.projectCheckLists[].projectStepName").type(JsonFieldType.STRING)
 						.description("프로젝트 단계명"),

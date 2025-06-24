@@ -4,9 +4,9 @@ import java.util.UUID;
 
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
 
-public record ProjectCheckListCreateRequest(String title, UUID projectStepId, String approval) {
+public record ProjectCheckListCreateRequest(String title, String content, UUID projectStepId, String approval) {
 
 	public ProjectCheckList toEntity() {
-		return new ProjectCheckList(this.title, this.projectStepId, this.approval);
+		return new ProjectCheckList(this.title, this.content, this.projectStepId, this.approval);
 	}
 }

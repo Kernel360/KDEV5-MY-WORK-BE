@@ -30,6 +30,9 @@ public class ProjectCheckList {
 	@Column(length = 100)
 	private String title;
 
+	@Column(length = 500)
+	private String content;
+
 	@Column(nullable = false)
 	private UUID projectStepId;
 
@@ -45,8 +48,9 @@ public class ProjectCheckList {
 	@NotNull
 	private Boolean deleted;
 
-	public ProjectCheckList(String title, UUID projectStepId, String approval) {
+	public ProjectCheckList(String title, String content, UUID projectStepId, String approval) {
 		this.title = title;
+		this.content = content;
 		this.projectStepId = projectStepId;
 		this.approval = approval;
 		this.deleted = false;
@@ -67,6 +71,7 @@ public class ProjectCheckList {
 	public void update(ProjectCheckListUpdateRequest projectCheckListUpdateRequest) {
 
 		this.title = projectCheckListUpdateRequest.getTitle();
+		this.content = projectCheckListUpdateRequest.getContent();
 	}
 
 	public void softDelete() {

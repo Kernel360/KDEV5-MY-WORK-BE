@@ -17,6 +17,10 @@ public class ProjectCheckListCreateWebRequest {
 	@Size(min = 1, max = 100)
 	private String title;
 
+	@NotBlank
+	@Size(min = 1, max = 500)
+	private String content;
+
 	@NotNull
 	private UUID projectStepId;
 
@@ -24,6 +28,6 @@ public class ProjectCheckListCreateWebRequest {
 	private String approval;
 
 	public ProjectCheckListCreateRequest toServiceDto() {
-		return new ProjectCheckListCreateRequest(this.title, this.projectStepId, this.approval);
+		return new ProjectCheckListCreateRequest(this.title, this.content, this.projectStepId, this.approval);
 	}
 }
