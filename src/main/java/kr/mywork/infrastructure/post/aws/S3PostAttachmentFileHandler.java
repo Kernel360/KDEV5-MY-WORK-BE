@@ -34,4 +34,10 @@ public class S3PostAttachmentFileHandler implements PostAttachmentFileHandler {
 		final String key = filePath.replaceFirst("^/", "");
 		return s3Template.createSignedGetURL(bucketName, key, duration);
 	}
+
+	@Override
+	public void delete(final String filePath) {
+		final String key = filePath.replaceFirst("^/", "");
+		s3Template.deleteObject(bucketName, key);
+	}
 }
