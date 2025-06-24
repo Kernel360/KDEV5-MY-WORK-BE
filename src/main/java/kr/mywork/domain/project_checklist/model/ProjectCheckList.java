@@ -60,6 +60,7 @@ public class ProjectCheckList {
 		return new ProjectCheckList(
 			projectCheckList.id,
 			projectCheckList.title,
+			projectCheckList.content,
 			projectCheckList.projectStepId,
 			projectCheckList.approval,
 			projectCheckList.createdAt,
