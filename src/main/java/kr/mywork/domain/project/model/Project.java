@@ -1,21 +1,16 @@
 package kr.mywork.domain.project.model;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -54,18 +49,23 @@ public class Project {
 	@Setter
 	private Boolean deleted = false;
 
+	@Column(nullable = false, name = "project_amount")
+	private long projectAmount = 0L;
+
 	public Project(
 		final String name,
 		final LocalDateTime startAt,
 		final LocalDateTime endAt,
 		final String step,
-		final String detail
+		final String detail,
+		final Long projectAmount
 	) {
 		this.name = name;
 		this.startAt = startAt;
 		this.endAt = endAt;
 		this.step = step;
 		this.detail = detail;
+		this.projectAmount = projectAmount;
 	}
 
 	public static Project copyOf(Project project) {
@@ -77,7 +77,8 @@ public class Project {
 							project.createdAt,
 							project.modifiedAt,
 							project.detail,
-							project.deleted);
+							project.deleted,
+							project.projectAmount);
 	}
 
 	public void updateFrom(ProjectUpdateRequest request) {
