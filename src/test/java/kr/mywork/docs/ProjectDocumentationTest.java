@@ -172,7 +172,7 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("startAt").type(JsonFieldType.STRING).description("시작 날짜"),
 					fieldWithPath("endAt").type(JsonFieldType.STRING).description("종료 날짜"),
 					fieldWithPath("step").type(JsonFieldType.STRING)
-						.description("프로젝트 단계 (NOT_STARTED, IN_PROGRESS, PAUSED, COMPLETED)"),
+						.description("프로젝트 단계 (CONTRACT, IN_PROGRESS, PAYMENT, COMPLETED)"),
 					fieldWithPath("detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
 					fieldWithPath("devCompanyId").type(JsonFieldType.STRING).description("개발사 UUID"),
 					fieldWithPath("clientCompanyId").type(JsonFieldType.STRING).description("클라이언트 UUID"),
@@ -230,7 +230,7 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("startAt").type(JsonFieldType.STRING).description("시작 날짜"),
 					fieldWithPath("endAt").type(JsonFieldType.STRING).description("종료 날짜"),
 					fieldWithPath("step").type(JsonFieldType.STRING)
-						.description("프로젝트 단계 (NOT_STARTED, IN_PROGRESS, PAUSED, COMPLETED)"),
+						.description("프로젝트 단계 (CONTRACT, IN_PROGRESS, PAYMENT, COMPLETED)"),
 					fieldWithPath("detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
 					fieldWithPath("deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
 					fieldWithPath("projectAmount").type(JsonFieldType.NUMBER).description("프로젝트 결제 가격"))

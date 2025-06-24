@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ProjectUpdateWebRequest {
 
-	private static final String PROJECT_KEYWORD_TYPE = "^(NOT_STARTED|IN_PROGRESS|PAUSED|COMPLETED)$";
+	private static final String PROJECT_KEYWORD_TYPE = "^(CONTRACT|IN_PROGRESS|PAYMENT|COMPLETED)$";
 
 	@Length(min = 1, max = 200, message = "{project.invalid-name-length}")
 	private final String name;
