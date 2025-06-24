@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,18 +23,22 @@ import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
+import kr.mywork.domain.post.service.dto.response.PostApprovalRequest;
+import kr.mywork.domain.post.service.dto.response.PostApprovalResponse;
 import kr.mywork.domain.post.service.dto.response.PostDetailResponse;
 import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
 import kr.mywork.domain.post.service.dto.response.PostUpdateResponse;
+import kr.mywork.interfaces.post.controller.dto.request.PostApprovalWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostCreateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostUpdateWebRequest;
+import kr.mywork.interfaces.post.controller.dto.response.PostApprovalWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostCreateWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.PostDeleteWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostDetailWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostIdCreateWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostListSelectWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostSelectWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostUpdateWebResponse;
-import kr.mywork.interfaces.post.controller.dto.response.PostDeleteWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -128,5 +132,18 @@ public class PostController {
 		final PostDeleteWebResponse postDeleteWebResponse = new PostDeleteWebResponse(deletedPostId);
 
 		return ApiResponse.success(postDeleteWebResponse);
+	}
+
+	@PutMapping("/posts/{postId}/approval")
+	public ApiResponse<PostApprovalWebResponse> approvalPost(
+		@RequestBody @Valid PostApprovalWebRequest postApprovalWebRequest,
+		@PathVariable final UUID postId,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
+		PostApprovalRequest postApprovalRequest = postApprovalWebRequest.toServiceDto();
+
+		PostApprovalResponse postApprovalResponse = postService.approvalPost(postId,
+			postApprovalRequest, loginMemberDetail);
+
+		return ApiResponse.success(new PostApprovalWebResponse(postApprovalResponse));
 	}
 }

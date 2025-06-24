@@ -80,4 +80,7 @@ public class Post {
 			post.deleted);
 	}
 
+	public void changeApproval(String approval) {
+		this.approval = approval;
+	}
 }
