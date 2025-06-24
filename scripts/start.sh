@@ -12,5 +12,7 @@ mkdir -p ../log/info
 mkdir -p ../log/warn
 mkdir -p ../log/error
 
+sudo chown -R ec2-user:ec2-user ../log
+
 # 백그라운드에서 실행
 nohup java -jar $JAR_PATH --spring.profiles.active=prod --spring.config.location=file:/home/ec2-user/config/application-prod.yml > /home/ec2-user/deploy/nohup.out 2>&1 &
