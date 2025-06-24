@@ -2,7 +2,9 @@ package kr.mywork.docs;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -13,8 +15,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 
-import io.awspring.cloud.s3.S3Template;
 import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentActiveWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlIssueWebRequest;
@@ -213,6 +212,48 @@ public class PostUploadDocumentation extends RestDocsDocumentation {
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.postAttachmentId").type(JsonFieldType.STRING).description("게시글 첨부파일 ID"),
 					fieldWithPath("data.downloadUrl").type(JsonFieldType.STRING).description("첨부파일 다운로드 URL"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("게시글 첨부파일 삭제 성공")
+	@Sql("classpath:sql/post-attachment-delete.sql")
+	void 게시글_첨부파일_삭제_성공() throws Exception {
+		// given
+		final String accessToken = createUserAccessToken();
+		final UUID postAttachmentId = UUID.fromString("019790db-3830-768d-83ea-a57eeee6bbfc");
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			delete("/api/posts/attachment/{postAttachmentId}", postAttachmentId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data.postAttachmentId").value(postAttachmentId.toString()),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("post-attachment-delete-success", postAttachmentDeleteResource()));
+	}
+
+	private ResourceSnippet postAttachmentDeleteResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Post API")
+				.summary("게시글 파일 삭제 API")
+				.description("게시글에 첨부된 파일을 삭제한다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.pathParameters(
+					parameterWithName("postAttachmentId").description("삭제할 게시글 첨부파일 ID"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.postAttachmentId").type(JsonFieldType.STRING).description("삭제된 게시글 첨부파일 ID"),
+					fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN).description("게시글 첨부파일 삭제 여부"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
