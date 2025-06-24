@@ -1,23 +1,17 @@
 package kr.mywork.interfaces.dashboard.controller;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.common.auth.components.annotation.LoginMember;
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.dashboard.service.DashboardService;
+import kr.mywork.domain.dashboard.service.dto.response.DashboardPopularProjectsResponse;
 import kr.mywork.domain.project.service.ProjectService;
 import kr.mywork.domain.project.service.dto.request.NearDeadlineProjectRequest;
 import kr.mywork.domain.project.service.dto.response.NearDeadlineProjectResponse;
-import kr.mywork.domain.dashboard.service.dto.response.DashboardPopularProjectsResponse;
-import kr.mywork.domain.project.service.ProjectService;
-import kr.mywork.interfaces.dashboard.controller.dto.response.DashboardCountSummaryWebResponse;
-import kr.mywork.interfaces.dashboard.controller.dto.response.NearDeadlineProjectWebResponse;
-import kr.mywork.interfaces.dashboard.controller.dto.response.NearDeadlineProjectListWebResponse;
-import kr.mywork.interfaces.dashboard.controller.dto.response.DashboardPopularProjectListWebResponse;
-import kr.mywork.interfaces.dashboard.controller.dto.response.DashboardPopularProjectWebResponse;
+import kr.mywork.domain.project.service.dto.response.ProjectAmountSummaryResponse;
+import kr.mywork.interfaces.dashboard.controller.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -32,6 +27,8 @@ import java.util.List;
 @RequestMapping("/api/dashboard")
 @Validated
 public class DashboardController {
+
+	private static final String AMOUNT_CHART_TYPE = "^(CHART_TYPE_WEEK|CHART_TYPE_MONTH)$";
 
 	private final DashboardService dashboardService;
 	private final ProjectService projectService;
@@ -90,5 +87,22 @@ public class DashboardController {
 			new NearDeadlineProjectListWebResponse(nearDeadlineProjectWebResponses, totalCount);
 
 		return ApiResponse.success(response);
+	}
+	@GetMapping("/project-amount")
+	public ApiResponse<ProjectAmountSummaryWebResponse> getProjectAmountSummary(
+			@LoginMember final LoginMemberDetail loginMemberDetail,
+			@RequestParam(name = "chartType")
+			@Pattern(regexp = AMOUNT_CHART_TYPE, message = "{dashboard.invalid.amount-char-type}") String chartType){
+		LocalDate today = LocalDate.now();
+		//날짜, totalCount
+		final List<ProjectAmountSummaryResponse> projectAmountSummaryList = projectService.findProjectAmountSummary(loginMemberDetail,chartType,today);
+
+		final List<ProjectAmountChartWebResponse> projectAmountChartWebResponses = projectAmountSummaryList.stream()
+				.map(ProjectAmountChartWebResponse::from)
+				.toList();
+
+		final ProjectAmountSummaryWebResponse projectAmountSummaryWebResponse = new ProjectAmountSummaryWebResponse(projectAmountChartWebResponses);
+
+		return ApiResponse.success(projectAmountSummaryWebResponse);
 	}
 }
