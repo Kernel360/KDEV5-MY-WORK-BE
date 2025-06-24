@@ -27,6 +27,14 @@ public class ProjectCheckList {
 	@UnixTimeOrderedUuidGeneratedValue
 	private UUID id;
 
+	private UUID authorId;
+
+	private String authorName;
+
+	private UUID companyId;
+
+	private String companyName;
+
 	@Column(length = 100)
 	private String title;
 
@@ -48,7 +56,12 @@ public class ProjectCheckList {
 	@NotNull
 	private Boolean deleted;
 
-	public ProjectCheckList(String title, String content, UUID projectStepId, String approval) {
+	public ProjectCheckList(UUID authorId, String authorName, UUID companyId, String companyName,
+		String title, String content, UUID projectStepId, String approval) {
+		this.authorId = authorId;
+		this.authorName = authorName;
+		this.companyId = companyId;
+		this.companyName = companyName;
 		this.title = title;
 		this.content = content;
 		this.projectStepId = projectStepId;
@@ -56,9 +69,14 @@ public class ProjectCheckList {
 		this.deleted = false;
 	}
 
+
 	public static ProjectCheckList copyOf(ProjectCheckList projectCheckList) {
 		return new ProjectCheckList(
 			projectCheckList.id,
+			projectCheckList.authorId,
+			projectCheckList.authorName,
+			projectCheckList.companyId,
+			projectCheckList.companyName,
 			projectCheckList.title,
 			projectCheckList.content,
 			projectCheckList.projectStepId,
