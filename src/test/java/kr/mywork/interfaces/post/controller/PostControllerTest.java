@@ -1,14 +1,10 @@
 package kr.mywork.interfaces.post.controller;
 
-import static org.junit.jupiter.params.provider.Arguments.*;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.domain.project.service.ProjectService;
+import kr.mywork.interfaces.project.controller.ProjectController;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,12 +21,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import java.util.stream.Stream;
 
-import kr.mywork.common.api.support.response.ResultType;
-import kr.mywork.domain.project.service.ProjectService;
-import kr.mywork.interfaces.project.controller.ProjectController;
-import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = ProjectController.class,
 	excludeFilters = {
@@ -60,7 +59,7 @@ class PostControllerTest {
 		final ProjectCreateWebRequest projectCreateWebRequest = new ProjectCreateWebRequest("프로젝트 이름",
 			LocalDateTime.of(2025, 6, 5, 12, 0),
 			LocalDateTime.of(2025, 7, 5, 12, 0),
-			"COMPLETED", "프로젝트 설명입니다.", devCompanyId, clientCompanyId);
+			"COMPLETED", "프로젝트 설명입니다.", devCompanyId, clientCompanyId,100L);
 
 		final String requestBody = objectMapper.writeValueAsString(projectCreateWebRequest);
 
@@ -89,7 +88,7 @@ class PostControllerTest {
 		// when(projectService.createProject(any())).thenReturn(createdProjectId);
 
 		final ProjectCreateWebRequest projectCreateWebRequest = new ProjectCreateWebRequest(
-			name, startAt, endAt, step, detail, devCompanyId, clientCompanyId);
+			name, startAt, endAt, step, detail, devCompanyId, clientCompanyId,100L);
 
 		final String requestBody = objectMapper.writeValueAsString(projectCreateWebRequest);
 
