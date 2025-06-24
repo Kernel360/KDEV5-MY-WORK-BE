@@ -192,6 +192,18 @@ public class QueryDslProjectRepository implements ProjectRepository {
 				.fetch();
 	}
 
+	@Override
+	public List<Project> findCompletedProjectsByIdsWithDate(List<UUID> projectIds, LocalDateTime startDate,String status){
+		return queryFactory
+				.selectFrom(project)
+				.where(
+						project.id.in(projectIds),
+						project.endAt.goe(startDate),
+						project.step.eq(status)
+				)
+				.fetch();
+	}
+
 	private BooleanExpression eqProjectStep(final String step) {
 		if (step == null) {
 			return null;
