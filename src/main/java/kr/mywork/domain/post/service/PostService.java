@@ -24,6 +24,8 @@ import kr.mywork.domain.post.repository.PostIdRepository;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
+import kr.mywork.domain.post.service.dto.response.PostApprovalRequest;
+import kr.mywork.domain.post.service.dto.response.PostApprovalResponse;
 import kr.mywork.domain.post.service.dto.response.PostDetailResponse;
 import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
 import kr.mywork.domain.post.service.dto.response.PostTotalCountInStepResponse;
@@ -50,6 +52,20 @@ public class PostService {
 	private final ProjectStepRepository projectStepRepository;
 	private final ProjectRepository projectRepository;
 	private final ApplicationEventPublisher eventPublisher;
+
+	@Transactional
+	public PostApprovalResponse approvalPost(UUID postId, PostApprovalRequest postApprovalRequest, LoginMemberDetail loginMemberDetail) {
+		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
+
+		Post before = Post.copyOf(post);
+
+		post.changeApproval(postApprovalRequest.getApprovalStatus());
+
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, post, loginMemberDetail));
+
+		return new PostApprovalResponse(post.getId(), post.getApproval());
+	}
 
 	@Transactional
 	public UUID createPostId() {
