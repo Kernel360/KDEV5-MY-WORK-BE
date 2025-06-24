@@ -1,4 +1,4 @@
-package kr.mywork.common.logging;
+package kr.mywork.common.async;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,4 +24,20 @@ public class AsyncConfig {
 
 		return taskExecutor;
 	}
+
+	@Bean
+	public TaskExecutor eventTaskExecutor() {
+		final ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+
+		taskExecutor.setCorePoolSize(10);
+		taskExecutor.setMaxPoolSize(20);
+		taskExecutor.setQueueCapacity(50);
+
+		taskExecutor.setTaskDecorator(new MDCTaskDecorator());
+		taskExecutor.setThreadNamePrefix("event-task");
+		taskExecutor.setThreadNamePrefix("event-group");
+
+		return taskExecutor;
+	}
+
 }
