@@ -37,4 +37,6 @@ public interface ProjectRepository {
 	List<Project> findProjectsNameById(List<UUID> mostPostProjectIds);
 
 	List<Project> findProjectsByIds(List<UUID> projectIds);
+
+	List<Project> findCompletedProjectsByIdsWithDate(List<UUID> projectIds, LocalDateTime startDate,String status);
 }

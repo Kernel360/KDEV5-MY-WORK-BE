@@ -21,6 +21,7 @@ import kr.mywork.domain.project.errors.ProjectAssignNotFoundException;
 import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
 import kr.mywork.domain.project.model.Project;
+import kr.mywork.domain.project.model.ProjectAmountChartRole;
 import kr.mywork.domain.project.model.ProjectAssign;
 import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project.repository.ProjectAssignRepository;
@@ -36,13 +37,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -468,4 +470,91 @@ public class ProjectService {
 				))
 				.toList();
 	}
+    @Transactional
+    public List<ProjectAmountSummaryResponse> findProjectAmountSummary(LoginMemberDetail memberDetail, String chartType, LocalDate today) {
+        //로그인한 유저의 타입별로 프로젝트 Ids를 반환Add commentMore actions
+        final List<UUID> projectIds = getProjectIdsByRoleName(memberDetail);
+        String status = "COMPLETED";
+
+        if (ProjectAmountChartRole.CHART_WEEK.isSameChartType(chartType)) {
+            //프로젝트 조회 (1달전의 주의 첫날 월요일 기준)
+            LocalDate oneMonthAgo = today.minusMonths(1);
+            LocalDate startOfWeek = oneMonthAgo.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+            LocalDateTime startDate = startOfWeek.atStartOfDay();
+
+            //프로젝트 날짜 기준으로 조회.
+            final List<Project> projects = projectRepository.findCompletedProjectsByIdsWithDate(projectIds, startDate,status);
+
+            List<ProjectAmountSummaryResponse> result = new ArrayList<>();
+
+            for (int i = 3; i >= 0; i--) {
+                LocalDateTime weekStart = startDate.plusWeeks(i);
+                //반복문은 7씩 증가 하지만 종료일은 오늘기준으로 가야함
+                LocalDateTime weekEnd = (i < 3) ? startDate.plusWeeks(i + 1) : today.atStartOfDay();
+                // 계산 통계 합계
+                long totalAmount = projects.stream()
+                        .filter(project -> {
+                            LocalDateTime endAt = project.getEndAt();
+                            return !endAt.isBefore(weekStart) && endAt.isBefore(weekEnd);
+                        })
+                        .mapToLong(Project::getProjectAmount)
+                        .sum();
+
+                //몇월인지 구함
+                int month = weekStart.getMonthValue();
+                //몇째 주 인지 구함
+                int weekOfMonth = weekStart.get(ChronoField.ALIGNED_WEEK_OF_MONTH);
+                String label = month + "월" + weekOfMonth + "주";
+
+                result.add(new ProjectAmountSummaryResponse(label, totalAmount));
+            }
+            return result;
+        }
+
+        if (ProjectAmountChartRole.CHART_MONTH.isSameChartType(chartType)) {
+            //프로젝트 월초 6개월 치 데이터
+            YearMonth sixMonthAgo = YearMonth.from(today).minusMonths(5);
+            LocalDate startOfMonth = sixMonthAgo.atDay(1);
+            LocalDateTime startDate = startOfMonth.atStartOfDay();
+            //프로젝트 날짜 기준으로 조회.
+            final List<Project> projects = projectRepository.findCompletedProjectsByIdsWithDate(projectIds, startDate,status);
+
+            List<ProjectAmountSummaryResponse> result = new ArrayList<>();
+
+
+            for (int i = 5; i >= 0; i--) {
+                YearMonth targetMonth = YearMonth.from(today).minusMonths(i);
+                LocalDateTime monthStart = targetMonth.atDay(1).atStartOfDay();            // 월의 시작일
+                LocalDateTime monthEnd = targetMonth.atEndOfMonth().plusDays(1).atStartOfDay(); // 다음 달 1일 00:00
+
+                // 계산 통계 합계
+                long totalAmount = projects.stream()
+                        .filter(project -> {
+                            LocalDateTime endAt = project.getEndAt();
+                            return !endAt.isBefore(monthStart) && endAt.isBefore(monthEnd);
+                        })
+                        .mapToLong(Project::getProjectAmount)
+                        .sum();
+
+                //몇월인지 구함
+                String label = targetMonth.getMonthValue() + "월";
+
+                result.add(new ProjectAmountSummaryResponse(label, totalAmount));
+            }
+            return result;
+
+        }
+        return Collections.emptyList();
+    }
+
+    private List<UUID> getProjectIdsByRoleName(LoginMemberDetail memberDetail) {
+        String roleName = memberDetail.roleName();
+        if (MemberRole.CLIENT_ADMIN.isSameRoleName(roleName) || MemberRole.DEV_ADMIN.isSameRoleName(roleName)) {
+            return projectAssignRepository.findCompanyProjectsByCompanyId(memberDetail.companyId(), roleName);
+        } else if (MemberRole.USER.isSameRoleName(roleName)) {
+            return projectMemberRepository.findProjectIdsByMemberId(memberDetail.memberId());
+        } else {
+            throw new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND);
+        }
+    }
 }
