@@ -232,7 +232,8 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("step").type(JsonFieldType.STRING)
 						.description("프로젝트 단계 (NOT_STARTED, IN_PROGRESS, PAUSED, COMPLETED)"),
 					fieldWithPath("detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
-					fieldWithPath("deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"))
+					fieldWithPath("deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
+					fieldWithPath("projectAmount").type(JsonFieldType.NUMBER).description("프로젝트 결제 가격"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.id").type(JsonFieldType.STRING).description("프로젝트 ID"),
@@ -242,6 +243,7 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.step").type(JsonFieldType.STRING).description("진행 상태"),
 					fieldWithPath("data.detail").type(JsonFieldType.STRING).description("상세 설명"),
 					fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
+					fieldWithPath("data.projectAmount").type(JsonFieldType.NUMBER).description("프로젝트 결제 가격"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
