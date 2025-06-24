@@ -1,5 +1,20 @@
 package kr.mywork.domain.member.service;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
+import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
 import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 import kr.mywork.domain.member.errors.*;
 import kr.mywork.domain.member.model.Member;
@@ -29,6 +44,7 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public List<CompanyMemberResponse> findMemberByCompanyId(UUID companyId, int page) {
@@ -46,7 +62,7 @@ public class MemberService {
 	}
 
 	@Transactional
-	public UUID createMember(MemberCreateRequest request) {
+	public UUID createMember(MemberCreateRequest request, LoginMemberDetail loginMemberDetail) {
 		//이메일 검사
 		if (memberRepository.existsByEmail(request.getEmail())) {
 			throw new EmailAlreadyExistsException(MemberErrorType.EMAIL_ALREADY_EXISTS);
@@ -61,24 +77,30 @@ public class MemberService {
 
 		final Member savedMember = memberRepository.save(member);
 
+		eventPublisher.publishEvent(new CreateEventObject(savedMember, loginMemberDetail));
+
 		return savedMember.getId();
 	}
 
 	@Transactional
-	public UUID deleteMember(UUID memberId) {
+	public UUID deleteMember(UUID memberId, LoginMemberDetail loginMemberDetail) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberIdNotFoundException(MemberErrorType.ID_NOT_FOUND));
 
 		//더티체킹
 		member.softDelete();
 
+		eventPublisher.publishEvent(new DeleteEventObject(member, loginMemberDetail));
+
 		return member.getId();
 	}
 
 	@Transactional
-	public UUID updateMember(final MemberUpdateRequest memberUpdateRequest) {
+	public UUID updateMember(final MemberUpdateRequest memberUpdateRequest, LoginMemberDetail loginMemberDetail) {
 		Member member = memberRepository.findById(memberUpdateRequest.id())
 			.orElseThrow(() -> new MemberIdNotFoundException(MemberErrorType.ID_NOT_FOUND));
+
+		Member before = Member.copyOf(member);
 
 		member.updateFrom(
 			memberUpdateRequest.companyId(),
@@ -90,6 +112,8 @@ public class MemberService {
 			memberUpdateRequest.email(),
 			memberUpdateRequest.birthDate(),
 			memberUpdateRequest.deleted());
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, member, loginMemberDetail));
 
 		return member.getId();
 	}

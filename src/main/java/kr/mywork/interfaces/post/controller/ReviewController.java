@@ -55,7 +55,7 @@ public class ReviewController {
 			loginMemberDetail.memberName(),
 			loginMemberDetail.companyName());
 
-		final ReviewCreateResponse reviewCreateResponse = reviewService.save(reviewCreateRequest);
+		final ReviewCreateResponse reviewCreateResponse = reviewService.save(reviewCreateRequest, loginMemberDetail);
 		return ApiResponse.success(ReviewCreateWebResponse.fromServiceRequest(reviewCreateResponse));
 	}
 
@@ -68,7 +68,7 @@ public class ReviewController {
 		final ReviewModifyRequest reviewModifyRequest = new ReviewModifyRequest(
 			loginMemberDetail.memberId(), reviewId, reviewModifyWebRequest.getComment());
 
-		final ReviewModifyResponse reviewModifyResponse = reviewService.modifyComment(reviewModifyRequest);
+		final ReviewModifyResponse reviewModifyResponse = reviewService.modifyComment(reviewModifyRequest, loginMemberDetail);
 
 		return ApiResponse.success(ReviewModifyWebResponse.fromServiceRequest(reviewModifyResponse));
 	}
@@ -76,12 +76,13 @@ public class ReviewController {
 	@DeleteMapping("/api/reviews/{reviewId}")
 	public ApiResponse<ReviewDeleteWebResponse> deleteReview(
 		// TODO 사용자 인증 정보 첨부하기
-		@PathVariable("reviewId") UUID reviewId) {
+		@PathVariable("reviewId") UUID reviewId,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
 		final ReviewDeleteResponse reviewDeleteResponse = reviewService.deleteReview(new ReviewDeleteRequest(
 			UUID.fromString("019738c6-a0e8-7cbf-9b39-fb91ac12af33"), // TODO 사용자 아이디 추가
 			reviewId
-		));
+		), loginMemberDetail);
 
 		return ApiResponse.success(new ReviewDeleteWebResponse(reviewDeleteResponse.reviewId()));
 	}

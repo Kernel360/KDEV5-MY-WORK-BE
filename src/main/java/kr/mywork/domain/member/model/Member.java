@@ -78,6 +78,20 @@ public class Member {
 		this.birthDate = birthDate;
 	}
 
+	public static Member copyOf(Member member) {
+		return new Member(
+			member.companyId,
+			member.name,
+			member.department,
+			member.position,
+			member.role.toString(),
+			member.phoneNumber,
+			member.email,
+			member.password,
+			member.birthDate
+		);
+	}
+
 	// 소프트 딜리트 전용 메서드
 	public void softDelete() {
 		this.deleted = true; // ← 더티 체킹 대상

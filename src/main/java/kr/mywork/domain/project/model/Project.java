@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Project {
 
 	@Id
@@ -64,6 +66,18 @@ public class Project {
 		this.endAt = endAt;
 		this.step = step;
 		this.detail = detail;
+	}
+
+	public static Project copyOf(Project project) {
+		return new Project(project.id,
+							project.name,
+							project.startAt,
+							project.endAt,
+							project.step,
+							project.createdAt,
+							project.modifiedAt,
+							project.detail,
+							project.deleted);
 	}
 
 	public void updateFrom(ProjectUpdateRequest request) {

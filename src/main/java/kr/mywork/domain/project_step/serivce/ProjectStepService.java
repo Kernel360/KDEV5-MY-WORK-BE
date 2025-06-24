@@ -6,9 +6,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
+import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
 import kr.mywork.domain.project_step.model.ProjectStep;
 import kr.mywork.domain.project_step.repository.ProjectStepRepository;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepCreateRequest;
@@ -23,9 +27,10 @@ import lombok.RequiredArgsConstructor;
 public class ProjectStepService {
 
 	private final ProjectStepRepository projectStepRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	public Integer saveAll(
-		final UUID projectId, final List<ProjectStepCreateRequest> projectStepCreateRequests) {
+		final UUID projectId, final List<ProjectStepCreateRequest> projectStepCreateRequests, LoginMemberDetail loginMemberDetail) {
 		// TODO projectId 를 기반으로 Project 존재 유무 검증 필요
 
 		final List<ProjectStep> projectSteps = projectStepCreateRequests.stream()
@@ -34,11 +39,16 @@ public class ProjectStepService {
 
 		final List<ProjectStep> savedProjectSteps = projectStepRepository.saveAll(projectSteps);
 
+		projectSteps.forEach(projectStep -> {
+			eventPublisher.publishEvent(new CreateEventObject(projectStep, loginMemberDetail));
+		});
+
 		return savedProjectSteps.size();
 	}
 
 	public List<ProjectStepUpdateResponse> updateProjectSteps(
-		final UUID projectId, final List<ProjectStepUpdateRequest> projectStepUpdateRequests) {
+		final UUID projectId, final List<ProjectStepUpdateRequest> projectStepUpdateRequests,
+		LoginMemberDetail loginMemberDetail) {
 		// TODO ProjectId 검증 로직 추가
 
 		final Map<UUID, ProjectStepUpdateRequest> projectStepUpdateRequestMap =
@@ -51,7 +61,9 @@ public class ProjectStepService {
 			final ProjectStepUpdateRequest projectStepUpdateRequest =
 				projectStepUpdateRequestMap.get(projectStep.getId());
 
+			ProjectStep before = ProjectStep.copyOf(projectStep);
 			projectStep.update(projectStepUpdateRequest.title(), projectStepUpdateRequest.orderNum());
+			eventPublisher.publishEvent(new ModifyEventObject(before, projectStep, loginMemberDetail));
 		});
 
 		return projectSteps.stream().map(ProjectStepUpdateResponse::fromEntity).toList();

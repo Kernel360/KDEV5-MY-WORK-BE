@@ -67,4 +67,17 @@ public class Post {
 	public void delete() {
 		this.deleted = true;
 	}
+
+	public static Post copyOf(final Post post) {
+		return new Post(
+			post.id,
+			post.projectStepId,
+			post.title,
+			post.companyName,
+			post.authorName,
+			post.content,
+			post.approval,
+			post.deleted);
+	}
+
 }

@@ -63,7 +63,7 @@ class ReviewControllerTest {
 		final UUID postId = UUID.fromString("01972f9b-232a-7dbe-aad2-3bffc0b78ced");
 		final UUID reviewId = UUID.fromString("01972ea5-73ff-75e1-9083-d1d51a0f186a");
 
-		when(reviewService.save(any())).thenReturn(new ReviewCreateResponse(reviewId, null, "코멘트01", "작성자1", "회사01"));
+		when(reviewService.save(any(), any())).thenReturn(new ReviewCreateResponse(reviewId, null, "코멘트01", "작성자1", "회사01"));
 
 		final ReviewCreateWebRequest reviewCreateWebRequest = new ReviewCreateWebRequest(
 			postId, "코멘트01", null);
@@ -91,7 +91,7 @@ class ReviewControllerTest {
 		final UUID postId = UUID.fromString("01972f9b-232a-7dbe-aad2-3bffc0b78ced");
 		final UUID reviewId = UUID.fromString("01972ea5-73ff-75e1-9083-d1d51a0f186a");
 
-		when(reviewService.save(any())).thenReturn(new ReviewCreateResponse(reviewId, null, "코멘트01", "작성자1", "회사01"));
+		when(reviewService.save(any(), any())).thenReturn(new ReviewCreateResponse(reviewId, null, "코멘트01", "작성자1", "회사01"));
 
 		final ReviewCreateWebRequest reviewCreateWebRequest = new ReviewCreateWebRequest(
 			postId, "", null);
@@ -119,7 +119,7 @@ class ReviewControllerTest {
 		final UUID memberId = UUID.fromString("01973844-b287-73d0-8f9d-f86fad4ac4c3");
 		final UUID reviewId = UUID.fromString("01973844-d55f-7350-b505-f198eaf0cd38");
 
-		when(reviewService.modifyComment(any())).thenReturn(new ReviewModifyResponse(reviewId, "코멘트01_수정"));
+		when(reviewService.modifyComment(any(), any())).thenReturn(new ReviewModifyResponse(reviewId, "코멘트01_수정"));
 
 		final ReviewModifyWebRequest reviewModifyWebRequest = new ReviewModifyWebRequest("코멘트01_수정");
 
@@ -148,7 +148,7 @@ class ReviewControllerTest {
 		final UUID reviewId = UUID.fromString("01973844-d55f-7350-b505-f198eaf0cd38");
 		final String emptyComment = "  ";
 
-		when(reviewService.modifyComment(any())).thenReturn(new ReviewModifyResponse(reviewId, "코멘트01_수정"));
+		when(reviewService.modifyComment(any(), any())).thenReturn(new ReviewModifyResponse(reviewId, "코멘트01_수정"));
 
 		final ReviewModifyWebRequest reviewModifyWebRequest = new ReviewModifyWebRequest(emptyComment);
 

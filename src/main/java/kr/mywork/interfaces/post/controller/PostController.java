@@ -18,6 +18,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.common.auth.components.annotation.LoginMember;
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.post.service.PostService;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
@@ -55,11 +57,12 @@ public class PostController {
 	@PostMapping("/projects/{project-id}/posts")
 	public ApiResponse<PostCreateWebResponse> createPost(
 		@PathVariable(name = "project-id") final UUID projectId,
-		@RequestBody @Valid final PostCreateWebRequest postCreateWebRequest) {
+		@RequestBody @Valid final PostCreateWebRequest postCreateWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
 		final PostCreateRequest postCreateRequest = postCreateWebRequest.toServiceDto(projectId);
 
-		final UUID createdPostId = postService.createPost(postCreateRequest);
+		final UUID createdPostId = postService.createPost(postCreateRequest, loginMemberDetail);
 
 		final PostCreateWebResponse postCreateWebResponse = new PostCreateWebResponse(createdPostId);
 
@@ -70,11 +73,12 @@ public class PostController {
 	@PutMapping("/posts/{postId}")
 	public ApiResponse<PostUpdateWebResponse> updatePost(
 		@RequestBody @Valid final PostUpdateWebRequest postUpdateWebRequest,
-		@PathVariable final UUID postId) {
+		@PathVariable final UUID postId,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
 		final PostUpdateRequest postUpdateRequest = postUpdateWebRequest.toServiceDto(postId);
 
-		final PostUpdateResponse postUpdateResponse = postService.updatePost(postUpdateRequest);
+		final PostUpdateResponse postUpdateResponse = postService.updatePost(postUpdateRequest, loginMemberDetail);
 
 		final PostUpdateWebResponse postUpdateWebResponse = PostUpdateWebResponse.from(postUpdateResponse);
 
@@ -117,9 +121,10 @@ public class PostController {
 
 	@DeleteMapping("/posts/{postId}")
 	public ApiResponse<PostDeleteWebResponse> deletePost(
-		@PathVariable final UUID postId) {
+		@PathVariable final UUID postId,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
-		final UUID deletedPostId = postService.deletePost(postId);
+		final UUID deletedPostId = postService.deletePost(postId, loginMemberDetail);
 		final PostDeleteWebResponse postDeleteWebResponse = new PostDeleteWebResponse(deletedPostId);
 
 		return ApiResponse.success(postDeleteWebResponse);

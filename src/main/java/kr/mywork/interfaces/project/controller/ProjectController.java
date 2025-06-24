@@ -36,11 +36,12 @@ public class ProjectController {
 
 	@PostMapping
 	public ApiResponse<ProjectCreateWebResponse> createProject(
-		@RequestBody @Valid final ProjectCreateWebRequest projectCreateWebRequest) {
+		@RequestBody @Valid final ProjectCreateWebRequest projectCreateWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
 		final ProjectCreateRequest projectCreateRequest = projectCreateWebRequest.toServiceDto();
 
-		final UUID createdId = projectService.createProject(projectCreateRequest);
+		final UUID createdId = projectService.createProject(projectCreateRequest, loginMemberDetail);
 
 		return ApiResponse.success(new ProjectCreateWebResponse(createdId));
 	}
@@ -48,11 +49,12 @@ public class ProjectController {
 	@PutMapping("/{projectId}")
 	public ApiResponse<ProjectUpdateWebResponse> updateProject(
 		@RequestBody @Valid final ProjectUpdateWebRequest webRequest,
-		@PathVariable final UUID projectId) {
+		@PathVariable final UUID projectId,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
 		final ProjectUpdateRequest projectUpdateRequest = webRequest.toServiceDto();
 
-		final ProjectUpdateResponse serviceResponse = projectService.updateProject(projectId, projectUpdateRequest);
+		final ProjectUpdateResponse serviceResponse = projectService.updateProject(projectId, projectUpdateRequest, loginMemberDetail);
 
 		final ProjectUpdateWebResponse webResponse = ProjectUpdateWebResponse.from(serviceResponse);
 
@@ -61,10 +63,11 @@ public class ProjectController {
 
 	@DeleteMapping
 	public ApiResponse<ProjectDeleteWebResponse> deleteProject(
-		@RequestBody final ProjectDeleteWebRequest webRequest
+		@RequestBody final ProjectDeleteWebRequest webRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail
 	) {
 		// 1) WebRequest → service 로직 (ID만 필요)
-		final UUID deletedId = projectService.deleteProject(webRequest.getId());
+		final UUID deletedId = projectService.deleteProject(webRequest.getId(), loginMemberDetail);
 
 		// 2) WebResponse 생성
 		return ApiResponse.success(new ProjectDeleteWebResponse(deletedId));

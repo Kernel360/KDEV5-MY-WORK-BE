@@ -1,12 +1,9 @@
 package kr.mywork.interfaces.post.controller;
 
 import static org.junit.jupiter.params.provider.Arguments.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -58,7 +55,7 @@ class PostControllerTest {
 		final UUID devCompanyId = UUID.fromString("01973ee2-3c1c-792f-9fa9-1e61fd218a6f");
 		final UUID clientCompanyId = UUID.fromString("01973ee2-7e42-7c7a-846d-caf8979cd023");
 
-		when(projectService.createProject(any())).thenReturn(createdProjectId);
+		// when(projectService.createProject(any())).thenReturn(createdProjectId);
 
 		final ProjectCreateWebRequest projectCreateWebRequest = new ProjectCreateWebRequest("프로젝트 이름",
 			LocalDateTime.of(2025, 6, 5, 12, 0),
@@ -89,7 +86,7 @@ class PostControllerTest {
 		// given
 		final UUID createdProjectId = UUID.fromString("01973ee1-ce0a-7350-afbd-2467ad13253a");
 
-		when(projectService.createProject(any())).thenReturn(createdProjectId);
+		// when(projectService.createProject(any())).thenReturn(createdProjectId);
 
 		final ProjectCreateWebRequest projectCreateWebRequest = new ProjectCreateWebRequest(
 			name, startAt, endAt, step, detail, devCompanyId, clientCompanyId);
