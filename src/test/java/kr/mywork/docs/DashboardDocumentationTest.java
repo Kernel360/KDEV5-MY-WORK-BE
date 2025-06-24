@@ -155,4 +155,90 @@ public class DashboardDocumentationTest extends RestDocsDocumentation {
 				)
 				.build());
 	}
+
+	@Test
+	@DisplayName("대시보드 결제 통계 조회 devAdmin 성공")
+	@Sql("classpath:sql/dashboard-amount-dev-admin.sql")
+	void 대시보드_결제_통계_개발사_주단위_조회_성공() throws Exception {
+		// given
+		final String accessToken = createDevAdminAccessToken();
+
+		// when
+		final ResultActions result = mockMvc.perform(
+				get("/api/dashboard/project-amount")
+						.param("chartType", "CHART_TYPE_WEEK")
+						.contentType(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist()
+		).andDo(document("dashboard-amount-dev-admin-success", dashboardAmountDevAdminSuccessResource()));
+	}
+
+	private ResourceSnippet dashboardAmountDevAdminSuccessResource() {
+		return resource(
+				ResourceSnippetParameters.builder()
+						.tag("Dashboard API")
+						.summary("대시보드 결제 통계 조회 API")
+						.description("대시보드 결제 통계를 조회한다.")
+						.requestHeaders(
+								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+								headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+						.queryParameters(
+								parameterWithName("chartType").description("결제 통계 차트 노출 기준(주단위,월단위)"))
+						.responseFields(
+								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+								fieldWithPath("data.chartData[].label").type(JsonFieldType.STRING).description("결제 통계 차트에 노출명"),
+								fieldWithPath("data.chartData[].totalAmount").type(JsonFieldType.NUMBER).description("결제 통계 총 금액"),
+								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보")
+						)
+						.build());
+	}
+
+	@Test
+	@DisplayName("대시보드 결제 통계 조회 devAdmin 성공")
+	@Sql("classpath:sql/dashboard-amount-dev-admin.sql")
+	void 대시보드_결제_통계_개발사_월단위_조회_성공() throws Exception {
+		// given
+		final String accessToken = createDevAdminAccessToken();
+
+		// when
+		final ResultActions result = mockMvc.perform(
+				get("/api/dashboard/project-amount")
+						.param("chartType", "CHART_TYPE_MONTH")
+						.contentType(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist()
+		).andDo(document("dashboard-amount-dev-admin-month-success", dashboardAmountDevAdminMonthSuccessResource()));
+	}
+
+	private ResourceSnippet dashboardAmountDevAdminMonthSuccessResource() {
+		return resource(
+				ResourceSnippetParameters.builder()
+						.tag("Dashboard API")
+						.summary("대시보드 결제 통계 조회 API")
+						.description("대시보드 결제 월단위 통계를 조회한다.")
+						.requestHeaders(
+								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+								headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+						.queryParameters(
+								parameterWithName("chartType").description("결제 통계 차트 노출 기준(주단위,월단위)"))
+						.responseFields(
+								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+								fieldWithPath("data.chartData[].label").type(JsonFieldType.STRING).description("결제 통계 차트에 노출명"),
+								fieldWithPath("data.chartData[].totalAmount").type(JsonFieldType.NUMBER).description("결제 통계 총 금액"),
+								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보")
+						)
+						.build());
+	}
 }
