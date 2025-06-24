@@ -118,9 +118,13 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("체크리스트 ID"),
 					fieldWithPath("data.title").type(JsonFieldType.STRING).description("체크리스트 제목"),
 					fieldWithPath("data.content").type(JsonFieldType.STRING).description("체크리스트 내용"),
+					fieldWithPath("data.companyName").type(JsonFieldType.STRING).description("작성자 회사명"),
+					fieldWithPath("data.authorName").type(JsonFieldType.STRING).description("작성자 명"),
 					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
+					fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성일"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
