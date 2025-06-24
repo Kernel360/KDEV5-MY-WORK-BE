@@ -1,4 +1,4 @@
-package kr.mywork.common.logging;
+package kr.mywork.common.async;
 
 import java.util.Map;
 
