@@ -43,8 +43,6 @@ public class SecurityConfig {
 	private final JwtProperties jwtProperties;
 	private final ObjectMapper objectMapper;
 	private final AuthenticationProvider loginAuthenticationProvider;
-	private final HttpLoggingFilter httpLoggingFilter;
-	private final RequestTrackingIdFilter requestTrackingIdFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -93,8 +91,8 @@ public class SecurityConfig {
 			})
 			.addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-			.addFilterBefore(requestTrackingIdFilter, JwtAuthenticationFilter.class)
-			.addFilterAfter(httpLoggingFilter, RequestTrackingIdFilter.class)
+			.addFilterBefore(new RequestTrackingIdFilter(), JwtAuthenticationFilter.class)
+			.addFilterAfter(new HttpLoggingFilter(), RequestTrackingIdFilter.class)
 			.exceptionHandling(exception -> exception
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint())
 				.accessDeniedHandler(jwtAccessDeniedHandler())
