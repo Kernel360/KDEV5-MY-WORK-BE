@@ -118,6 +118,7 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
 					fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN).description("프로젝트 삭제 여부"),
 					fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("프로젝트 생성 일자"),
+					fieldWithPath("data.projectAmount").type(JsonFieldType.NUMBER).description("프로젝트 결제 가격"),
 					fieldWithPath("data.devCompanyId").type(JsonFieldType.STRING).description("프로젝트 개발사 아이디"),
 					fieldWithPath("data.devCompanyName").type(JsonFieldType.STRING).description("프로젝트 개발사 이름"),
 					fieldWithPath("data.devContactPhoneNum").type(JsonFieldType.STRING).description("프로젝트 개발사 전화번호"),
