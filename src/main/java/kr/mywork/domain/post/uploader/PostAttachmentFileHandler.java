@@ -8,4 +8,6 @@ public interface PostAttachmentFileHandler {
 	URL createUploadUrl(UUID postId, String fileName);
 
 	URL issueDownloadUrl(String key, Duration duration);
+
+	void delete(String filePath);
 }

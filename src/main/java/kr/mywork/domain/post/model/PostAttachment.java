@@ -11,6 +11,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
+import kr.mywork.domain.company.errors.CompanyErrorType;
+import kr.mywork.domain.company.errors.CompanyImageEmptyException;
+import kr.mywork.domain.post.errors.PostAttachmentDeletedException;
+import kr.mywork.domain.post.errors.PostErrorType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -72,5 +76,16 @@ public class PostAttachment {
 
     public String getFilePath() {
         return String.format("%s/%s", this.postId, this.fileName);
+    }
+
+    public boolean delete() {
+        if (this.deleted) {
+            throw new PostAttachmentDeletedException(PostErrorType.ATTACHMENT_DELETED);
+        }
+
+        this.deleted = true;
+        this.active = false;
+
+        return true;
     }
 }

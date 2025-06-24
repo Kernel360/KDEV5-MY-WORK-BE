@@ -14,6 +14,7 @@ import kr.mywork.domain.post.model.PostAttachment;
 import kr.mywork.domain.post.repository.PostAttachmentRepository;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentActiveResponse;
+import kr.mywork.domain.post.service.dto.response.PostAttachmentDeleteResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentDownloadResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlIssueResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlReissueResponse;
@@ -87,4 +88,14 @@ public class PostAttachmentUploadService {
 		return new PostAttachmentDownloadResponse(postAttachment.getId(), downloadUrl.toString());
 	}
 
+	@Transactional
+	public PostAttachmentDeleteResponse deletePostAttachment(final UUID postAttachmentId) {
+		final PostAttachment postAttachment = postAttachmentRepository.findById(postAttachmentId)
+			.orElseThrow(() -> new PostAttachmentNotFoundException(PostErrorType.ATTACHMENT_NOT_FOUND));
+
+		postAttachmentFileHandler.delete(postAttachment.getFilePath());
+		final boolean deleted = postAttachment.delete();
+
+		return new PostAttachmentDeleteResponse(postAttachment.getId(), deleted);
+	}
 }
