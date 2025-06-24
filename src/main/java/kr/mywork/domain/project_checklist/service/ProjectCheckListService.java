@@ -20,6 +20,7 @@ import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project_checklist.errors.ProjectCheckListErrorType;
 import kr.mywork.domain.project_checklist.errors.ProjectCheckListNotFoundException;
+import kr.mywork.domain.project_checklist.listener.event.CheckListHistoryCreationEvent;
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
 import kr.mywork.domain.project_checklist.repository.ProjectCheckListRepository;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListApprovalRequest;
@@ -49,11 +50,14 @@ public class ProjectCheckListService {
 	public ProjectCheckListCreateResponse createProjectCheckList(
 		ProjectCheckListCreateRequest projectCheckListRequest, LoginMemberDetail loginMemberDetail) {
 
-		//TODO 프로젝트 단계 존재하는지 체크해야함.
-
 		ProjectCheckList projectCheckList = projectCheckListRepository.save(projectCheckListRequest);
 
 		eventPublisher.publishEvent(new CreateEventObject(projectCheckList, loginMemberDetail));
+		eventPublisher.publishEvent(new CheckListHistoryCreationEvent(
+			projectCheckList.getId(),
+			loginMemberDetail.companyName(),
+			loginMemberDetail.memberName(),
+			"PENDING"));
 
 		return ProjectCheckListCreateResponse.from(projectCheckList);
 
