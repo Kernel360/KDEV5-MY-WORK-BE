@@ -1,6 +1,5 @@
 package kr.mywork.domain.project.service;
 
-import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -43,8 +42,8 @@ import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.NearDeadlineProjectRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
-import kr.mywork.domain.project.service.dto.response.*;
 import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
+import kr.mywork.domain.project.service.dto.response.MyProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.NearDeadlineProjectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
@@ -52,18 +51,6 @@ import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
 import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
