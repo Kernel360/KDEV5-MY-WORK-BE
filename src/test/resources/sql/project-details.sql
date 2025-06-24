@@ -26,7 +26,7 @@ VALUES (UNHEX(REPLACE('1234a9a9-90b6-9898-a9dc-92c9861aa98c', '-', '')),
         'logo.png',
         NOW(), NOW(), FALSE);
 
-INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted)
+INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted,project_amount)
 VALUES (UNHEX(REPLACE('01973a42-0995-74aa-9298-a25cb8dae6ef', '-', '')),
         '테스트 프로젝트',
         NOW(),
@@ -35,7 +35,8 @@ VALUES (UNHEX(REPLACE('01973a42-0995-74aa-9298-a25cb8dae6ef', '-', '')),
         NOW(),
         NOW(),
         '테스트용 프로젝트입니다',
-        0);
+        0,
+        100);
 
 insert into project_assign (created_at, client_company_id, dev_company_id, id, project_id)
 values (NOW(),
