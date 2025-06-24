@@ -80,6 +80,6 @@ public class ProjectCheckList {
 	}
 
 	public void changeApproval(ProjectCheckListApprovalRequest projectCheckListApprovalRequest) {
-		this.approval = projectCheckListApprovalRequest.getApproval();
+		this.approval = projectCheckListApprovalRequest.approval();
 	}
 }

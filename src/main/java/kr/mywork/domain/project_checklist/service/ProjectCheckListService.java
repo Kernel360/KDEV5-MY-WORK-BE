@@ -20,6 +20,7 @@ import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project_checklist.errors.ProjectCheckListErrorType;
 import kr.mywork.domain.project_checklist.errors.ProjectCheckListNotFoundException;
+import kr.mywork.domain.project_checklist.listener.event.CheckListApprovalUpdateEvent;
 import kr.mywork.domain.project_checklist.listener.event.CheckListHistoryCreationEvent;
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
 import kr.mywork.domain.project_checklist.repository.ProjectCheckListRepository;
@@ -45,6 +46,7 @@ public class ProjectCheckListService {
 	private final ProjectStepRepository projectStepRepository;
 	private final ProjectRepository projectRepository;
 	private final ApplicationEventPublisher eventPublisher;
+	private final ApplicationEventPublisher applicationEventPublisher;
 
 	@Transactional
 	public ProjectCheckListCreateResponse createProjectCheckList(
@@ -104,7 +106,7 @@ public class ProjectCheckListService {
 	@Transactional
 	public ProjectCheckListApprovalResponse approvalProjectCheckList(
 		ProjectCheckListApprovalRequest projectCheckListApprovalRequest, LoginMemberDetail loginMemberDetail) {
-		ProjectCheckList projectCheckList = projectCheckListRepository.findById(projectCheckListApprovalRequest.getId())
+		ProjectCheckList projectCheckList = projectCheckListRepository.findById(projectCheckListApprovalRequest.id())
 			.orElseThrow(
 				() -> new ProjectCheckListNotFoundException(ProjectCheckListErrorType.PROJECT_CHECK_LIST_NOT_FOUND));
 
@@ -113,6 +115,14 @@ public class ProjectCheckListService {
 		projectCheckList.changeApproval(projectCheckListApprovalRequest);
 
 		eventPublisher.publishEvent(new ModifyEventObject(before, projectCheckList, loginMemberDetail));
+		applicationEventPublisher.publishEvent(
+			new CheckListApprovalUpdateEvent(
+				projectCheckListApprovalRequest.id(),
+				projectCheckListApprovalRequest.approval(),
+				projectCheckListApprovalRequest.reason(),
+				loginMemberDetail.companyName(),
+				loginMemberDetail.memberName()));
+
 
 		return ProjectCheckListApprovalResponse.from(projectCheckList);
 	}
