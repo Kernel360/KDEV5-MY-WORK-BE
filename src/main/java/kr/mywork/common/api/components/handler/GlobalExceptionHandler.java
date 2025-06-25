@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -57,6 +59,29 @@ public class GlobalExceptionHandler {
 			.body(ApiResponse.error(errorType.getErrorCode().name(), errorType.getMessage()));
 	}
 
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	public ResponseEntity<ApiResponse<?>> handleHttpRequestMethodNotSupportedException(
+		HttpRequestMethodNotSupportedException exception) {
+
+		final CommonErrorType errorType = CommonErrorType.HTTP_METHOD_NOT_SUPPORT;
+
+		logInfo(exception);
+
+		return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+			.body(ApiResponse.error(errorType.getErrorCode().name(), errorType.getMessage()));
+	}
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
+
+		final CommonErrorType errorType = CommonErrorType.HTTP_MESSAGE_NOT_READABLE;
+
+		logInfo(exception);
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body(ApiResponse.error(errorType.getErrorCode().name(), errorType.getMessage()));
+	}
+
 	@ExceptionHandler(AuthException.class)
 	public ResponseEntity<ApiResponse<?>> handleAuthException(AuthException exception) {
 		final AuthErrorType errorType = exception.getErrorType();
@@ -70,7 +95,13 @@ public class GlobalExceptionHandler {
 			.body(ApiResponse.error(errorType.getErrorCode().name(), errorType.getMessage()));
 	}
 
-	private void logWarn(final RuntimeException exception) {
+	private void logInfo(final Exception exception) {
+		log.info("exception : {}, message : {}",
+			exception.getClass().getSimpleName(),
+			exception.getMessage());
+	}
+
+	private void logWarn(final Exception exception) {
 		log.warn("exception : {}, message : {}\n stackTraces: {}",
 			exception.getClass().getSimpleName(),
 			exception.getMessage(),
