@@ -371,8 +371,7 @@ public class ProjectCheckListDocumentationTest extends RestDocsDocumentation {
 						.description("작성자 명"),
 					fieldWithPath("data.projectCheckLists[].title").type(JsonFieldType.STRING)
 						.description("체크리스트 명"),
-					fieldWithPath("data.projectCheckLists[].content").type(JsonFieldType.STRING).description("체크리스트 내용"),
-					fieldWithPath("data.projectCheckLists[].checkListContent").type(JsonFieldType.STRING)
+					fieldWithPath("data.projectCheckLists[].content").type(JsonFieldType.STRING)
 						.description("체크리스트 내용"),
 					fieldWithPath("data.projectCheckLists[].approval").type(JsonFieldType.STRING).description("승인 여부"),
 					fieldWithPath("data.projectCheckLists[].projectStepName").type(JsonFieldType.STRING)
