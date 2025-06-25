@@ -5,6 +5,7 @@ import java.util.UUID;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListCreateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +28,15 @@ public class ProjectCheckListCreateWebRequest {
 	@NotNull
 	private String approval;
 
-	public ProjectCheckListCreateRequest toServiceDto() {
-		return new ProjectCheckListCreateRequest(this.title, this.content, this.projectStepId, this.approval);
+	public ProjectCheckListCreateRequest toServiceDto(LoginMemberDetail loginMemberDetail) {
+		return new ProjectCheckListCreateRequest(
+			loginMemberDetail.memberId(),
+			loginMemberDetail.memberName(),
+			loginMemberDetail.companyId(),
+			loginMemberDetail.companyName(),
+			this.title,
+			this.content,
+			this.projectStepId,
+			this.approval);
 	}
 }

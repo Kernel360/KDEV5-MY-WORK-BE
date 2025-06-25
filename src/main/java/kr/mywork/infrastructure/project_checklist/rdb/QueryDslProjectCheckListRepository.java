@@ -61,6 +61,8 @@ public class QueryDslProjectCheckListRepository implements ProjectCheckListRepos
 	@Override
 	public List<ProjectCheckListSelectResponse> findAllByProjectIdAndStepId(final UUID projectId, final UUID projectStepId) {
 		return queryFactory.select(Projections.constructor(ProjectCheckListSelectResponse.class,
+				projectCheckList.id,
+				projectCheckList.authorName,
 				projectCheckList.title,
 				projectCheckList.content,
 				projectCheckList.approval,
