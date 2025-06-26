@@ -33,7 +33,7 @@ public class QueryDslCheckListHistoryRepository implements CheckListHistoryRepos
 				checkListHistory.id,
 				checkListHistory.companyName,
 				checkListHistory.authorName,
-				checkListHistory.content,
+				checkListHistory.reason,
 				checkListHistory.approval,
 				checkListHistory.createdAt))
 			.from(checkListHistory)

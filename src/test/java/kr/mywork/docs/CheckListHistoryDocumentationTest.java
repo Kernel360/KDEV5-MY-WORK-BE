@@ -58,7 +58,7 @@ public class CheckListHistoryDocumentationTest extends RestDocsDocumentation {
 							fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 							fieldWithPath("data[].historyId").type(JsonFieldType.STRING).description("체크리스트 히스토리 ID"),
 							fieldWithPath("data[].approval").type(JsonFieldType.STRING).description("승인 상태"),
-							fieldWithPath("data[].content").type(JsonFieldType.STRING).description("사유"),
+							fieldWithPath("data[].reason").type(JsonFieldType.STRING).description("사유"),
 							fieldWithPath("data[].companyName").type(JsonFieldType.STRING).description("회사 이름"),
 							fieldWithPath("data[].memberName").type(JsonFieldType.STRING).description("유저 이름"),
 							fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("생성 일시"),
