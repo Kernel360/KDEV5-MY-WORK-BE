@@ -14,6 +14,10 @@ import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.notification.model.NotificationActionType;
+import kr.mywork.domain.notification.model.NotificationTitle;
+import kr.mywork.domain.notification.model.TargetType;
+import kr.mywork.domain.notification.service.NotificationService;
 import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
 import kr.mywork.domain.project.model.Project;
@@ -34,6 +38,8 @@ import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListD
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListSelectResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectCheckListUpdateResponse;
 import kr.mywork.domain.project_checklist.service.dto.response.ProjectStepCheckListCountResponse;
+import kr.mywork.domain.project_step.errors.ProjectStepErrorType;
+import kr.mywork.domain.project_step.errors.ProjectStepNotFoundException;
 import kr.mywork.domain.project_step.model.ProjectStep;
 import kr.mywork.domain.project_step.repository.ProjectStepRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +53,7 @@ public class ProjectCheckListService {
 	private final ProjectRepository projectRepository;
 	private final ApplicationEventPublisher eventPublisher;
 	private final ApplicationEventPublisher applicationEventPublisher;
+	private final NotificationService notificationService;
 
 	@Transactional
 	public ProjectCheckListCreateResponse createProjectCheckList(
@@ -123,8 +130,47 @@ public class ProjectCheckListService {
 				loginMemberDetail.companyName(),
 				loginMemberDetail.memberName()));
 
+		ProjectStep projectStep = projectStepRepository.findById(projectCheckList.getProjectStepId())
+				.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
+
+		notificationService.save(
+			projectCheckList.getAuthorId(),
+			projectCheckList.getAuthorName(),
+			projectCheckList.getTitle(),
+			loginMemberDetail.memberName(),
+			loginMemberDetail.memberId(),
+			TargetType.PROJECT_CHECK_LIST,
+			projectCheckList.getId(),
+			determineProjectCheckListActionType(projectCheckList.getApproval()),
+			projectCheckList.getModifiedAt(),
+			projectStep.getProjectId(),
+			projectStep.getId()
+		);
+
 
 		return ProjectCheckListApprovalResponse.from(projectCheckList);
+	}
+
+	private String determineProjectCheckListTitle(final String approvalStatus) {
+		if (approvalStatus.equals("APPROVED"))
+			return NotificationTitle.PROJECT_CHECK_LIST_APPROVED.getTitle();
+		if (approvalStatus.equals("REJECTED"))
+			return NotificationTitle.PROJECT_CHECK_LIST_REJECTED.getTitle();
+		if (approvalStatus.equals("REQUEST_CHANGES"))
+			return NotificationTitle.PROJECT_CHECK_LIST_REQUEST_CHANGES.getTitle();
+
+		return "APPROVED";
+	}
+
+	private NotificationActionType determineProjectCheckListActionType(final String approvalStatus) {
+		if (approvalStatus.equals("APPROVED"))
+			return NotificationActionType.APPROVED;
+		if (approvalStatus.equals("REJECTED"))
+			return NotificationActionType.REJECTED;
+		if (approvalStatus.equals("REQUEST_CHANGES"))
+			return NotificationActionType.REQUEST_CHANGES;
+
+		return NotificationActionType.APPROVED;
 	}
 
 	@Transactional
