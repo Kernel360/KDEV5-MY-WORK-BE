@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import kr.mywork.domain.project_checklist.service.dto.response.CheckListHistorySelectResponse;
 
-public record CheckListHistorySelectWebResponse(UUID historyId, String companyName, String memberName, String content,
+public record CheckListHistorySelectWebResponse(UUID historyId, String companyName, String memberName, String reason,
 												String approval,
 												@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime createdAt) {
 
@@ -17,7 +17,7 @@ public record CheckListHistorySelectWebResponse(UUID historyId, String companyNa
 			checkListHistorySelectResponse.historyId(),
 			checkListHistorySelectResponse.companyName(),
 			checkListHistorySelectResponse.memberName(),
-			checkListHistorySelectResponse.content(),
+			checkListHistorySelectResponse.reason(),
 			checkListHistorySelectResponse.approval(),
 			checkListHistorySelectResponse.createdAt());
 	}

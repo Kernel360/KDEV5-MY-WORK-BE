@@ -32,28 +32,28 @@ public class CheckListHistory {
     private String approval;
 
     @Column(length = 200)
-    private String content;
+    private String reason;
 
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     private CheckListHistory(final UUID checkListId, final String companyName, final String authorName,
-        final String approval, final String content) {
+        final String approval, final String reason) {
         this.checkListId = checkListId;
         this.companyName = companyName;
         this.authorName = authorName;
         this.approval = approval;
-        this.content = content;
+        this.reason = reason;
     }
 
-    public static CheckListHistory CreationHistory(final UUID checkListId, final String companyName,
+    public static CheckListHistory creationHistory(final UUID checkListId, final String companyName,
         final String authorName, final String approval) {
-        return new CheckListHistory(checkListId, companyName, authorName, approval, CREATED_MESSAGE);
+        return new CheckListHistory(checkListId, companyName, authorName, approval, null);
     }
 
     public static CheckListHistory updateHistory(final UUID checkListId, final String companyName,
-        final String authorName, final String approval, String content) {
-        return new CheckListHistory(checkListId, companyName, authorName, approval, content);
+        final String authorName, final String approval, final String reason) {
+        return new CheckListHistory(checkListId, companyName, authorName, approval, reason);
     }
 }

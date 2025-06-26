@@ -23,7 +23,7 @@ public class CheckListHistoryTxListener {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handleCheckListCreatedHistory(final CheckListHistoryCreationEvent event) {
-		final CheckListHistory checkListHistory = CheckListHistory.CreationHistory(event.checkListId(),
+		final CheckListHistory checkListHistory = CheckListHistory.creationHistory(event.checkListId(),
 			event.companyName(), event.authorName(), event.approval());
 
 		checkListHistoryRepository.save(checkListHistory);
