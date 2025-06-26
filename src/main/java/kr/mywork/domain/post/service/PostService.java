@@ -65,7 +65,7 @@ public class PostService {
 
 		Post before = Post.copyOf(post);
 
-		ProjectStep projectStep = projectStepRepository.findById(postId)
+		ProjectStep projectStep = projectStepRepository.findById(post.getProjectStepId())
 			.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
 
 		post.changeApproval(postApprovalRequest.getApprovalStatus());
