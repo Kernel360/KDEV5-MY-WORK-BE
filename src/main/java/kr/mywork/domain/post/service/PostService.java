@@ -16,6 +16,10 @@ import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.member.repository.MemberRepository;
+import kr.mywork.domain.notification.model.NotificationActionType;
+import kr.mywork.domain.notification.model.TargetType;
+import kr.mywork.domain.notification.service.NotificationService;
 import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
@@ -52,6 +56,8 @@ public class PostService {
 	private final ProjectStepRepository projectStepRepository;
 	private final ProjectRepository projectRepository;
 	private final ApplicationEventPublisher eventPublisher;
+	private final NotificationService notificationService;
+	private final MemberRepository memberRepository;
 
 	@Transactional
 	public PostApprovalResponse approvalPost(UUID postId, PostApprovalRequest postApprovalRequest, LoginMemberDetail loginMemberDetail) {
@@ -59,8 +65,24 @@ public class PostService {
 
 		Post before = Post.copyOf(post);
 
+		ProjectStep projectStep = projectStepRepository.findById(postId)
+			.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
+
 		post.changeApproval(postApprovalRequest.getApprovalStatus());
 
+		notificationService.save(
+			post.getAuthorId(),
+			post.getAuthorName(),
+			post.getTitle(),
+			loginMemberDetail.memberName(),
+			loginMemberDetail.memberId(),
+			TargetType.POST,
+			post.getId(),
+			NotificationActionType.APPROVED,
+			post.getModifiedAt(),
+			projectStep.getProjectId(),
+			projectStep.getId()
+		);
 
 		eventPublisher.publishEvent(new ModifyEventObject(before, post, loginMemberDetail));
 
