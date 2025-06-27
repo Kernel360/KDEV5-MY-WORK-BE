@@ -30,7 +30,6 @@ public class DashboardController {
 
 	private static final String AMOUNT_CHART_TYPE = "^(CHART_TYPE_WEEK|CHART_TYPE_MONTH)$";
 
-	private final DashboardService dashboardService;
 	private final ProjectService projectService;
 
 	@GetMapping("/total-summary")
