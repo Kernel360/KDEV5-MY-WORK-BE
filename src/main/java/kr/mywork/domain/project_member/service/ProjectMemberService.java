@@ -1,11 +1,5 @@
 package kr.mywork.domain.project_member.service;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-
 import jakarta.transaction.Transactional;
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
@@ -16,6 +10,11 @@ import kr.mywork.domain.project_member.error.ProjectMemberNotFoundException;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
