@@ -26,8 +26,12 @@ public class HttpLoggingFilter implements Filter {
 
 	private static final String LARGE_VALUE = "[large value]";
 	private static final String CONTENT_EMPTY = "[empty]";
+
 	private static final int RESPONSE_BODY_MAX_BYTE_LENGTH = 1024;
-	private static final int HEADER_MAX_SIZE = 50;
+	private static final int HEADER_MAX_SIZE = 300;
+
+	private static final String HEADER_DELIMITER = "; ";
+	private static final String HEADER_COLON = ": ";
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -63,11 +67,11 @@ public class HttpLoggingFilter implements Filter {
 			String headerName = headerNames.nextElement();
 			String headerValue = request.getHeader(headerName);
 
-			if (headerName.length() >= HEADER_MAX_SIZE) {
-				headerValue = headerValue.substring(0, HEADER_MAX_SIZE) + "...";
+			if (headerValue.length() >= HEADER_MAX_SIZE) {
+				headerValue = LARGE_VALUE;
 			}
 
-			headers.append(headerName).append(": ").append(headerValue).append("; ");
+			headers.append(headerName).append(HEADER_COLON).append(headerValue).append(HEADER_DELIMITER);
 		}
 		return headers.toString().trim();
 	}
@@ -124,12 +128,12 @@ public class HttpLoggingFilter implements Filter {
 		final StringBuilder headerBuilder = new StringBuilder();
 
 		for (Map.Entry<String, String> headerEntry : responseHeadersMap.entrySet()) {
-			headerBuilder.append(headerEntry.getKey()).append(": ");
+			headerBuilder.append(headerEntry.getKey()).append(HEADER_COLON);
 
 			if (headerEntry.getValue().length() <= HEADER_MAX_SIZE) {
-				headerBuilder.append(headerEntry.getValue());
+				headerBuilder.append(headerEntry.getValue()).append(HEADER_DELIMITER);
 			} else {
-				headerBuilder.append(headerEntry.getValue(), 0, HEADER_MAX_SIZE).append("...");
+				headerBuilder.append(LARGE_VALUE);
 			}
 		}
 
