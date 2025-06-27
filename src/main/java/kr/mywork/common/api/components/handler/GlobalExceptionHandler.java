@@ -10,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import kr.mywork.common.api.support.error.CommonErrorType;
 import kr.mywork.common.api.support.response.ApiResponse;
@@ -79,6 +80,16 @@ public class GlobalExceptionHandler {
 		logInfo(exception);
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body(ApiResponse.error(errorType.getErrorCode().name(), errorType.getMessage()));
+	}
+
+	@ExceptionHandler(NoResourceFoundException.class)
+	public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadable(NoResourceFoundException exception) {
+		final CommonErrorType errorType = CommonErrorType.NO_RESOURCE_FOUND;
+
+		logInfo(exception);
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 			.body(ApiResponse.error(errorType.getErrorCode().name(), errorType.getMessage()));
 	}
 
