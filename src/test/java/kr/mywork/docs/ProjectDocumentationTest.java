@@ -71,6 +71,8 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 						.description("프로젝트 할당 가능한 멤버 아이디"),
 					fieldWithPath("data.members[].memberName").type(JsonFieldType.STRING)
 						.description("프로젝트 할당 가능한 멤버 이름"),
+					fieldWithPath("data.members[].email").type(JsonFieldType.STRING)
+							.description("프로젝트 할당 가능한 멤버 이메일"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
