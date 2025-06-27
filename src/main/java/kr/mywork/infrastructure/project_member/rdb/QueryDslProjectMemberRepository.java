@@ -34,7 +34,9 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 				CompanyMemberInProjectResponse.class,
 				member.id,
 				member.name,
-				member.email
+				member.email,
+				member.role.stringValue(),
+				projectMember.manager
 			))
 			.from(projectMember)
 			.join(member).on(projectMember.memberId.eq(member.id))

@@ -1,15 +1,8 @@
 package kr.mywork.docs;
 
-import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.UUID;
-
+import com.epages.restdocs.apispec.ResourceSnippet;
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import kr.mywork.common.api.support.response.ResultType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -18,10 +11,15 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.epages.restdocs.apispec.ResourceSnippet;
-import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import java.util.UUID;
 
-import kr.mywork.common.api.support.response.ResultType;
+import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ProjectMemberDocumentationTest extends RestDocsDocumentation {
 
@@ -106,7 +104,9 @@ public class ProjectMemberDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.members[].memberId").type(JsonFieldType.STRING).description("프로젝트 멤버 아이디"),
 					fieldWithPath("data.members[].memberName").type(JsonFieldType.STRING).description("프로젝트 멤버 이름"),
 					fieldWithPath("data.members[].email").type(JsonFieldType.STRING).description("프로젝트 멤버 이메일"),
-					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+					fieldWithPath("data.members[].memberRole").type(JsonFieldType.STRING).description("프로젝트 멤버 권한"),
+					fieldWithPath("data.members[].isManager").type(JsonFieldType.BOOLEAN).description("프로젝트 멤버 메니저 유부"),
+						fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
 	@Test
