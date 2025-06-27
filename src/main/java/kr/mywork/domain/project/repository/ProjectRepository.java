@@ -1,5 +1,6 @@
 package kr.mywork.domain.project.repository;
 
+import jakarta.annotation.Nullable;
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
 
@@ -39,4 +40,11 @@ public interface ProjectRepository {
 	List<Project> findProjectsByIds(List<UUID> projectIds);
 
 	List<Project> findCompletedProjectsByIdsWithDate(List<UUID> projectIds, LocalDateTime startDate,String status);
+
+	Long getSummaryProjectTotalCount(@Nullable List<UUID> projectIds);
+
+	Long getSummaryInProgressProjectTotalCount(@Nullable List<UUID> projectIds, LocalDateTime now);
+
+	Long getSummaryCompletedProjectTotalCount(@Nullable List<UUID> projectIds, LocalDateTime now);
+
 }
