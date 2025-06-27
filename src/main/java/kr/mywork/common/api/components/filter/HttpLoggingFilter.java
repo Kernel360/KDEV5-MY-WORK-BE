@@ -1,8 +1,14 @@
 package kr.mywork.common.api.components.filter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -17,6 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class HttpLoggingFilter implements Filter {
+
+	private static final String LARGE_VALUE = "[large value]";
+	private static final String CONTENT_EMPTY = "[empty]";
+	private static final int RESPONSE_BODY_MAX_BYTE_LENGTH = 1024;
+	private static final int HEADER_MAX_SIZE = 50;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -52,8 +63,8 @@ public class HttpLoggingFilter implements Filter {
 			String headerName = headerNames.nextElement();
 			String headerValue = request.getHeader(headerName);
 
-			if (headerName.length() >= 50) {
-				headerValue = headerValue.substring(0, 50) + "...";
+			if (headerName.length() >= HEADER_MAX_SIZE) {
+				headerValue = headerValue.substring(0, HEADER_MAX_SIZE) + "...";
 			}
 
 			headers.append(headerName).append(": ").append(headerValue).append("; ");
@@ -62,33 +73,67 @@ public class HttpLoggingFilter implements Filter {
 	}
 
 	private String getRequestBodyAsString(final HttpRequestBodyCachedWrapper request) throws IOException {
-		return new String(request.getCachedBody(),
-			request.getCharacterEncoding() != null ? request.getCharacterEncoding() : "UTF-8");
+		return new String(request.getCachedBody(), StandardCharsets.UTF_8);
 	}
 
 	private void logResponse(final HttpResponseBodyCachedWrapper response) throws IOException {
 		final int status = response.getStatus();
-		final String headers = getResponseHeadersAsString(response);
-		final String body = new String(response.getCachedBody(),
-			(response.getCharacterEncoding() != null) ? response.getCharacterEncoding() : "UTF-8");
+		final Map<String, String> headersMap = getResponseHeaderMap(response);
+		final String headers = getResponseHeadersAsString(headersMap);
+		final String body = getResponseBodyAsString(response, headersMap);
 
 		log.info("HTTP Response - Status: {}, Headers: {}, Body: {}", status, headers, body);
 	}
 
-	private String getResponseHeadersAsString(HttpServletResponse response) {
-		final StringBuilder headers = new StringBuilder();
+	private Map<String, String> getResponseHeaderMap(final HttpResponseBodyCachedWrapper response) {
+		Map<String, String> headersMap = new LinkedHashMap<>();
 		final Collection<String> headerNames = response.getHeaderNames();
 
 		for (String headerName : headerNames) {
 			String headerValue = response.getHeader(headerName);
 
-			if (headerValue.length() >= 50) {
-				headerValue = headerValue.substring(0, 50) + "...";
+			// access token 값 로깅 방지용
+			if (headerValue.length() >= HEADER_MAX_SIZE) {
+				headerValue = LARGE_VALUE;
 			}
 
-			headers.append(headerName).append(": ").append(headerValue).append("; ");
+			headersMap.put(headerName, headerValue);
 		}
-		return headers.toString().trim();
+
+		return headersMap;
+
+	}
+
+	private String getResponseBodyAsString(
+		final HttpResponseBodyCachedWrapper response,
+		final Map<String, String> headersMap
+	) throws IOException {
+		if (!headersMap.containsKey(HttpHeaders.CONTENT_TYPE)) {
+			return CONTENT_EMPTY;
+		}
+
+		if (!headersMap.get(HttpHeaders.CONTENT_TYPE).equals(MediaType.APPLICATION_JSON_VALUE)) {
+			return CONTENT_EMPTY;
+		}
+
+		return (response.getCachedBody().length <= RESPONSE_BODY_MAX_BYTE_LENGTH) ?
+			new String(response.getCachedBody(), StandardCharsets.UTF_8) : LARGE_VALUE;
+	}
+
+	private String getResponseHeadersAsString(Map<String, String> responseHeadersMap) {
+		final StringBuilder headerBuilder = new StringBuilder();
+
+		for (Map.Entry<String, String> headerEntry : responseHeadersMap.entrySet()) {
+			headerBuilder.append(headerEntry.getKey()).append(": ");
+
+			if (headerEntry.getValue().length() <= HEADER_MAX_SIZE) {
+				headerBuilder.append(headerEntry.getValue());
+			} else {
+				headerBuilder.append(headerEntry.getValue(), 0, HEADER_MAX_SIZE).append("...");
+			}
+		}
+
+		return headerBuilder.toString().trim();
 	}
 
 	// 우회한 response body byte 코드 주입해야 하므로 제거 금지!!
