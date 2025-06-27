@@ -106,4 +106,12 @@ public class QueryDslProjectAssignRepository implements ProjectAssignRepository 
 			.where(companyFilter(companyId, memberRole))
 			.fetch();
 	}
+	@Override
+	public List<ProjectAssign> getCompanyAdminProjectIds(UUID companyId, String userType) {
+		return queryFactory
+				.selectFrom(projectAssign)
+				.where(companyFilter(companyId, userType))
+				.fetch();
+	}
+
 }
