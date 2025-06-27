@@ -32,7 +32,7 @@ public class DashboardDocumentationTest extends RestDocsDocumentation {
 
 		// when
 		ResultActions result = mockMvc.perform(
-			get("/api/dashboard/total-summery")
+			get("/api/dashboard/total-summary")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
