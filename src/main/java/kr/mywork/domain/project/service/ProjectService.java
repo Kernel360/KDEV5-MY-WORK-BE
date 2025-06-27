@@ -307,7 +307,8 @@ public class ProjectService {
 		return companyMembers.stream()
 			.map(member -> new ProjectMemberResponse(
 				member.getId(),
-				member.getName()
+				member.getName(),
+				member.getEmail()
 			)).collect(Collectors.toList());
 	}
 
