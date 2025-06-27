@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.common.auth.components.annotation.LoginMember;
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.company.service.CompanyService;
 import kr.mywork.domain.company.service.dto.request.CompanyCreateRequest;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
@@ -46,7 +48,7 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class CompanyController {
 
-	private static final String COMPANY_TYPE_REGX = "^(DEV|CLIENT)$";
+	public static final String COMPANY_TYPE_REGX = "^(DEV|CLIENT)$";
 	private static final String COMPANY_KEYWORD_TYPE = "^(NAME|BUSINESS_NUMBER|PHONE_NUMBER|ADDRESS)$";
 
 	private final CompanyService companyService;
@@ -60,11 +62,12 @@ public class CompanyController {
 
 	@PostMapping
 	public ApiResponse<CompanyCreateWebResponse> createCompany(
-		@RequestBody final CompanyCreateWebRequest companyCreateWebRequest) {
+		@RequestBody final CompanyCreateWebRequest companyCreateWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
 		final CompanyCreateRequest companyCreateRequest = companyCreateWebRequest.toServiceDto();
 
-		final UUID createdCompanyId = companyService.createCompany(companyCreateRequest);
+		final UUID createdCompanyId = companyService.createCompany(companyCreateRequest, loginMemberDetail);
 
 		final CompanyCreateWebResponse companyCreateWebResponse = new CompanyCreateWebResponse(createdCompanyId);
 
@@ -73,11 +76,12 @@ public class CompanyController {
 
 	@PutMapping
 	public ApiResponse<CompanyUpdateWebResponse> updateCompany(
-		@RequestBody final CompanyUpdateWebRequest companyUpdateWebRequest) {
+		@RequestBody final CompanyUpdateWebRequest companyUpdateWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
 		final CompanyUpdateRequest companyUpdateRequest = companyUpdateWebRequest.toServiceDto();
 
-		final UUID companyId = companyService.updateCompany(companyUpdateRequest);
+		final UUID companyId = companyService.updateCompany(companyUpdateRequest, loginMemberDetail);
 
 		final CompanyUpdateWebResponse companyUpdateWebResponse = new CompanyUpdateWebResponse(companyId);
 
@@ -86,8 +90,9 @@ public class CompanyController {
 
 	@DeleteMapping("/{companyId}")
 	public ApiResponse<CompanyDeleteWebResponse> deleteCompany(
-		@PathVariable (name="companyId")UUID companyId) {
-		final UUID deleteCompanyId = companyService.deleteCompany(companyId);
+		@PathVariable (name="companyId")UUID companyId,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
+		final UUID deleteCompanyId = companyService.deleteCompany(companyId, loginMemberDetail);
 
 		final CompanyDeleteWebResponse companyDeleteWebResponse = new CompanyDeleteWebResponse(deleteCompanyId);
 

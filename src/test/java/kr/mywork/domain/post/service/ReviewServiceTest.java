@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
 
 import kr.mywork.domain.post.repository.ReviewRepository;
 import kr.mywork.domain.post.service.dto.ReviewSelectResponse;
@@ -24,10 +25,12 @@ class ReviewServiceTest {
 
 	private ReviewRepository reviewRepository;
 
+	private ApplicationEventPublisher eventPublisher;
+
 	@BeforeEach
 	void setUp() {
 		this.reviewRepository = Mockito.mock(ReviewRepository.class);
-		this.reviewService = new ReviewService(reviewRepository);
+		this.reviewService = new ReviewService(reviewRepository, eventPublisher);
 	}
 
 	@Test

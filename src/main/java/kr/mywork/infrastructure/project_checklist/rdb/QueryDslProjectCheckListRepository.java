@@ -44,16 +44,16 @@ public class QueryDslProjectCheckListRepository implements ProjectCheckListRepos
 	public List<ProjectStepCheckListCountResponse> findProgressCountGroupByProjectStepIdAndApproval(
 		final Collection<UUID> projectStepIds, final String approval) {
 		return queryFactory.select(Projections.constructor(ProjectStepCheckListCountResponse.class,
-				projectCheckList.projectStepId,
+				projectStep.id,
 				count(projectCheckList.id),
 				projectStep.orderNum))
-			.from(projectCheckList)
-			.join(projectStep).on(projectCheckList.projectStepId.eq(projectStep.id))
-			.where(
-				projectCheckList.deleted.isFalse(),
-				eqApproval(approval),
-				projectCheckList.projectStepId.in(projectStepIds))
-			.groupBy(projectCheckList.projectStepId, projectStep.orderNum)
+			.from(projectStep)
+			.leftJoin(projectCheckList)
+				.on(projectCheckList.projectStepId.eq(projectStep.id)
+					.and(projectCheckList.deleted.isFalse())
+					.and(eqApproval(approval)))
+			.where(projectStep.id.in(projectStepIds))
+			.groupBy(projectStep.id, projectStep.orderNum)
 			.orderBy(projectStep.orderNum.asc())
 			.fetch();
 	}
@@ -61,7 +61,10 @@ public class QueryDslProjectCheckListRepository implements ProjectCheckListRepos
 	@Override
 	public List<ProjectCheckListSelectResponse> findAllByProjectIdAndStepId(final UUID projectId, final UUID projectStepId) {
 		return queryFactory.select(Projections.constructor(ProjectCheckListSelectResponse.class,
+				projectCheckList.id,
+				projectCheckList.authorName,
 				projectCheckList.title,
+				projectCheckList.content,
 				projectCheckList.approval,
 				projectStep.title,
 				projectCheckList.createdAt))

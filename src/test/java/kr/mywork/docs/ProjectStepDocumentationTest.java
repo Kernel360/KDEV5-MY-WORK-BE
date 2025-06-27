@@ -181,4 +181,50 @@ public class ProjectStepDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
+
+	@Test
+	@DisplayName("프로젝트 단계 와 단게별 게시글 수 조회 성공")
+	@Sql("classpath:sql/project-step-get-with-count.sql")
+	void 프로젝트_단계_및_개시글수_조회_성공() throws Exception {
+		//given
+		final String accessToken = createUserAccessToken();
+
+		UUID projectId = UUID.fromString("0197893a-ad34-734c-97d7-2e0dd6429247");
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			get("/api/projects/{projectId}/steps-with-count", projectId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		//then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("project-get-steps-with-count-success", projectGetSetpsWithCountSuccessResource()));
+	}
+
+	public ResourceSnippet projectGetSetpsWithCountSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Project Step API")
+				.summary("프로젝트 단계 및 개시글수 조회 API")
+				.description("프로젝트 단계를 조회한다")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.steps[].projectStepId").type(JsonFieldType.STRING)
+						.description("프로젝트 단계 아이디"),
+					fieldWithPath("data.steps[].title").type(JsonFieldType.STRING).description("프로젝트 단계 이름"),
+					fieldWithPath("data.steps[].orderNum").type(JsonFieldType.NUMBER)
+						.description("프로젝트 단계 순서"),
+					fieldWithPath("data.steps[].totalCount").type(JsonFieldType.NUMBER)
+						.description("프로젝트 단계의 개시글 수"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build());
+	}
 }

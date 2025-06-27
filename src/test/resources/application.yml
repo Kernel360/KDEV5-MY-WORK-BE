@@ -9,21 +9,40 @@ spring:
     username: root
     password: cooper2025
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  cloud:
+    aws:
+      s3:
+        region: us-east-1 # TODO 운영용은 별도로 선언
+      credentials:
+        access-key: test # TODO 운영용은 별도로 선언
+        secret-key: test # TODO 운영용은 별도로 선언
 company:
   page:
     size: 10
+  upload:
+    duration: 3m
 member:
   page:
     size: 10
 post:
   page:
     size: 10
+  upload:
+    bucket-name: mywork-upload-bucket
+    duration: 3m
+    endpoint: http://localhost:4566
 project:
   page:
     size: 10
 review:
   page:
     size: 10
+activityLog:
+  page:
+    size: 10
+dashboard:
+  page:
+    size: 5
 jwt:
   access-token:
     private-key: 126cab8a5d9087a27be4e2a0599682e2bab38e80201d1befa2dd9d55ecbdeac58bab0c84301ad9f9f8a71836825e5a7214e7a9fb17a8578418de6cfe9a15cbc7

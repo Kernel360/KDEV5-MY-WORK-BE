@@ -67,6 +67,16 @@ public class Review {
 		this.deleted = false;
 	}
 
+	public static Review copyOf(Review review) {
+		return new Review(
+			review.postId,
+			review.parentId,
+			review.memberId,
+			review.comment,
+			review.companyName,
+			review.authorName);
+	}
+
 	public boolean modifyComment(final String comment) {
 		this.comment = comment;
 		return true;

@@ -1,9 +1,9 @@
 package kr.mywork.domain.project.service.dto.response;
 
+import kr.mywork.domain.project.model.Project;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import kr.mywork.domain.project.model.Project;
 
 public record ProjectUpdateResponse(
 	UUID id,
@@ -14,7 +14,8 @@ public record ProjectUpdateResponse(
 	String detail,
 	Boolean deleted,
 	LocalDateTime createdAt,
-	LocalDateTime modifiedAt
+	LocalDateTime modifiedAt,
+	Long projectAmount
 ) {
 	public static ProjectUpdateResponse from(Project project) {
 		return new ProjectUpdateResponse(
@@ -26,7 +27,8 @@ public record ProjectUpdateResponse(
 			project.getDetail(),
 			project.getDeleted(),
 			project.getCreatedAt(),
-			project.getModifiedAt()
+			project.getModifiedAt(),
+			project.getProjectAmount()
 		);
 	}
 }

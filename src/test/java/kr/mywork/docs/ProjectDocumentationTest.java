@@ -1,20 +1,11 @@
 package kr.mywork.docs;
 
-import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
-
+import com.epages.restdocs.apispec.ResourceSnippet;
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectDeleteWebRequest;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectUpdateWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -23,13 +14,15 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.epages.restdocs.apispec.ResourceSnippet;
-import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-import kr.mywork.common.api.support.response.ResultType;
-import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
-import kr.mywork.interfaces.project.controller.dto.request.ProjectDeleteWebRequest;
-import kr.mywork.interfaces.project.controller.dto.request.ProjectUpdateWebRequest;
+import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.ResourceDocumentation.*;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ProjectDocumentationTest extends RestDocsDocumentation {
 
@@ -125,6 +118,7 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
 					fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN).description("프로젝트 삭제 여부"),
 					fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("프로젝트 생성 일자"),
+					fieldWithPath("data.projectAmount").type(JsonFieldType.NUMBER).description("프로젝트 결제 가격"),
 					fieldWithPath("data.devCompanyId").type(JsonFieldType.STRING).description("프로젝트 개발사 아이디"),
 					fieldWithPath("data.devCompanyName").type(JsonFieldType.STRING).description("프로젝트 개발사 이름"),
 					fieldWithPath("data.devContactPhoneNum").type(JsonFieldType.STRING).description("프로젝트 개발사 전화번호"),
@@ -148,7 +142,8 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 			"IN_PROGRESS",
 			"서비스 개발 프로젝트입니다.",
 			UUID.fromString("019759dd-378a-7590-9bd4-b204a064a120"),
-			UUID.fromString("019759de-4cdf-70e6-a0c9-3188cac11476")
+			UUID.fromString("019759de-4cdf-70e6-a0c9-3188cac11476"),
+			200L
 		);
 
 		// when
@@ -177,10 +172,11 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("startAt").type(JsonFieldType.STRING).description("시작 날짜"),
 					fieldWithPath("endAt").type(JsonFieldType.STRING).description("종료 날짜"),
 					fieldWithPath("step").type(JsonFieldType.STRING)
-						.description("프로젝트 단계 (NOT_STARTED, IN_PROGRESS, PAUSED, COMPLETED)"),
+						.description("프로젝트 단계 (CONTRACT, IN_PROGRESS, PAYMENT, COMPLETED)"),
 					fieldWithPath("detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
 					fieldWithPath("devCompanyId").type(JsonFieldType.STRING).description("개발사 UUID"),
-					fieldWithPath("clientCompanyId").type(JsonFieldType.STRING).description("클라이언트 UUID"))
+					fieldWithPath("clientCompanyId").type(JsonFieldType.STRING).description("클라이언트 UUID"),
+					fieldWithPath("projectAmount").type(JsonFieldType.NUMBER).description("프로젝트 결제 가격"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.id").type(JsonFieldType.STRING).description("생성된 프로젝트 ID"),
@@ -204,7 +200,8 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 			LocalDateTime.of(2025, 11, 30, 18, 0),
 			"COMPLETED",
 			"프로젝트가 완료되었습니다.",
-			false);
+			false,
+			100L);
 
 		// when
 		final ResultActions result = mockMvc.perform(
@@ -233,9 +230,10 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("startAt").type(JsonFieldType.STRING).description("시작 날짜"),
 					fieldWithPath("endAt").type(JsonFieldType.STRING).description("종료 날짜"),
 					fieldWithPath("step").type(JsonFieldType.STRING)
-						.description("프로젝트 단계 (NOT_STARTED, IN_PROGRESS, PAUSED, COMPLETED)"),
+						.description("프로젝트 단계 (CONTRACT, IN_PROGRESS, PAYMENT, COMPLETED)"),
 					fieldWithPath("detail").type(JsonFieldType.STRING).description("프로젝트 상세 설명"),
-					fieldWithPath("deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"))
+					fieldWithPath("deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
+					fieldWithPath("projectAmount").type(JsonFieldType.NUMBER).description("프로젝트 결제 가격"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 					fieldWithPath("data.id").type(JsonFieldType.STRING).description("프로젝트 ID"),
@@ -245,6 +243,7 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.step").type(JsonFieldType.STRING).description("진행 상태"),
 					fieldWithPath("data.detail").type(JsonFieldType.STRING).description("상세 설명"),
 					fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
+					fieldWithPath("data.projectAmount").type(JsonFieldType.NUMBER).description("프로젝트 결제 가격"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
 	}
@@ -345,5 +344,46 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.totalCount").type(JsonFieldType.NUMBER).description("전체 프로젝트 개수"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
+	}
+	@Test
+	@DisplayName("내 프로젝트만 조회")
+	@Sql("classpath:sql/my-project-list.sql")
+	void 내_프로젝트_조회_성공() throws Exception {
+		//given
+		final String accessToken = createDevAdminAccessToken();
+
+		//when
+		final ResultActions result = mockMvc.perform(
+				get("/api/projects/my-projects")
+						.contentType(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		//then
+		result.andExpectAll(
+						status().isOk(),
+						jsonPath("$.result").value(ResultType.SUCCESS.name()),
+						jsonPath("$.data").exists(),
+						jsonPath("$.error").doesNotExist())
+				.andDo(document("my-project-list-success", myProjectListSuccessResource()));
+	}
+
+	private ResourceSnippet myProjectListSuccessResource() {
+		return resource(
+				ResourceSnippetParameters.builder()
+						.tag("Project API")
+						.summary("내 프로젝트 리스트 조회 API")
+						.description("내 프로젝트 리스트를 조회한다")
+						.requestHeaders(
+								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+								headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+						.responseFields(
+								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+								fieldWithPath("data.projects[].id").type(JsonFieldType.STRING).description("프로젝트 id"),
+								fieldWithPath("data.projects[].name").type(JsonFieldType.STRING).description("프로젝트 이름"),
+								fieldWithPath("data.projects[].detail").type(JsonFieldType.STRING).description("프로젝트 상세"),
+								fieldWithPath("data.projects[].startAt").type(JsonFieldType.STRING).description("프로젝트 시작일"),
+								fieldWithPath("data.projects[].endAt").type(JsonFieldType.STRING).description("프로젝트 마감일"),
+								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+						.build());
 	}
 }

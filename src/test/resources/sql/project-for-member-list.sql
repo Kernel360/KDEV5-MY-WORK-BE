@@ -151,10 +151,12 @@ INSERT INTO project_member (id,
                             member_id,
                             manager,
                             deleted,
-                            created_at)
+                            created_at,
+                            modified_at)
 VALUES (UNHEX(REPLACE('01933a42-b752-722c-bce7-d2e8c40b3509', '-', '')),
         UNHEX(REPLACE(@project_id, '-', '')),
         UNHEX(REPLACE('01973a42-2a6b-7aa2-aa6f-27242bd2aaf9', '-', '')), -- 멤버 3 ID
         0, -- manager 여부 (0: 일반, 1: 매니저)
         0, -- deleted 플래그 (0: 활성, 1: 삭제됨)
+        NOW(),
         NOW());

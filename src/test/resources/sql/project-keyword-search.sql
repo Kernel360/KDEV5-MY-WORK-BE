@@ -1,38 +1,38 @@
 --- 프로젝트 데이터
-INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted)
+INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted,project_amount)
 VALUES
     (UNHEX(REPLACE('01975f5b-b0c0-796f-b15a-cbbeedabe1e3','-','')),
-     '고객사 개발 프로젝트01', NOW(), NOW(), 'NOT_STARTED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다01', 0),
+     '고객사 개발 프로젝트01', NOW(), NOW(), 'CONTRACT', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다01', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-723f-b41c-bc922a25f86c','-','')),
-     '고객사 개발 프로젝트02', NOW(), NOW(), 'IN_PROGRESS', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다02', 0),
+     '고객사 개발 프로젝트02', NOW(), NOW(), 'IN_PROGRESS', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다02', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-7478-8517-333d362cfc6a','-','')),
-     '고객사 개발 프로젝트03', NOW(), NOW(), 'PAUSED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다03', 0),
+     '고객사 개발 프로젝트03', NOW(), NOW(), 'PAYMENT', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다03', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-73c8-99d8-c7ea5aaba8d5','-','')),
-     '고객사 개발 프로젝트04', NOW(), NOW(), 'COMPLETED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다05', 0),
+     '고객사 개발 프로젝트04', NOW(), NOW(), 'COMPLETED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다05', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-7c72-92b8-a46e34d4413b','-','')),
-     '고객사 개발 프로젝트05', NOW(), NOW(), 'NOT_STARTED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다05', 0),
+     '고객사 개발 프로젝트05', NOW(), NOW(), 'CONTRACT', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다05', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-7b42-b3b1-b1b4194699a3','-','')),
-     '고객사 개발 프로젝트06', NOW(), NOW(), 'IN_PROGRESS', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다05', 0),
+     '고객사 개발 프로젝트06', NOW(), NOW(), 'IN_PROGRESS', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다05', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-7abd-bf8c-5fe34b889870','-','')),
-     '고객사 개발 프로젝트07', NOW(), NOW(), 'PAUSED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다05', 0),
+     '고객사 개발 프로젝트07', NOW(), NOW(), 'PAYMENT', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다05', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-73d4-a7b5-77de269e1a34','-','')),
-     '고객사 개발 프로젝트08', NOW(), NOW(), 'COMPLETED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다08', 0),
+     '고객사 개발 프로젝트08', NOW(), NOW(), 'COMPLETED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다08', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-7010-a0de-8dc2756c99ee','-','')),
-     '고객사 개발 프로젝트09', NOW(), NOW(), 'NOT_STARTED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다09', 0),
+     '고객사 개발 프로젝트09', NOW(), NOW(), 'CONTRACT', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다09', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-7966-b08c-9b69ed36fa6a','-','')),
-     '고객사 개발 프로젝트10', NOW(), NOW(), 'IN_PROGRESS', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다10', 0),
+     '고객사 개발 프로젝트10', NOW(), NOW(), 'IN_PROGRESS', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다10', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-7cb1-89da-1761c3b927e0','-','')),
-     '고객사 개발 프로젝트11', NOW(), NOW(), 'PAUSED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다11', 0),
+     '고객사 개발 프로젝트11', NOW(), NOW(), 'PAYMENT', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다11', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-7ff8-8efe-e04459d2c70b','-','')),
-     '고객사 개발 프로젝트12', NOW(), NOW(), 'COMPLETED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다12', 0),
+     '고객사 개발 프로젝트12', NOW(), NOW(), 'COMPLETED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다12', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-7d83-88c3-30f058bdaf7a','-','')),
-     '고객사 개발 프로젝트13', NOW(), NOW(), 'NOT_STARTED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다13', 0),
+     '고객사 개발 프로젝트13', NOW(), NOW(), 'CONTRACT', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다13', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-734b-8fca-f3f88410f6dc','-','')),
-     '고객사 개발 프로젝트14', NOW(), NOW(), 'IN_PROGRESS', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다14', 0),
+     '고객사 개발 프로젝트14', NOW(), NOW(), 'IN_PROGRESS', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다14', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-74ca-9891-cfe2bd4b4e16','-','')),
-     '고객사 개발 프로젝트15', NOW(), NOW(), 'PAUSED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다15', 0),
+     '고객사 개발 프로젝트15', NOW(), NOW(), 'PAYMENT', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다15', 0,0),
     (UNHEX(REPLACE('01975f5b-b0c0-7d6a-af1f-9146009079ad','-','')),
-     '고객사 개발 프로젝트16', NOW(), NOW(), 'COMPLETED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다16', 0);
+     '고객사 개발 프로젝트16', NOW(), NOW(), 'COMPLETED', NOW(), NOW(), '고객사의 웹페이지를 구성해주는 프로젝트입니다16', 0,0);
 
 --- 프로젝트 할당 데이터
 INSERT INTO project_assign (id, project_id, dev_company_id, client_company_id, created_at)
@@ -150,7 +150,7 @@ VALUES
  NOW());
 
 --- 개발사 데이터
-INSERT INTO company (id, name, contact_phone_number, business_number, address, contact_email, detail, logo_image_path, type, deleted, created_at, modified_at)
+INSERT INTO company (id, name, contact_phone_number, business_number, address, contact_email, detail, file_name, type, deleted, created_at, modified_at)
 VALUES
 -- 개발사01
 (UNHEX(REPLACE('01975f65-a5f0-7867-8224-57f8725c8221','-','')),
@@ -217,7 +217,7 @@ VALUES
  '개발사 이름16', '02-1234-5616', '123-45-67816', '서울특별시 강남구 테헤란로 138, 16층', 'contact16@devcompany.com', '웹 개발 전문 개발사입니다16', NULL, 'DEV', 0, NOW(), NOW());
 
 --- 고객사 데이터
-INSERT INTO company (id, name, contact_phone_number, business_number, address, contact_email, detail, logo_image_path, type, deleted, created_at, modified_at)
+INSERT INTO company (id, name, contact_phone_number, business_number, address, contact_email, detail, file_name, type, deleted, created_at, modified_at)
 VALUES
 -- 고객사01
 (UNHEX(REPLACE('01975f65-a5f0-7130-8d02-e52ddc218c10','-','')),

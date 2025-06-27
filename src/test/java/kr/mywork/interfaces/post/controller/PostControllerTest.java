@@ -1,17 +1,10 @@
 package kr.mywork.interfaces.post.controller;
 
-import static org.junit.jupiter.params.provider.Arguments.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.domain.project.service.ProjectService;
+import kr.mywork.interfaces.project.controller.ProjectController;
+import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,12 +21,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import java.util.stream.Stream;
 
-import kr.mywork.common.api.support.response.ResultType;
-import kr.mywork.domain.project.service.ProjectService;
-import kr.mywork.interfaces.project.controller.ProjectController;
-import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = ProjectController.class,
 	excludeFilters = {
@@ -58,12 +54,12 @@ class PostControllerTest {
 		final UUID devCompanyId = UUID.fromString("01973ee2-3c1c-792f-9fa9-1e61fd218a6f");
 		final UUID clientCompanyId = UUID.fromString("01973ee2-7e42-7c7a-846d-caf8979cd023");
 
-		when(projectService.createProject(any())).thenReturn(createdProjectId);
+		// when(projectService.createProject(any())).thenReturn(createdProjectId);
 
 		final ProjectCreateWebRequest projectCreateWebRequest = new ProjectCreateWebRequest("프로젝트 이름",
 			LocalDateTime.of(2025, 6, 5, 12, 0),
 			LocalDateTime.of(2025, 7, 5, 12, 0),
-			"COMPLETED", "프로젝트 설명입니다.", devCompanyId, clientCompanyId);
+			"COMPLETED", "프로젝트 설명입니다.", devCompanyId, clientCompanyId,100L);
 
 		final String requestBody = objectMapper.writeValueAsString(projectCreateWebRequest);
 
@@ -89,10 +85,10 @@ class PostControllerTest {
 		// given
 		final UUID createdProjectId = UUID.fromString("01973ee1-ce0a-7350-afbd-2467ad13253a");
 
-		when(projectService.createProject(any())).thenReturn(createdProjectId);
+		// when(projectService.createProject(any())).thenReturn(createdProjectId);
 
 		final ProjectCreateWebRequest projectCreateWebRequest = new ProjectCreateWebRequest(
-			name, startAt, endAt, step, detail, devCompanyId, clientCompanyId);
+			name, startAt, endAt, step, detail, devCompanyId, clientCompanyId,100L);
 
 		final String requestBody = objectMapper.writeValueAsString(projectCreateWebRequest);
 

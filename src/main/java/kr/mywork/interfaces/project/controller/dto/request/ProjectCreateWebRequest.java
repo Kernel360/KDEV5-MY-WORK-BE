@@ -1,22 +1,21 @@
 package kr.mywork.interfaces.project.controller.dto.request;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.validation.constraints.Pattern;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Length;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @NoArgsConstructor(force = true)
 @RequiredArgsConstructor
 public class ProjectCreateWebRequest {
 
-	private static final String PROJECT_KEYWORD_TYPE = "^(NOT_STARTED|IN_PROGRESS|PAUSED|COMPLETED)$";
+	private static final String PROJECT_KEYWORD_TYPE = "^(CONTRACT|IN_PROGRESS|PAYMENT|COMPLETED)$";
 
 	@Length(min = 1, max = 200, message = "{project.invalid-name-length}")
 	private final String name;
@@ -34,6 +33,8 @@ public class ProjectCreateWebRequest {
 	private final UUID devCompanyId;
 	private final UUID clientCompanyId;
 
+	private final Long projectAmount;
+
 	public ProjectCreateRequest toServiceDto() {
 		return new ProjectCreateRequest(
 			this.name,
@@ -42,7 +43,8 @@ public class ProjectCreateWebRequest {
 			this.step,
 			this.detail,
 			this.devCompanyId,
-			this.clientCompanyId
+			this.clientCompanyId,
+			this.projectAmount
 		);
 	}
 }

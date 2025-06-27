@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -114,11 +115,94 @@ public class QueryDslProjectRepository implements ProjectRepository {
 	}
 
 	@Override
+	public List<Project> findAllNearDeadlineProjects(final int page, final int size, final LocalDate baseDate) {
+		final int offset = (page - 1) * size;
+
+		return queryFactory
+			.selectFrom(project)
+			.where(
+				project.deleted.isFalse(),
+				project.endAt.between(baseDate.atStartOfDay(), baseDate.plusDays(5).atTime(23, 59, 59))
+			)
+			.orderBy(project.endAt.asc())
+			.offset(offset)
+			.limit(size)
+			.fetch();
+	}
+
+	@Override
+	public List<Project> findAllNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, int page, int pageSize, LocalDateTime now) {
+		final int offset = (page - 1) * pageSize;
+		return queryFactory
+			.selectFrom(project)
+			.where(
+				project.id.in(projectIds)
+					.and(project.deleted.isFalse())
+					.and(project.endAt.goe(now))
+			)
+			.orderBy(project.endAt.asc())
+			.offset(offset)
+			.limit(pageSize)
+			.fetch();
+	}
+
+	@Override
+	public Long countNearDeadlineProjects(LocalDate baseDate) {
+		return queryFactory
+			.select(project.count())
+			.from(project)
+			.where(
+				project.deleted.isFalse(),
+				project.endAt.between(baseDate.atStartOfDay(), baseDate.plusDays(5).atTime(23, 59, 59))
+			)
+			.fetchOne();
+	}
+
+
+	@Override
+	public Long countNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, LocalDate baseDate) {
+		if (projectIds == null || projectIds.isEmpty()) {
+			return 0L;
+		}
+		return queryFactory
+			.select(project.count())
+			.from(project)
+			.where(
+				project.id.in(projectIds),
+				project.deleted.isFalse(),
+				project.endAt.between(baseDate.atStartOfDay(), baseDate.plusDays(5).atTime(23, 59, 59))
+			)
+			.fetchOne();
+	}
+
+
+	@Override
 	public List<Project> findProjectsNameById(List<UUID> mostPostProjectIds) {
 		return queryFactory
 			.selectFrom(project)
 			.where(project.id.in(mostPostProjectIds))
 			.fetch();
+	}
+
+
+	@Override
+	public List<Project> findProjectsByIds(List<UUID> projectIds) {
+		return queryFactory
+				.selectFrom(project)
+				.where(project.id.in(projectIds))
+				.fetch();
+	}
+
+	@Override
+	public List<Project> findCompletedProjectsByIdsWithDate(List<UUID> projectIds, LocalDateTime startDate,String status){
+		return queryFactory
+				.selectFrom(project)
+				.where(
+						project.id.in(projectIds),
+						project.endAt.goe(startDate),
+						project.step.eq(status)
+				)
+				.fetch();
 	}
 
 	private BooleanExpression eqProjectStep(final String step) {

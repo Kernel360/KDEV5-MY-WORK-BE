@@ -35,35 +35,38 @@ public class MemberController {
     private final MemberService memberService;
     private final ProjectService projectService;
 
-    @PostMapping
-    public ApiResponse<MemberCreateWebResponse> memberCreateWebResponseApiResponse(
-            @RequestBody final MemberCreateWebRequest memberCreateWebRequest) {
+	@PostMapping
+	public ApiResponse<MemberCreateWebResponse> memberCreateWebResponseApiResponse(
+		@RequestBody final MemberCreateWebRequest memberCreateWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
         final MemberCreateRequest memberCreateRequest = memberCreateWebRequest.toServiceDto();
 
-        final UUID createdMemberId = memberService.createMember(memberCreateRequest);
+		final UUID createdMemberId = memberService.createMember(memberCreateRequest, loginMemberDetail);
 
         final MemberCreateWebResponse memberCreateWebResponse = new MemberCreateWebResponse(createdMemberId);
 
         return ApiResponse.success(memberCreateWebResponse);
     }
 
-    @DeleteMapping
-    public ApiResponse<MemberDeleteWebResponse> deleteMember(
-            @RequestBody MemberDeleteWebRequest memberDeleteWebRequest) {
-        final UUID memberId = memberService.deleteMember(memberDeleteWebRequest.memberId());
+	@DeleteMapping
+	public ApiResponse<MemberDeleteWebResponse> deleteMember(
+		@RequestBody MemberDeleteWebRequest memberDeleteWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
+		final UUID memberId = memberService.deleteMember(memberDeleteWebRequest.memberId(), loginMemberDetail);
 
         MemberDeleteWebResponse memberDeleteWebResponse = new MemberDeleteWebResponse(memberId);
 
         return ApiResponse.success(memberDeleteWebResponse);
     }
 
-    @PutMapping
-    public ApiResponse<MemberUpdateWebResponse> updateMember(
-            @RequestBody MemberUpdateWebRequest memberUpdateWebRequest) {
-        final MemberUpdateRequest memberUpdateRequest = memberUpdateWebRequest.toServiceDto();
+	@PutMapping
+	public ApiResponse<MemberUpdateWebResponse> updateMember(
+		@RequestBody MemberUpdateWebRequest memberUpdateWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
+		final MemberUpdateRequest memberUpdateRequest = memberUpdateWebRequest.toServiceDto();
 
-        final UUID updatedId = memberService.updateMember(memberUpdateRequest);
+		final UUID updatedId = memberService.updateMember(memberUpdateRequest, loginMemberDetail);
 
         final MemberUpdateWebResponse memberUpdateWebResponse = new MemberUpdateWebResponse(updatedId);
 

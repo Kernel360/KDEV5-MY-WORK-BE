@@ -1,8 +1,8 @@
 -- 프로젝트 
-INSERT INTO project(id, name, step, detail, start_at, end_at, deleted, created_at, modified_at)
+INSERT INTO project(id, name, step, detail, start_at, end_at, deleted, created_at, modified_at,project_amount)
 VALUES
-    (UNHEX(REPLACE('01975d7f-052c-7d8f-819b-9a08f322ead3','-','')), '금융 거래 시스템 업그레이드', 'COMPLETED', '본 프로젝트는 금융 거래 시스템 업그레이드을 통해 업무 효율을 극대화하고 사용자 경험을 향상시키는 것을 목표로 합니다.', '2025-04-26 17:58:05', '2025-10-07 19:58:05', b'0', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (UNHEX(REPLACE('01975d82-e17b-71a9-801d-b941addc79d2','-','')), '리테일 POS 시스템 개발', 'IN_PROGRESS', '본 프로젝트는 리테일 POS 시스템 개발을 통해 업무 효율을 극대화하고 사용자 경험을 향상시키는 것을 목표로 합니다.', '2025-04-12 02:15:32', '2025-07-19 05:15:32', b'0', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    (UNHEX(REPLACE('01975d7f-052c-7d8f-819b-9a08f322ead3','-','')), '금융 거래 시스템 업그레이드', 'COMPLETED', '본 프로젝트는 금융 거래 시스템 업그레이드을 통해 업무 효율을 극대화하고 사용자 경험을 향상시키는 것을 목표로 합니다.', '2025-04-26 17:58:05', '2025-10-07 19:58:05', b'0', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0),
+    (UNHEX(REPLACE('01975d82-e17b-71a9-801d-b941addc79d2','-','')), '리테일 POS 시스템 개발', 'IN_PROGRESS', '본 프로젝트는 리테일 POS 시스템 개발을 통해 업무 효율을 극대화하고 사용자 경험을 향상시키는 것을 목표로 합니다.', '2025-04-12 02:15:32', '2025-07-19 05:15:32', b'0', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0);
 
 -- 프로젝트 단계
 INSERT INTO project_step(id,project_id,order_num,title,created_at)

@@ -10,6 +10,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import kr.mywork.domain.company.errors.CompanyErrorType;
+import kr.mywork.domain.company.errors.CompanyImageEmptyException;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -47,7 +49,7 @@ public class Company {
 	private String contactEmail;
 
 	@Column
-	private String logoImagePath;
+	private String fileName;
 
 	@Column(nullable = false, columnDefinition = "timestamp")
 	@CreationTimestamp
@@ -62,7 +64,7 @@ public class Company {
 
 	public Company(final UUID id, final String name, final String detail, final String businessNumber,
 		final String address, final String type, final String contactPhoneNumber, final String contactEmail,
-		final String logoImagePath) {
+		final String fileName) {
 		this.id = id;
 		this.name = name;
 		this.detail = detail;
@@ -71,7 +73,21 @@ public class Company {
 		this.type = CompanyType.from(type);
 		this.contactPhoneNumber = contactPhoneNumber;
 		this.contactEmail = contactEmail;
-		this.logoImagePath = logoImagePath;
+		this.fileName = fileName;
+	}
+
+	public static Company copyOf(Company company) {
+		return new Company(
+			company.id,
+			company.name,
+			company.detail,
+			company.businessNumber,
+			company.address,
+			company.type.toString(),
+			company.contactPhoneNumber,
+			company.contactEmail,
+			company.fileName
+		);
 	}
 
 	public void updateFrom(CompanyUpdateRequest companyUpdateRequest) {
@@ -83,7 +99,23 @@ public class Company {
 		this.type = CompanyType.from(companyUpdateRequest.getType());
 		this.contactPhoneNumber = companyUpdateRequest.getContactPhoneNumber();
 		this.contactEmail = companyUpdateRequest.getContactEmail();
-		this.logoImagePath = companyUpdateRequest.getLogoImagePath();
+		this.fileName = companyUpdateRequest.getLogoImagePath();
 	}
 
+	public String getFilePath() {
+		return String.format("/%s/%s", id, fileName);
+	}
+
+	public boolean existsImage() {
+		return !(this.fileName == null || this.fileName.isEmpty());
+	}
+
+	public boolean deleteImage() {
+		if (this.fileName == null) {
+			throw new CompanyImageEmptyException(CompanyErrorType.COMPANY_IMAGE_EMPTY);
+		}
+
+		this.fileName = null;
+		return true;
+	}
 }

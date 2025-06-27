@@ -1,14 +1,25 @@
 package kr.mywork.domain.post.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.uuid.Generators;
 
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
+import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.member.repository.MemberRepository;
+import kr.mywork.domain.notification.model.NotificationActionType;
+import kr.mywork.domain.notification.model.TargetType;
+import kr.mywork.domain.notification.service.NotificationService;
 import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
@@ -17,8 +28,11 @@ import kr.mywork.domain.post.repository.PostIdRepository;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.request.PostUpdateRequest;
+import kr.mywork.domain.post.service.dto.response.PostApprovalRequest;
+import kr.mywork.domain.post.service.dto.response.PostApprovalResponse;
 import kr.mywork.domain.post.service.dto.response.PostDetailResponse;
 import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
+import kr.mywork.domain.post.service.dto.response.PostTotalCountInStepResponse;
 import kr.mywork.domain.post.service.dto.response.PostUpdateResponse;
 import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
@@ -27,8 +41,9 @@ import kr.mywork.domain.project_step.errors.ProjectStepErrorType;
 import kr.mywork.domain.project_step.errors.ProjectStepNotFoundException;
 import kr.mywork.domain.project_step.model.ProjectStep;
 import kr.mywork.domain.project_step.repository.ProjectStepRepository;
+import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepDetailRequest;
+import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepPostTotalCountResponse;
 import lombok.RequiredArgsConstructor;
-
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -40,6 +55,39 @@ public class PostService {
 	private final PostIdRepository postIdRepository;
 	private final ProjectStepRepository projectStepRepository;
 	private final ProjectRepository projectRepository;
+	private final ApplicationEventPublisher eventPublisher;
+	private final NotificationService notificationService;
+	private final MemberRepository memberRepository;
+
+	@Transactional
+	public PostApprovalResponse approvalPost(UUID postId, PostApprovalRequest postApprovalRequest, LoginMemberDetail loginMemberDetail) {
+		Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
+
+		Post before = Post.copyOf(post);
+
+		ProjectStep projectStep = projectStepRepository.findById(post.getProjectStepId())
+			.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
+
+		post.changeApproval(postApprovalRequest.getApprovalStatus());
+
+		notificationService.save(
+			post.getAuthorId(),
+			post.getAuthorName(),
+			post.getTitle(),
+			loginMemberDetail.memberName(),
+			loginMemberDetail.memberId(),
+			TargetType.POST,
+			post.getId(),
+			NotificationActionType.APPROVED,
+			post.getModifiedAt(),
+			projectStep.getProjectId(),
+			projectStep.getId()
+		);
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, post, loginMemberDetail));
+
+		return new PostApprovalResponse(post.getId(), post.getApproval());
+	}
 
 	@Transactional
 	public UUID createPostId() {
@@ -48,20 +96,26 @@ public class PostService {
 	}
 
 	@Transactional
-	public UUID createPost(PostCreateRequest postCreateRequest) {
+	public UUID createPost(PostCreateRequest postCreateRequest, LoginMemberDetail loginMemberDetail) {
 		postIdRepository.findById(postCreateRequest.getId())
 			.orElseThrow(() -> new PostIdNotFoundException(PostErrorType.ID_NOT_FOUND));
 
 		final Post savedPost = postRepository.save(postCreateRequest);
+
+		eventPublisher.publishEvent(new CreateEventObject(savedPost, loginMemberDetail));
+
 		return savedPost.getId();
 	}
 
 	@Transactional
-	public PostUpdateResponse updatePost(PostUpdateRequest postUpdateRequest) {
+	public PostUpdateResponse updatePost(PostUpdateRequest postUpdateRequest, LoginMemberDetail loginMemberDetail) {
 		Post post = postRepository.findById(postUpdateRequest.getId())
 			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
 
+		Post before = Post.copyOf(post);
 		post.update(postUpdateRequest);
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, post, loginMemberDetail));
 		return PostUpdateResponse.from(post);
 	}
 
@@ -120,12 +174,38 @@ public class PostService {
 	}
 
 	@Transactional
-	public UUID deletePost(UUID postId) {
+	public UUID deletePost(UUID postId, LoginMemberDetail loginMemberDetail) {
 		Post post = postRepository.findById(postId)
 			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
 
 		post.delete();
 
+		eventPublisher.publishEvent(new DeleteEventObject(post, loginMemberDetail));
+
 		return post.getId();
+	}
+
+	@Transactional
+	public List<ProjectStepPostTotalCountResponse> getProjectStepsWithPostTotalCount(List<ProjectStepDetailRequest> noneCountProjectSteps){
+		final List<UUID> projectStepIds = noneCountProjectSteps.stream()
+			.map(ProjectStepDetailRequest::projectStepId)
+			.toList();
+
+		final List<PostTotalCountInStepResponse> getPostTotalCount = postRepository.findPostCountGroupedByProjectStepId(projectStepIds);
+
+		Map<UUID, Long> postCountMap = getPostTotalCount.stream()
+			.collect(Collectors.toMap(
+				PostTotalCountInStepResponse::projectStepId,
+				PostTotalCountInStepResponse::totalCount
+			));
+
+		return noneCountProjectSteps.stream()
+			.map(step -> new ProjectStepPostTotalCountResponse(
+				step.projectStepId(),
+				step.title(),
+				step.orderNum(),
+				postCountMap.getOrDefault(step.projectStepId(), 0L)
+			))
+			.toList();
 	}
 }

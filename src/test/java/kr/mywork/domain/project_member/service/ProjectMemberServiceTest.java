@@ -14,7 +14,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
 
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 
@@ -22,11 +24,15 @@ class ProjectMemberServiceTest {
 
 	private ProjectMemberService projectMemberService;
 	private ProjectMemberRepository projectMemberRepository;
+	private ApplicationEventPublisher eventPublisher;
+	private LoginMemberDetail loginMemberDetail;
 
 	@BeforeEach
 	void setUp() {
 		this.projectMemberRepository = Mockito.mock(ProjectMemberRepository.class);
-		this.projectMemberService = new ProjectMemberService(projectMemberRepository);
+		this.eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+		this.loginMemberDetail = Mockito.mock(LoginMemberDetail.class);
+		this.projectMemberService = new ProjectMemberService(projectMemberRepository, eventPublisher);
 	}
 
 	@Test
@@ -42,7 +48,7 @@ class ProjectMemberServiceTest {
 			.willReturn(Optional.of(new ProjectMember(projectId, memberId)));
 
 		// when
-		projectMemberService.addMemberToCompany(projectId, memberId);
+		projectMemberService.addMemberToCompany(projectId, memberId, loginMemberDetail);
 
 		// then
 		verify(projectMemberRepository, times(1)).findByMemberIdAndProjectId(any(), any());
@@ -62,7 +68,7 @@ class ProjectMemberServiceTest {
 			.willReturn(new ProjectMember(projectId, memberId));
 
 		// when
-		projectMemberService.addMemberToCompany(projectId, memberId);
+		projectMemberService.addMemberToCompany(projectId, memberId, loginMemberDetail);
 
 		// then
 		verify(projectMemberRepository, never()).findByMemberIdAndProjectId(any(), any());

@@ -7,10 +7,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.mywork.domain.member.model.MemberRole;
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
+import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
 import kr.mywork.domain.post.errors.review.ReviewErrorType;
 import kr.mywork.domain.post.errors.review.ReviewNotFoundException;
 import kr.mywork.domain.post.model.Review;
@@ -33,31 +37,40 @@ public class ReviewService {
 	private int reviewPageSize;
 
 	private final ReviewRepository reviewRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
-	public ReviewCreateResponse save(final ReviewCreateRequest reviewCreateRequest) {
+	public ReviewCreateResponse save(final ReviewCreateRequest reviewCreateRequest, LoginMemberDetail loginMemberDetail) {
 		// TODO Post 조회 및 검증 로직 추가 필요
 
 		final Review review = reviewCreateRequest.toEntity();
 		final Review savedReview = reviewRepository.save(review);
 
+		eventPublisher.publishEvent(new CreateEventObject(savedReview, loginMemberDetail));
+
 		return ReviewCreateResponse.fromEntity(savedReview);
 	}
 
-	public ReviewModifyResponse modifyComment(final ReviewModifyRequest reviewModifyRequest) {
+	public ReviewModifyResponse modifyComment(final ReviewModifyRequest reviewModifyRequest, LoginMemberDetail loginMemberDetail) {
 		final Review review = reviewRepository.findById(reviewModifyRequest.reviewId())
 			.orElseThrow(() -> new ReviewNotFoundException(ReviewErrorType.REVIEW_NOT_FOUND));
 
+		Review before = Review.copyOf(review);
+
 		review.modifyComment(reviewModifyRequest.comment());
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, review, loginMemberDetail));
 
 		return new ReviewModifyResponse(review.getId(), review.getComment());
 	}
 
-	public ReviewDeleteResponse deleteReview(final ReviewDeleteRequest reviewDeleteRequest) {
+	public ReviewDeleteResponse deleteReview(final ReviewDeleteRequest reviewDeleteRequest, LoginMemberDetail loginMemberDetail) {
 		// TODO 본인 작성 검증 내용 추가
 		final Review review = reviewRepository.findById(reviewDeleteRequest.reviewId())
 			.orElseThrow(() -> new ReviewNotFoundException(ReviewErrorType.REVIEW_NOT_FOUND));
 
 		review.delete();
+
+		eventPublisher.publishEvent(new DeleteEventObject(review, loginMemberDetail));
 
 		return new ReviewDeleteResponse(review.getId());
 	}

@@ -1,6 +1,6 @@
 -- 회사 삽입
 INSERT INTO company (id, name, detail, business_number, address, type,
-                     contact_phone_number, contact_email, logo_image_path,
+                     contact_phone_number, contact_email, file_name,
                      created_at, modified_at, deleted)
 VALUES (UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
         '마이워크',
@@ -10,5 +10,5 @@ VALUES (UNHEX(REPLACE('0196f7a6-10b6-7123-a2dc-32c3861ea55e', '-', '')),
         'DEV',
         '010-1234-5678',
         'info@mywork.com',
-        '/images/logo.png',
+        'logo.png',
         NOW(), NOW(), FALSE);

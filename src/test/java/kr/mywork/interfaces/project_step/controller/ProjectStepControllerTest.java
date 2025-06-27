@@ -1,18 +1,14 @@
 package kr.mywork.interfaces.project_step.controller;
 
-import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.domain.post.service.PostService;
+import kr.mywork.domain.project_step.serivce.ProjectStepService;
+import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepUpdateResponse;
+import kr.mywork.interfaces.project_step.dto.request.ProjectStepCreateWebRequest;
+import kr.mywork.interfaces.project_step.dto.request.ProjectStepUpdateWebRequest;
+import kr.mywork.interfaces.project_step.dto.request.ProjectStepsCreateWebRequest;
+import kr.mywork.interfaces.project_step.dto.request.ProjectStepsUpdateWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,15 +25,18 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 
-import kr.mywork.common.api.support.response.ResultType;
-import kr.mywork.domain.project_step.serivce.ProjectStepService;
-import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepUpdateResponse;
-import kr.mywork.interfaces.project_step.dto.request.ProjectStepCreateWebRequest;
-import kr.mywork.interfaces.project_step.dto.request.ProjectStepUpdateWebRequest;
-import kr.mywork.interfaces.project_step.dto.request.ProjectStepsCreateWebRequest;
-import kr.mywork.interfaces.project_step.dto.request.ProjectStepsUpdateWebRequest;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = ProjectStepController.class,
 	excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = WebSecurityConfigurer.class)}, //security 설정을 종료하기 위한 설정
@@ -53,11 +52,14 @@ class ProjectStepControllerTest {
 	@MockitoBean
 	private ProjectStepService projectStepService;
 
+	@MockitoBean
+	private PostService postService;
+
 	@Test
 	@DisplayName("프로젝트 단계 목록 생성 성공")
 	void 프로젝트_단계_목록_생성_성공() throws Exception {
 		// given
-		when(projectStepService.saveAll(any(), any())).thenReturn(7);
+		when(projectStepService.saveAll(any(), any(), any())).thenReturn(7);
 
 		final UUID projectId = UUID.fromString("0197207e-7331-7000-946b-a29a79a82424");
 
@@ -91,7 +93,7 @@ class ProjectStepControllerTest {
 	void 프로젝트_단계_목록_유효하지_않은_입력값_실패(
 		final UUID projectId, final List<ProjectStepCreateWebRequest> projectStepCreateWebRequests) throws Exception {
 		// given
-		when(projectStepService.saveAll(any(), any())).thenReturn(7);
+		when(projectStepService.saveAll(any(), any(), any())).thenReturn(7);
 
 		final ProjectStepsCreateWebRequest projectStepsCreateWebRequest = new ProjectStepsCreateWebRequest(
 			projectId, projectStepCreateWebRequests);
@@ -135,7 +137,7 @@ class ProjectStepControllerTest {
 	void 프로젝트_단계_수정_유효하지_않은_입력값_실패(
 		final UUID projectId, final List<ProjectStepUpdateWebRequest> projectStepUpdateWebRequests) throws Exception {
 		// given
-		when(projectStepService.updateProjectSteps(any(), any()))
+		when(projectStepService.updateProjectSteps(any(), any(), any()))
 			.thenReturn(List.of(
 				new ProjectStepUpdateResponse(UUID.fromString("01972e99-c314-7e8e-817f-7933e74a76a3"), "기획_수정", 1),
 				new ProjectStepUpdateResponse(UUID.fromString("01972e9a-6282-78bc-98e6-51f7fcd9cad8"), "개발_수정", 2),

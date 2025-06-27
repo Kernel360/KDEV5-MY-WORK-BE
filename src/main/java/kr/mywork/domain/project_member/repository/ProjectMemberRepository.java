@@ -12,6 +12,7 @@ public interface ProjectMemberRepository {
 	List<CompanyMemberInProjectResponse> findCompanyMembersInProject(UUID projectId,UUID companyId);
 	Optional<ProjectMember> findByMemberIdAndProjectId(UUID memberId,UUID projectId);
 	boolean existsByMemberIdAndProjectIdAndDeleted(UUID memberId, UUID projectId, boolean deleted);
+	List<ProjectMember> findAllByMemberId(UUID memberId);
 	List<UUID> findProjectIdsByMemberId(UUID memberId);
 	List<ProjectMember> getUserProjectIds(UUID memberId);
 }

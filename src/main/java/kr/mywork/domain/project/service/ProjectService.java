@@ -1,6 +1,9 @@
 package kr.mywork.domain.project.service;
 
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
+import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.Company;
@@ -21,24 +24,30 @@ import kr.mywork.domain.project.errors.ProjectAssignNotFoundException;
 import kr.mywork.domain.project.errors.ProjectErrorType;
 import kr.mywork.domain.project.errors.ProjectNotFoundException;
 import kr.mywork.domain.project.model.Project;
+import kr.mywork.domain.project.model.ProjectAmountChartRole;
 import kr.mywork.domain.project.model.ProjectAssign;
 import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project.repository.ProjectAssignRepository;
 import kr.mywork.domain.project.repository.ProjectRepository;
+import kr.mywork.domain.project.service.dto.request.NearDeadlineProjectRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
 import kr.mywork.domain.project.service.dto.response.*;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.YearMonth;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,41 +61,54 @@ public class ProjectService {
 	@Value("${project.page.size}")
 	private int projectPageSize;
 
+	@Value("${dashboard.page.size}")
+	private int dashboardPageSize;
+
 	private final ProjectRepository projectRepository;
 	private final ProjectAssignRepository projectAssignRepository;
 	private final CompanyRepository companyRepository;
 	private final MemberRepository memberRepository;
 	private final PostRepository postRepository;
 	private final ProjectMemberRepository projectMemberRepository;
-
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
-	public UUID createProject(ProjectCreateRequest request) {
+	public UUID createProject(ProjectCreateRequest request, LoginMemberDetail loginMemberDetail) {
 
 		final Project savedProject = projectRepository.save(
-			new Project(request.name(), request.startAt(), request.endAt(), request.step(), request.detail()));
+			new Project(request.name(), request.startAt(), request.endAt(), request.step(), request.detail(),request.projectAmount()));
 
 		projectAssignRepository.save(
 			new ProjectAssign(savedProject.getId(), request.devCompanyId(), request.clientCompanyId()));
+
+		eventPublisher.publishEvent(new CreateEventObject(savedProject, loginMemberDetail));
 
 		return savedProject.getId();
 	}
 
 	@Transactional
-	public UUID deleteProject(UUID projectId) {
+	public UUID deleteProject(UUID projectId, LoginMemberDetail loginMemberDetail) {
 		var project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
 
 		project.setDeleted(true);
+
+		eventPublisher.publishEvent(new DeleteEventObject(project, loginMemberDetail));
+
 		return project.getId();
 	}
 
 	@Transactional
-	public ProjectUpdateResponse updateProject(UUID projectId, ProjectUpdateRequest request) {
+	public ProjectUpdateResponse updateProject(UUID projectId, ProjectUpdateRequest request, LoginMemberDetail loginMemberDetail) {
 		var project = projectRepository.findById(projectId)
 			.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
 
+		Project before = Project.copyOf(project);
+
 		project.updateFrom(request);
+
+		eventPublisher.publishEvent(new ModifyEventObject(before, project, loginMemberDetail));
+
 		return ProjectUpdateResponse.from(project);
 	}
 
@@ -105,9 +127,9 @@ public class ProjectService {
 			.orElseThrow(() -> new CompanyNotFoundException(CompanyErrorType.COMPANY_NOT_FOUND));
 
 		return new ProjectDetailResponse(project.getId(), project.getName(), project.getStartAt(), project.getEndAt(),
-			project.getStep(), project.getDetail(), project.getDeleted(), project.getCreatedAt(), devCompany.getId(),
-			devCompany.getName(), devCompany.getContactPhoneNumber(), clientCompany.getId(), clientCompany.getName(),
-			clientCompany.getContactPhoneNumber());
+			project.getStep(), project.getDetail(), project.getDeleted(), project.getCreatedAt(), project.getProjectAmount(),
+			devCompany.getId(), devCompany.getName(), devCompany.getContactPhoneNumber(),
+			clientCompany.getId(), clientCompany.getName(),clientCompany.getContactPhoneNumber());
 	}
 
 	@Transactional(readOnly = true)
@@ -338,6 +360,7 @@ public class ProjectService {
 			})
 			.toList();
 	}
+
 	public DashboardCountSummaryResponse getSummaryTotalCount(LoginMemberDetail loginMemberDetail) {
 
 		final String userType = loginMemberDetail.roleName();
@@ -380,4 +403,203 @@ public class ProjectService {
 		return new DashboardCountSummaryResponse(totalCount, inProgressCount, completedCount);
 	}
 
+	@Transactional(readOnly = true)
+	public List<NearDeadlineProjectResponse> findNearDeadlineProjectsByLoginMember(
+		final int page,
+		final NearDeadlineProjectRequest nearDeadlineProjectRequest,
+		final LocalDate baseDate
+	) {
+		final String userType = nearDeadlineProjectRequest.getMemberRole();
+		final LocalDateTime now = baseDate.atStartOfDay();
+
+		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(userType)) {
+			final List<Project> projects = projectRepository.findAllNearDeadlineProjects(page, dashboardPageSize, baseDate);
+			return projects.stream()
+				.map(this::toResponseWithDday)
+				.toList();
+		}
+
+		if (MemberRole.CLIENT_ADMIN.getRoleName().equals(userType) || MemberRole.DEV_ADMIN.getRoleName().equals(userType)) {
+			final UUID companyId = nearDeadlineProjectRequest.getCompanyId();
+			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId, userType);
+			final List<UUID> projectIds = assigns.stream()
+				.map(ProjectAssign::getProjectId)
+				.distinct()
+				.toList();
+
+			final List<Project> projects = projectRepository.findAllNearDeadlineProjectsByProjectIds(projectIds, page, dashboardPageSize, now);
+			return projects.stream()
+				.map(this::toResponseWithDday)
+				.toList();
+		}
+
+		final UUID memberId = nearDeadlineProjectRequest.getMemberId();
+		final List<ProjectMember> projectMembers = projectMemberRepository.findAllByMemberId(memberId);
+		final List<UUID> projectIds = projectMembers.stream()
+			.map(ProjectMember::getProjectId)
+			.distinct()
+			.toList();
+
+		final List<Project> projects = projectRepository.findAllNearDeadlineProjectsByProjectIds(projectIds, page, dashboardPageSize, now);
+		return projects.stream()
+			.map(this::toResponseWithDday)
+			.toList();
+	}
+
+	private NearDeadlineProjectResponse toResponseWithDday(Project project) {
+		int dday = Math.max(0, (int) ChronoUnit.DAYS.between(LocalDate.now(), project.getEndAt().toLocalDate()));
+		return NearDeadlineProjectResponse.of(project.getId(), project.getName(), project.getEndAt(), dday);
+	}
+
+	@Transactional(readOnly = true)
+	public Long countNearDeadlineProjectsByLoginMember(final NearDeadlineProjectRequest nearDeadlineProjectRequest, final LocalDate baseDate) {
+		final String memberRole = nearDeadlineProjectRequest.getMemberRole();
+
+		if (MemberRole.SYSTEM_ADMIN.getRoleName().equals(memberRole)) {
+			return projectRepository.countNearDeadlineProjects(baseDate);
+		}
+
+		if (MemberRole.CLIENT_ADMIN.getRoleName().equals(memberRole) || MemberRole.DEV_ADMIN.getRoleName().equals(
+			memberRole)) {
+			final UUID companyId = nearDeadlineProjectRequest.getCompanyId();
+			final List<ProjectAssign> assigns = projectAssignRepository.findAllByCompanyId(companyId, memberRole);
+			final List<UUID> projectIds = assigns.stream()
+				.map(ProjectAssign::getProjectId)
+				.toList();
+
+			return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds, baseDate);
+		}
+
+		final UUID memberId = nearDeadlineProjectRequest.getMemberId();
+		final List<ProjectMember> projectMembers = projectMemberRepository.findAllByMemberId(memberId);
+		final List<UUID> projectIds = projectMembers.stream()
+			.map(ProjectMember::getProjectId)
+			.distinct()
+			.toList();
+
+		return projectRepository.countNearDeadlineProjectsByProjectIds(projectIds, baseDate);
+	}
+
+	@Transactional
+	public List<MyProjectSelectResponse> findProjectsByLoginMember(LoginMemberDetail loginMemberDetail){
+		String memberRole = loginMemberDetail.roleName();
+		UUID companyId = loginMemberDetail.companyId();
+		final List<Project> myProjects;
+
+		// dev,client Admin
+		if(MemberRole.CLIENT_ADMIN.isSameRoleName(memberRole) ||
+				MemberRole.DEV_ADMIN.isSameRoleName(memberRole)){
+
+			final List<UUID> projectIds = projectAssignRepository.findCompanyProjectsByCompanyId(companyId,memberRole);
+
+			 myProjects =  projectRepository.findProjectsByIds(projectIds);
+
+		// user
+		}else if (MemberRole.USER.isSameRoleName(memberRole)){
+
+			final List<UUID> projectIds = projectMemberRepository.findProjectIdsByMemberId(loginMemberDetail.memberId());
+
+			myProjects =  projectRepository.findProjectsByIds(projectIds);
+
+		}else{
+			throw new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND);
+		}
+
+		return myProjects.stream()
+				.map(project -> MyProjectSelectResponse.of(
+						project.getId(),
+						project.getName(),
+						project.getDetail(),
+						project.getStartAt(),
+						project.getEndAt()
+				))
+				.toList();
+	}
+    @Transactional
+    public List<ProjectAmountSummaryResponse> findProjectAmountSummary(LoginMemberDetail memberDetail, String chartType, LocalDate today) {
+        //로그인한 유저의 타입별로 프로젝트 Ids를 반환Add commentMore actions
+        final List<UUID> projectIds = getProjectIdsByRoleName(memberDetail);
+        String status = "COMPLETED";
+
+        if (ProjectAmountChartRole.CHART_WEEK.isSameChartType(chartType)) {
+            //프로젝트 조회 (1달전의 주의 첫날 월요일 기준)
+            LocalDate oneMonthAgo = today.minusMonths(1);
+            LocalDate startOfWeek = oneMonthAgo.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+            LocalDateTime startDate = startOfWeek.atStartOfDay();
+
+            //프로젝트 날짜 기준으로 조회.
+            final List<Project> projects = projectRepository.findCompletedProjectsByIdsWithDate(projectIds, startDate,status);
+
+            List<ProjectAmountSummaryResponse> result = new ArrayList<>();
+
+            for (int i = 3; i >= 0; i--) {
+                LocalDateTime weekStart = startDate.plusWeeks(i);
+                //반복문은 7씩 증가 하지만 종료일은 오늘기준으로 가야함
+                LocalDateTime weekEnd = (i < 3) ? startDate.plusWeeks(i + 1) : today.atStartOfDay();
+                // 계산 통계 합계
+                long totalAmount = projects.stream()
+                        .filter(project -> {
+                            LocalDateTime endAt = project.getEndAt();
+                            return !endAt.isBefore(weekStart) && endAt.isBefore(weekEnd);
+                        })
+                        .mapToLong(Project::getProjectAmount)
+                        .sum();
+
+                //몇월인지 구함
+                int month = weekStart.getMonthValue();
+                //몇째 주 인지 구함
+                int weekOfMonth = weekStart.get(ChronoField.ALIGNED_WEEK_OF_MONTH);
+                String label = month + "월" + weekOfMonth + "주";
+
+                result.add(new ProjectAmountSummaryResponse(label, totalAmount));
+            }
+            return result;
+        }
+
+        if (ProjectAmountChartRole.CHART_MONTH.isSameChartType(chartType)) {
+            //프로젝트 월초 6개월 치 데이터
+            YearMonth sixMonthAgo = YearMonth.from(today).minusMonths(5);
+            LocalDate startOfMonth = sixMonthAgo.atDay(1);
+            LocalDateTime startDate = startOfMonth.atStartOfDay();
+            //프로젝트 날짜 기준으로 조회.
+            final List<Project> projects = projectRepository.findCompletedProjectsByIdsWithDate(projectIds, startDate,status);
+
+            List<ProjectAmountSummaryResponse> result = new ArrayList<>();
+
+
+            for (int i = 5; i >= 0; i--) {
+                YearMonth targetMonth = YearMonth.from(today).minusMonths(i);
+                LocalDateTime monthStart = targetMonth.atDay(1).atStartOfDay();            // 월의 시작일
+                LocalDateTime monthEnd = targetMonth.atEndOfMonth().plusDays(1).atStartOfDay(); // 다음 달 1일 00:00
+
+                // 계산 통계 합계
+                long totalAmount = projects.stream()
+                        .filter(project -> {
+                            LocalDateTime endAt = project.getEndAt();
+                            return !endAt.isBefore(monthStart) && endAt.isBefore(monthEnd);
+                        })
+                        .mapToLong(Project::getProjectAmount)
+                        .sum();
+
+                //몇월인지 구함
+                String label = targetMonth.getMonthValue() + "월";
+
+                result.add(new ProjectAmountSummaryResponse(label, totalAmount));
+            }
+            return result;
+
+        }
+        return Collections.emptyList();
+    }
+
+    private List<UUID> getProjectIdsByRoleName(LoginMemberDetail memberDetail) {
+        String roleName = memberDetail.roleName();
+        if (MemberRole.CLIENT_ADMIN.isSameRoleName(roleName) || MemberRole.DEV_ADMIN.isSameRoleName(roleName)) {
+            return projectAssignRepository.findCompanyProjectsByCompanyId(memberDetail.companyId(), roleName);
+        } else if (MemberRole.USER.isSameRoleName(roleName)) {
+            return projectMemberRepository.findProjectIdsByMemberId(memberDetail.memberId());
+        } else {
+            throw new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND);
+        }
+    }
 }

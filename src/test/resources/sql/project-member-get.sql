@@ -1,5 +1,5 @@
 -- 회사
-INSERT INTO company (id, name, contact_email, business_number, address, contact_phone_number, created_at, modified_at, type, logo_image_path, deleted, detail)
+INSERT INTO company (id, name, contact_email, business_number, address, contact_phone_number, created_at, modified_at, type, file_name, deleted, detail)
 VALUES (UUID_TO_BIN('6939d8be-1bf2-4f01-9189-12864e38d913'),
         '테스트 회사',
         'testcompany@example.com',
@@ -8,12 +8,12 @@ VALUES (UUID_TO_BIN('6939d8be-1bf2-4f01-9189-12864e38d913'),
         '02-1234-5678',
         NOW(), NOW(),
         'DEV',
-        '/path/to/logo.png',
+        'logo.png',
         0,
         '테스트 회사 상세 정보');
 
 -- 프로젝트
-INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted)
+INSERT INTO project (id, name, start_at, end_at, step, created_at, modified_at, detail, deleted,project_amount)
 VALUES (UUID_TO_BIN('01974f0b-5c7a-7fa2-9aba-1323490b77e9'),
         '테스트 프로젝트',
         NOW(),
@@ -22,6 +22,7 @@ VALUES (UUID_TO_BIN('01974f0b-5c7a-7fa2-9aba-1323490b77e9'),
         NOW(),
         NOW(),
         '테스트용 프로젝트입니다',
+        0,
         0);
 
 -- 멤버추가
@@ -60,7 +61,7 @@ INSERT INTO member (
          );
 
 -- 할당 멤버
-INSERT INTO project_member (id, project_id, member_id, manager, deleted, created_at)
+INSERT INTO project_member (id, project_id, member_id, manager, deleted, created_at, modified_at)
 VALUES
     (
         UUID_TO_BIN('01974f20-3bbe-7d0d-a27e-097667886779'),
@@ -68,6 +69,7 @@ VALUES
         UUID_TO_BIN('51a58807-bf20-4160-b4e0-edabba6df8f9'),
         0,
         0,
+        NOW(),
         NOW()
     ),
     (
@@ -76,5 +78,6 @@ VALUES
         UUID_TO_BIN('346cdf98-f47b-4d13-bbe4-bd3d0ea48504'),
         0,
         0,
+        NOW(),
         NOW()
     );

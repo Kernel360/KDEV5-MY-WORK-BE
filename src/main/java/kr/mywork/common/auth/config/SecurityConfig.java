@@ -22,6 +22,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import kr.mywork.common.api.components.filter.HttpLoggingFilter;
+import kr.mywork.common.api.components.filter.RequestTrackingIdFilter;
 import kr.mywork.domain.auth.service.JwtTokenProvider;
 import kr.mywork.domain.auth.service.TokenAuthenticationService;
 import kr.mywork.domain.member.model.MemberRole;
@@ -37,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
+
 	private final JwtProperties jwtProperties;
 	private final ObjectMapper objectMapper;
 	private final AuthenticationProvider loginAuthenticationProvider;
@@ -88,6 +91,8 @@ public class SecurityConfig {
 			})
 			.addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(new RequestTrackingIdFilter(), JwtAuthenticationFilter.class)
+			.addFilterAfter(new HttpLoggingFilter(), RequestTrackingIdFilter.class)
 			.exceptionHandling(exception -> exception
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint())
 				.accessDeniedHandler(jwtAccessDeniedHandler())

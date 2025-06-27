@@ -1,42 +1,27 @@
 package kr.mywork.interfaces.project.controller;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.common.auth.components.annotation.LoginMember;
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.project.service.ProjectService;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
-import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
+import kr.mywork.domain.project.service.dto.response.*;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectDeleteWebRequest;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectUpdateWebRequest;
-import kr.mywork.interfaces.project.controller.dto.response.ProjectCreateWebResponse;
-import kr.mywork.interfaces.project.controller.dto.response.ProjectDeleteWebResponse;
-import kr.mywork.interfaces.project.controller.dto.response.ProjectDetailWebResponse;
-import kr.mywork.interfaces.project.controller.dto.response.ProjectListWebResponse;
-import kr.mywork.interfaces.project.controller.dto.response.ProjectSelectWebResponse;
-import kr.mywork.interfaces.project.controller.dto.response.ProjectUpdateWebResponse;
+import kr.mywork.interfaces.project.controller.dto.response.*;
 import kr.mywork.interfaces.project.dto.response.ProjectMemberListWebResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -45,17 +30,19 @@ import lombok.RequiredArgsConstructor;
 public class ProjectController {
 
 	private static final String PROJECT_SEARCH_KEYWORD_TYPE = "^(PROJECT_NAME|DEV_COMPANY_NAME|CLIENT_COMPANY_NAME)$";
-	private static final String PROJECT_STEP_TYPE = "^(NOT_STARTED|IN_PROGRESS|PAUSED|COMPLETED)$";
+	//private static final String PROJECT_STEP_TYPE = "^(NOT_STARTED|IN_PROGRESS|PAUSED|COMPLETED)$";
+	private static final String PROJECT_STEP_TYPE = "^(CONTRACT|IN_PROGRESS|PAYMENT|COMPLETED)$";
 
 	private final ProjectService projectService;
 
 	@PostMapping
 	public ApiResponse<ProjectCreateWebResponse> createProject(
-		@RequestBody @Valid final ProjectCreateWebRequest projectCreateWebRequest) {
+		@RequestBody @Valid final ProjectCreateWebRequest projectCreateWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
 		final ProjectCreateRequest projectCreateRequest = projectCreateWebRequest.toServiceDto();
 
-		final UUID createdId = projectService.createProject(projectCreateRequest);
+		final UUID createdId = projectService.createProject(projectCreateRequest, loginMemberDetail);
 
 		return ApiResponse.success(new ProjectCreateWebResponse(createdId));
 	}
@@ -63,11 +50,12 @@ public class ProjectController {
 	@PutMapping("/{projectId}")
 	public ApiResponse<ProjectUpdateWebResponse> updateProject(
 		@RequestBody @Valid final ProjectUpdateWebRequest webRequest,
-		@PathVariable final UUID projectId) {
+		@PathVariable final UUID projectId,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
 		final ProjectUpdateRequest projectUpdateRequest = webRequest.toServiceDto();
 
-		final ProjectUpdateResponse serviceResponse = projectService.updateProject(projectId, projectUpdateRequest);
+		final ProjectUpdateResponse serviceResponse = projectService.updateProject(projectId, projectUpdateRequest, loginMemberDetail);
 
 		final ProjectUpdateWebResponse webResponse = ProjectUpdateWebResponse.from(serviceResponse);
 
@@ -76,10 +64,11 @@ public class ProjectController {
 
 	@DeleteMapping
 	public ApiResponse<ProjectDeleteWebResponse> deleteProject(
-		@RequestBody final ProjectDeleteWebRequest webRequest
+		@RequestBody final ProjectDeleteWebRequest webRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail
 	) {
 		// 1) WebRequest → service 로직 (ID만 필요)
-		final UUID deletedId = projectService.deleteProject(webRequest.getId());
+		final UUID deletedId = projectService.deleteProject(webRequest.getId(), loginMemberDetail);
 
 		// 2) WebResponse 생성
 		return ApiResponse.success(new ProjectDeleteWebResponse(deletedId));
@@ -130,5 +119,17 @@ public class ProjectController {
 			projectMemberResponses);
 
 		return ApiResponse.success(projectMemberListWebResponse);
+	}
+
+	@GetMapping("my-projects")
+	public ApiResponse<MyProjectListWebResponse> myProjectList(@LoginMember LoginMemberDetail loginMemberDetail){
+
+		final List<MyProjectSelectResponse> projectList =  projectService.findProjectsByLoginMember(loginMemberDetail);
+
+		final List<MyProjectSelectWebResponse> webList = projectList.stream()
+				.map(MyProjectSelectWebResponse::from)
+				.toList();
+
+		return ApiResponse.success(new MyProjectListWebResponse(webList));
 	}
 }

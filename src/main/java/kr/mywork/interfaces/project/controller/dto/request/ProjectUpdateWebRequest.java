@@ -1,21 +1,20 @@
 package kr.mywork.interfaces.project.controller.dto.request;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.validation.constraints.Pattern;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Length;
+
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(force = true)
 @RequiredArgsConstructor
 public class ProjectUpdateWebRequest {
 
-	private static final String PROJECT_KEYWORD_TYPE = "^(NOT_STARTED|IN_PROGRESS|PAUSED|COMPLETED)$";
+	private static final String PROJECT_KEYWORD_TYPE = "^(CONTRACT|IN_PROGRESS|PAYMENT|COMPLETED)$";
 
 	@Length(min = 1, max = 200, message = "{project.invalid-name-length}")
 	private final String name;
@@ -31,6 +30,8 @@ public class ProjectUpdateWebRequest {
 	private final String detail;
 	private final Boolean deleted;
 
+	private final Long projectAmount;
+
 	public ProjectUpdateRequest toServiceDto() {
 		return new ProjectUpdateRequest(
 			this.name,
@@ -38,7 +39,8 @@ public class ProjectUpdateWebRequest {
 			this.endAt,
 			this.step,
 			this.detail,
-			this.deleted
+			this.deleted,
+			this.projectAmount
 		);
 	}
 }

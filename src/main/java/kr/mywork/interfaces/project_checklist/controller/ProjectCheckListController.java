@@ -3,6 +3,7 @@ package kr.mywork.interfaces.project_checklist.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.common.auth.components.annotation.LoginMember;
+import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.project_checklist.service.ProjectCheckListService;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListApprovalRequest;
 import kr.mywork.domain.project_checklist.service.dto.request.ProjectCheckListCreateRequest;
@@ -40,19 +43,21 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class ProjectCheckListController {
 
 	private final ProjectCheckListService projectCheckListService;
 
 	@PostMapping("/api/projects/check-lists")
 	public ApiResponse<ProjectCheckListCreateWebResponse> createProjectCheckList(
-		@RequestBody @Valid ProjectCheckListCreateWebRequest projectCheckListCreateWebRequest
+		@RequestBody @Valid ProjectCheckListCreateWebRequest projectCheckListCreateWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail
 	) {
 
-		ProjectCheckListCreateRequest projectCheckListCreateRequest = projectCheckListCreateWebRequest.toServiceDto();
+		ProjectCheckListCreateRequest projectCheckListCreateRequest = projectCheckListCreateWebRequest.toServiceDto(loginMemberDetail);
 
 		ProjectCheckListCreateResponse projectCheckListCreateResponse = projectCheckListService.createProjectCheckList(
-			projectCheckListCreateRequest);
+			projectCheckListCreateRequest, loginMemberDetail);
 
 		return ApiResponse.success(new ProjectCheckListCreateWebResponse(projectCheckListCreateResponse));
 	}
@@ -69,32 +74,35 @@ public class ProjectCheckListController {
 
 	@PutMapping("/api/projects/check-lists")
 	public ApiResponse<ProjectCheckListUpdateWebResponse> getProjectCheckList(
-		@RequestBody @Valid ProjectCheckListUpdateWebRequest projectCheckListUpdateWebRequest) {
+		@RequestBody @Valid ProjectCheckListUpdateWebRequest projectCheckListUpdateWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 		ProjectCheckListUpdateRequest projectCheckListUpdateRequest = projectCheckListUpdateWebRequest.toServiceDto();
 
 		ProjectCheckListUpdateResponse projectCheckListUpdateResponse = projectCheckListService.updateProjectCheckList(
-			projectCheckListUpdateRequest);
+			projectCheckListUpdateRequest, loginMemberDetail);
 
 		return ApiResponse.success(new ProjectCheckListUpdateWebResponse(projectCheckListUpdateResponse));
 	}
 
 	@DeleteMapping("/api/projects/check-lists/{checkListId}")
 	public ApiResponse<ProjectCheckListDeleteWebResponse> deleteProjectCheckList(
-		@PathVariable final UUID checkListId) {
+		@PathVariable final UUID checkListId,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 
 		UUID deletedCheckListId = projectCheckListService.deleteProjectCheckList(
-			checkListId);
+			checkListId, loginMemberDetail);
 
 		return ApiResponse.success(new ProjectCheckListDeleteWebResponse(deletedCheckListId));
 	}
 
 	@PutMapping("/api/projects/check-lists/{checklistId}/approval")
 	public ApiResponse<ProjectCheckListApprovalWebResponse> approvalProjectCheckList(
-		@RequestBody @Valid ProjectCheckListApprovalWebRequest projectCheckListApprovalWebRequest) {
+		@RequestBody @Valid ProjectCheckListApprovalWebRequest projectCheckListApprovalWebRequest,
+		@LoginMember LoginMemberDetail loginMemberDetail) {
 		ProjectCheckListApprovalRequest projectCheckListApprovalRequest = projectCheckListApprovalWebRequest.toServiceDto();
 
 		ProjectCheckListApprovalResponse projectCheckListApprovalResponse = projectCheckListService.approvalProjectCheckList(
-			projectCheckListApprovalRequest);
+			projectCheckListApprovalRequest, loginMemberDetail);
 
 		return ApiResponse.success(new ProjectCheckListApprovalWebResponse(projectCheckListApprovalResponse));
 	}

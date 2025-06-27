@@ -21,6 +21,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.fasterxml.uuid.Generators;
 
 import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.post.controller.dto.request.PostApprovalWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostCreateWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostUpdateWebRequest;
 
@@ -362,6 +363,53 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.posts.[].approval").type(JsonFieldType.STRING).description("승인여부"),
 					fieldWithPath("data.posts.[].projectStepTitle").type(JsonFieldType.STRING).description("프로젝트단계명"),
 					fieldWithPath("data.totalCount").type(JsonFieldType.NUMBER).description("총 갯수"),
+					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+				.build()
+		);
+	}
+
+	@Test
+	@DisplayName("게시글 승인 성공")
+	@Sql("classpath:sql/post-for-approve.sql")
+	void 게시글_승인_성공() throws Exception {
+		// given
+		final String accessToken = createUserAccessToken();
+		UUID postId = UUID.fromString("1234a9a9-90b6-9898-a9dc-92c9861aa98c"); // UUID ver7
+
+		final PostApprovalWebRequest postApprovalWebRequest =
+			new PostApprovalWebRequest("APPROVED");
+
+		final String requestBody = objectMapper.writeValueAsString(postApprovalWebRequest);
+
+		// when
+		final ResultActions result = mockMvc.perform(
+			put("/api/posts/{postId}/approval", postId) // HTTP method (URL)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.content(requestBody));
+
+		// then
+		result.andExpectAll(
+				status().isOk(),
+				jsonPath("$.result").value(ResultType.SUCCESS.name()),
+				jsonPath("$.data").exists(),
+				jsonPath("$.error").doesNotExist())
+			.andDo(document("post-approval-success", postApprovalSuccessResource()));
+	}
+
+	private ResourceSnippet postApprovalSuccessResource() {
+		return resource(
+			ResourceSnippetParameters.builder()
+				.tag("Post API")
+				.summary("게시글 승인 API")
+				.description("게시글을 승인합니다.")
+				.requestHeaders(
+					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+				.responseFields(
+					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+					fieldWithPath("data.id").type(JsonFieldType.STRING).description("수정한 게시글 아이디"),
+					fieldWithPath("data.approvalStatus").type(JsonFieldType.STRING).description("승인 상태"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);

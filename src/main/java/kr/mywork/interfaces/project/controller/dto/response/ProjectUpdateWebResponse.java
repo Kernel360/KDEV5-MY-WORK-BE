@@ -1,11 +1,10 @@
 package kr.mywork.interfaces.project.controller.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
 
 public record ProjectUpdateWebResponse(
 	UUID id,
@@ -14,7 +13,8 @@ public record ProjectUpdateWebResponse(
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime endAt,
 	String step,
 	String detail,
-	Boolean deleted
+	Boolean deleted,
+	Long projectAmount
 ) {
 	public static ProjectUpdateWebResponse from(ProjectUpdateResponse response) {
 		return new ProjectUpdateWebResponse(
@@ -24,7 +24,8 @@ public record ProjectUpdateWebResponse(
 			response.endAt(),
 			response.step(),
 			response.detail(),
-			response.deleted()
+			response.deleted(),
+			response.projectAmount()
 		);
 	}
 }
