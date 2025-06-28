@@ -601,4 +601,21 @@ public class ProjectService {
 
 		return new DashboardCountSummaryResponse(totalCount, inProgressCount, completedCount);
 	}
+	@Transactional
+	public String getProjectStatus(UUID projectId){
+		final Project project = projectRepository.findById(projectId)
+				.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
+
+		return project.getStep();
+	}
+
+	@Transactional
+	public UUID updateProjectStatus(UUID projectId, String status){
+		final Project project = projectRepository.findById(projectId)
+				.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
+
+		project.updateStatus(status);
+
+		return project.getId();
+	}
 }

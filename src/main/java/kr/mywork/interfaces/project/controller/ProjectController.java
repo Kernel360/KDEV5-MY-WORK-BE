@@ -15,6 +15,8 @@ import kr.mywork.interfaces.project.controller.dto.request.ProjectDeleteWebReque
 import kr.mywork.interfaces.project.controller.dto.request.ProjectUpdateWebRequest;
 import kr.mywork.interfaces.project.controller.dto.response.*;
 import kr.mywork.interfaces.project.dto.response.ProjectMemberListWebResponse;
+import kr.mywork.interfaces.project_step.dto.response.ProjectStatusUpdateWebResponse;
+import kr.mywork.interfaces.project_step.dto.response.ProjectStatusWebResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -131,5 +133,30 @@ public class ProjectController {
 				.toList();
 
 		return ApiResponse.success(new MyProjectListWebResponse(webList));
+	}
+
+	@GetMapping("/project-status")
+	public ApiResponse<ProjectStatusWebResponse> getProjectStatus(
+			@RequestParam UUID projectId
+	){
+		final String projectStatus = projectService.getProjectStatus(projectId);
+
+		final ProjectStatusWebResponse projectStatusWebResponse = new ProjectStatusWebResponse(projectStatus);
+
+		return ApiResponse.success(projectStatusWebResponse);
+	}
+
+	@PostMapping("/project-status")
+	public ApiResponse<ProjectStatusUpdateWebResponse> updateProjectStatus(
+			@RequestParam UUID projectId,
+			@RequestParam(name = "status", required = false)
+			@Pattern(regexp = PROJECT_STEP_TYPE, message = "{project.invalid-status}") final String status
+	){
+		final UUID updatedProjectId = projectService.updateProjectStatus(projectId,status);
+
+		final ProjectStatusUpdateWebResponse projectStatusUpdateWebResponse =  new ProjectStatusUpdateWebResponse(updatedProjectId);
+
+		return ApiResponse.success(projectStatusUpdateWebResponse);
+
 	}
 }
