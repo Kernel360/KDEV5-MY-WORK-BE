@@ -388,4 +388,120 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 						.build());
 	}
+	@Test
+	@DisplayName("프로젝트 status 조회")
+	@Sql("classpath:sql/project-status.sql")
+	void 프로젝트_상태값_조회_성공() throws Exception {
+		//given
+		final String accessToken = createDevAdminAccessToken();
+		UUID projectId = UUID.fromString("01973a42-0995-74aa-9298-a25cb8dae6ef");
+
+		//when
+		final ResultActions result = mockMvc.perform(
+				get("/api/projects/project-status?projectId={projectId}",projectId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		//then
+		result.andExpectAll(
+						status().isOk(),
+						jsonPath("$.result").value(ResultType.SUCCESS.name()),
+						jsonPath("$.data").exists(),
+						jsonPath("$.error").doesNotExist())
+				.andDo(document("project-status-success", projectStatusSuccessResource()));
+	}
+
+	private ResourceSnippet projectStatusSuccessResource() {
+		return resource(
+				ResourceSnippetParameters.builder()
+						.tag("Project API")
+						.summary("프로젝트 상태값 조회 API")
+						.description("프로젝트 상태값을 조회한다")
+						.requestHeaders(
+								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+								headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+						.responseFields(
+								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+								fieldWithPath("data.projectStatus").type(JsonFieldType.STRING).description("프로젝트 상태값"),
+								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+						.build());
+	}
+	@Test
+	@DisplayName("프로젝트 status 업데이트")
+	@Sql("classpath:sql/project-status.sql")
+	void 프로젝트_상태값_업데이트_성공() throws Exception {
+		//given
+		final String accessToken = createSystemAccessToken();
+		UUID projectId = UUID.fromString("01973a42-0995-74aa-9298-a25cb8dae6ef");
+
+		//when
+		final ResultActions result = mockMvc.perform(
+				post("/api/projects/project-status?projectId={projectId}&status={status}",projectId,"COMPLETED")
+						.contentType(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		//then
+		result.andExpectAll(
+						status().isOk(),
+						jsonPath("$.result").value(ResultType.SUCCESS.name()),
+						jsonPath("$.data").exists(),
+						jsonPath("$.error").doesNotExist())
+				.andDo(document("project-status-updated-success", projectStatusUpdateSuccessResource()));
+	}
+
+	private ResourceSnippet projectStatusUpdateSuccessResource() {
+		return resource(
+				ResourceSnippetParameters.builder()
+						.tag("Project API")
+						.summary("프로젝트 상태값 업데이트 API")
+						.description("프로젝트 상태값을 업데이트 한다")
+						.requestHeaders(
+								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+								headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+						.responseFields(
+								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+								fieldWithPath("data.projectId").type(JsonFieldType.STRING).description("변경된 프로젝트 id"),
+								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+						.build());
+	}
+	@Test
+	@DisplayName("프로젝트 status 업데이트 실패")
+	@Sql("classpath:sql/project-status.sql")
+	void 프로젝트_상태값_업데이트_실패() throws Exception {
+		//given
+		final String accessToken = createDevAdminAccessToken();
+		UUID projectId = UUID.fromString("01973a42-0995-74aa-9298-a25cb8dae6ef");
+
+		//when
+		final ResultActions result = mockMvc.perform(
+				post("/api/projects/project-status?projectId={projectId}&status={status}",projectId,"COMPLETED")
+						.contentType(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
+
+		//then
+		result.andExpectAll(
+						status().is4xxClientError(),
+						jsonPath("$.result").value(ResultType.ERROR.name()),
+						jsonPath("$.data").doesNotExist(),
+						jsonPath("$.error").exists())
+				.andDo(document("project-status-updated-fail", projectStatusUpdateFailResource()));
+	}
+
+	private ResourceSnippet projectStatusUpdateFailResource() {
+		return resource(
+				ResourceSnippetParameters.builder()
+						.tag("Project API")
+						.summary("프로젝트 상태값 업데이트 API")
+						.description("프로젝트 상태값을 업데이트 한다")
+						.requestHeaders(
+								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+								headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+						.responseFields(
+								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+								fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터"),
+								fieldWithPath("error.code").type(JsonFieldType.STRING).description("에러 코드"),
+								fieldWithPath("error.message").type(JsonFieldType.STRING).description("에러 정보"),
+								fieldWithPath("error.data").type(JsonFieldType.NULL).description("에러 정보"))
+						.build());
+	}
 }
