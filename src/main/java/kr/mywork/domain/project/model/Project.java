@@ -88,5 +88,6 @@ public class Project {
 		this.step = request.step();
 		this.detail = request.detail();
 		this.deleted = request.deleted();
+		this.projectAmount = request.projectAmount();
 	}
 }
