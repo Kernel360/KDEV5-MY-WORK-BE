@@ -4,14 +4,17 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.mywork.domain.post.errors.MaxPostAttachmentsException;
 import kr.mywork.domain.post.errors.PostErrorType;
-import kr.mywork.domain.post.errors.PostNotFoundException;
-import kr.mywork.domain.post.model.Post;
+import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.model.PostAttachment;
+import kr.mywork.domain.post.model.PostId;
 import kr.mywork.domain.post.repository.PostAttachmentRepository;
+import kr.mywork.domain.post.repository.PostIdRepository;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentActiveResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentDeleteResponse;
@@ -28,22 +31,56 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostAttachmentUploadService {
 
+	@Value("${post.attachment.max-count}")
+	private int postAttachmentMaxCount;
+
 	private final PostRepository postRepository;
+	private final PostIdRepository postIdRepository;
 	private final PostAttachmentRepository postAttachmentRepository;
 	private final PostAttachmentFileHandler postAttachmentFileHandler;
 
 	@Transactional
 	public PostAttachmentUploadUrlIssueResponse issuePostAttachmentUploadUrl(final UUID postId, final String fileName) {
-		final Post savedPost = postRepository.findById(postId)
-			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
+		return postRepository.findById(postId)
+			.map(post -> createPostAttachmentToExistingPost(postId, fileName))
+			.orElseGet(() -> createPostAttachmentToNewPost(postId, fileName));
+	}
+
+	private PostAttachmentUploadUrlIssueResponse createPostAttachmentToExistingPost(
+		final UUID postId, final String fileName) {
+
+		if (isMaxPostAttachmentCount(postId)) {
+			throw new MaxPostAttachmentsException(PostErrorType.ATTACHMENT_MAX);
+		}
+
+		final PostAttachment postAttachment = PostAttachment.inactivePostAttachment(postId, fileName);
+		final PostAttachment savedPostAttachment = postAttachmentRepository.save(postAttachment);
 
 		final URL uploadUrl = postAttachmentFileHandler.createUploadUrl(postId, fileName);
 
-		// TODO 업로드 파일 크기, 확장자, 첨부 파일 갯수 (3개) 검토 필요
-		final PostAttachment postAttachment = PostAttachment.inactivePostAttachment(savedPost.getId(), fileName);
-		postAttachmentRepository.save(postAttachment);
+		return new PostAttachmentUploadUrlIssueResponse(savedPostAttachment.getId(), uploadUrl.toString());
+	}
 
-		return new PostAttachmentUploadUrlIssueResponse(postAttachment.getId(), uploadUrl.toString());
+	private PostAttachmentUploadUrlIssueResponse createPostAttachmentToNewPost(
+		final UUID postId, final String fileName) {
+
+		final PostId issuedPostId = postIdRepository.findById(postId)
+			.orElseThrow(() -> new PostIdNotFoundException(PostErrorType.ID_NOT_FOUND));
+
+		if (isMaxPostAttachmentCount(postId)) {
+			throw new MaxPostAttachmentsException(PostErrorType.ATTACHMENT_MAX);
+		}
+
+		final PostAttachment postAttachment = PostAttachment.inactivePostAttachment(issuedPostId.getId(), fileName);
+		final PostAttachment savedPostAttachment = postAttachmentRepository.save(postAttachment);
+
+		final URL uploadUrl = postAttachmentFileHandler.createUploadUrl(postId, fileName);
+
+		return new PostAttachmentUploadUrlIssueResponse(savedPostAttachment.getId(), uploadUrl.toString());
+	}
+
+	private boolean isMaxPostAttachmentCount(final UUID postId) {
+		return postAttachmentRepository.countByDeletedAndActive(postId, false, true) >= postAttachmentMaxCount;
 	}
 
 	@Transactional

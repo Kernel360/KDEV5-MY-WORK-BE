@@ -11,8 +11,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import kr.mywork.common.rdb.id.UnixTimeOrderedUuidGeneratedValue;
-import kr.mywork.domain.company.errors.CompanyErrorType;
-import kr.mywork.domain.company.errors.CompanyImageEmptyException;
 import kr.mywork.domain.post.errors.PostAttachmentDeletedException;
 import kr.mywork.domain.post.errors.PostErrorType;
 import lombok.AccessLevel;
@@ -54,7 +52,7 @@ public class PostAttachment {
     }
 
     public static PostAttachment inactivePostAttachment(final UUID postId, final String path) {
-        return new PostAttachment(postId, path, false, false);
+        return new PostAttachment(postId, path, true, false);
     }
 
     public boolean activate() {
