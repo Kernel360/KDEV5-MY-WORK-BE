@@ -3,6 +3,7 @@ package kr.mywork.interfaces.project_step.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.domain.post.service.PostService;
+import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import kr.mywork.domain.project_step.serivce.ProjectStepService;
 import kr.mywork.domain.project_step.serivce.dto.response.ProjectStepUpdateResponse;
 import kr.mywork.interfaces.project_step.dto.request.ProjectStepCreateWebRequest;
@@ -54,6 +55,9 @@ class ProjectStepControllerTest {
 
 	@MockitoBean
 	private PostService postService;
+
+	@MockitoBean
+	private ProjectMemberRepository projectMemberRepository;
 
 	@Test
 	@DisplayName("프로젝트 단계 목록 생성 성공")
