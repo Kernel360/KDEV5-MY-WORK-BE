@@ -1,5 +1,6 @@
 package kr.mywork.infrastructure.post.rdb;
 
+import static com.querydsl.core.types.ExpressionUtils.count;
 import static kr.mywork.domain.post.model.QPostAttachment.postAttachment;
 
 import java.util.Optional;
@@ -23,6 +24,14 @@ public class QueryDslPostAttachmentRepository implements PostAttachmentRepositor
 	@Override
 	public PostAttachment save(final PostAttachment postAttachment) {
 		return jpaPostAttachmentRepository.save(postAttachment);
+	}
+
+	@Override
+	public Long countByDeletedAndActive(final UUID postId, final boolean deleted, final boolean active) {
+		return queryFactory.select(count(postAttachment.id))
+			.from(postAttachment)
+			.where(postAttachment.id.eq(postId), postAttachment.deleted.eq(deleted), postAttachment.active.eq(active))
+			.fetchOne();
 	}
 
 	@Override
