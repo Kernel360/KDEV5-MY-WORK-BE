@@ -258,6 +258,9 @@ public class PostDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.authorName").type(JsonFieldType.STRING).description("작성자"),
 					fieldWithPath("data.approval").type(JsonFieldType.STRING).description("승인여부"),
 					fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성일"),
+					fieldWithPath("data.postAttachments[].postAttachmentId").type(JsonFieldType.STRING)
+						.description("첨부 파일 아이디"),
+					fieldWithPath("data.postAttachments[].fileName").type(JsonFieldType.STRING).description("첨부 파일 이름"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
