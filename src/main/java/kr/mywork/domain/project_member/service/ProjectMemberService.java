@@ -8,6 +8,7 @@ import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project_member.error.ProjectMemberErrorType;
 import kr.mywork.domain.project_member.error.ProjectMemberNotFoundException;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
+import kr.mywork.domain.project_member.service.dto.request.ProjectManagerUpdateRequest;
 import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -72,4 +73,19 @@ public class ProjectMemberService {
 
 		return projectMember.getId();
 	}
+	@Transactional
+	public UUID updateProjectManager(ProjectManagerUpdateRequest projectManagerUpdateRequest){
+		UUID memberId = projectManagerUpdateRequest.memberId();
+		UUID projectId = projectManagerUpdateRequest.projectId();
+
+		ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(memberId, projectId)
+				.orElseThrow(() -> new ProjectMemberNotFoundException(ProjectMemberErrorType.PROJECT_MEMBER_NOT_FOUND));
+
+		//true -> false , false -> true
+		projectMember.changeManager(projectMember.getManager());
+
+
+		return projectMember.getMemberId();
+	}
+
 }
