@@ -186,6 +186,7 @@ public class PostService {
 		post.delete();
 
 		eventPublisher.publishEvent(new DeleteEventObject(post, loginMemberDetail));
+		eventPublisher.publishEvent(new PostAttachmentDeleteEvent(postId));
 
 		return post.getId();
 	}
