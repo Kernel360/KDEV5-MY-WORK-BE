@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyIdNotFoundException;
-import kr.mywork.domain.company.errors.CompanyImageAlreadyExistException;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.Company;
 import kr.mywork.domain.company.model.CompanyId;
@@ -38,13 +37,14 @@ public class CompanyImageService {
 			.orElseGet(() -> uploadNewCompanyImage(companyId, fileName));
 	}
 
+
 	private CompanyImageUploadUrlIssueResponse uploadCompanyImage(final String fileName, final Company company) {
-		if (company.existsImage()) {
-			throw new CompanyImageAlreadyExistException(CompanyErrorType.COMPANY_IMAGE_EXIST);
-		}
+		// S3 는 트랜잭션을 보장할 수 없으므로 DB 데이터를 선반영 + 삭제가 되어야 이미지 업로드 가능
+		company.assignLogoImage(fileName);
 
 		final URL uploadUrl = companyImageFileHandler.createUploadUrl(company.getId(), fileName);
-			return new CompanyImageUploadUrlIssueResponse(company.getId(), uploadUrl.toString());
+
+		return new CompanyImageUploadUrlIssueResponse(company.getId(), uploadUrl.toString());
 	}
 
 	private CompanyImageUploadUrlIssueResponse uploadNewCompanyImage(final UUID companyId, final String fileName) {
