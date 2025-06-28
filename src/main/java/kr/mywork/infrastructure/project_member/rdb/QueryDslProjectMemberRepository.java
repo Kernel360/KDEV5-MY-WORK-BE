@@ -76,6 +76,18 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 	}
 
 	@Override
+	public Optional<ProjectMember> findProjectManagerByMemberIdAndProjectId(UUID memberId, UUID projectId) {
+		return Optional.ofNullable
+				(queryFactory
+				.selectFrom(projectMember)
+				.where(
+					projectMember.memberId.eq(memberId)
+						.and(projectMember.projectId.eq(projectId))
+							.and(projectMember.manager.isTrue())
+				).fetchOne());
+	}
+
+	@Override
 	public List<ProjectMember> findAllByMemberId(UUID memberId) {
 		return queryFactory
 			.selectFrom(projectMember)

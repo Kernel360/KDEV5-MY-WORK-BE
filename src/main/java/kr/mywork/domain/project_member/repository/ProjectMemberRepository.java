@@ -15,4 +15,5 @@ public interface ProjectMemberRepository {
 	List<ProjectMember> findAllByMemberId(UUID memberId);
 	List<UUID> findProjectIdsByMemberId(UUID memberId);
 	List<ProjectMember> getUserProjectIds(UUID memberId);
+	Optional<ProjectMember>findProjectManagerByMemberIdAndProjectId(UUID memberId ,UUID projectId);
 }
