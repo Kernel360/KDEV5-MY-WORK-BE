@@ -52,12 +52,7 @@ public class PostAttachment {
     }
 
     public static PostAttachment inactivePostAttachment(final UUID postId, final String path) {
-        return new PostAttachment(postId, path, true, false);
-    }
-
-    public boolean activate() {
-        this.active = true;
-        return true;
+        return new PostAttachment(postId, path, false, false);
     }
 
     public boolean isActive() {
