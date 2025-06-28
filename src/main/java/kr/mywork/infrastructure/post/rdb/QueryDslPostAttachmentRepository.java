@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.mywork.domain.post.model.PostAttachment;
