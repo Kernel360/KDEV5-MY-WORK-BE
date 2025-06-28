@@ -43,4 +43,15 @@ public class QueryDslPostAttachmentRepository implements PostAttachmentRepositor
 
 		return Optional.ofNullable(findPostAttachment);
 	}
+
+	@Override
+	public boolean existsByFileNameAndDeleted(final UUID postId, final String fileName, final boolean deleted) {
+		return queryFactory.select(postAttachment.id)
+			.from(postAttachment)
+			.where(
+				postAttachment.postId.eq(postId),
+				postAttachment.fileName.eq(fileName),
+				postAttachment.deleted.eq(deleted))
+			.fetchFirst() != null;
+	}
 }
