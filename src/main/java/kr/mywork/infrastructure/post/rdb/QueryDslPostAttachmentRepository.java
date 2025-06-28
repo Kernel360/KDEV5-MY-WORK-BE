@@ -3,6 +3,7 @@ package kr.mywork.infrastructure.post.rdb;
 import static com.querydsl.core.types.ExpressionUtils.count;
 import static kr.mywork.domain.post.model.QPostAttachment.postAttachment;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,5 +54,32 @@ public class QueryDslPostAttachmentRepository implements PostAttachmentRepositor
 				postAttachment.fileName.eq(fileName),
 				postAttachment.deleted.eq(deleted))
 			.fetchFirst() != null;
+	}
+
+	@Override
+	public List<PostAttachment> findAllByPostIdDeletedAndActive(final UUID postId, final Boolean deleted,
+		final Boolean active) {
+		return queryFactory.selectFrom(postAttachment)
+			.where(
+				postAttachment.postId.eq(postId),
+				eqDeleted(deleted),
+				eqActive(active))
+			.fetch();
+	}
+
+	private BooleanExpression eqDeleted(final Boolean deleted) {
+		if (deleted == null) {
+			return null;
+		}
+
+		return postAttachment.deleted.eq(deleted);
+	}
+
+	private BooleanExpression eqActive(final Boolean active) {
+		if (active == null) {
+			return null;
+		}
+
+		return postAttachment.active.eq(active);
 	}
 }
