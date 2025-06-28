@@ -23,3 +23,12 @@ INSERT INTO post (id,
              NOW(),
              NOW()
          );
+
+insert into post_attachment (id, post_id, file_name, active, deleted, created_at, modified_at)
+values (UUID_TO_BIN('019790db-3830-768d-83ea-a57eeee6bbfc'),
+        UUID_TO_BIN('1234a9a9-90b6-9898-a9dc-92c9861aa98c'),
+        'gradle.jepg',
+        TRUE,
+        FALSE,
+        '2025-06-21 14:00:00',
+        '2025-06-21 14:00:00');
