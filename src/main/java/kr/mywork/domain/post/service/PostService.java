@@ -16,14 +16,16 @@ import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
-import kr.mywork.domain.member.repository.MemberRepository;
 import kr.mywork.domain.notification.model.NotificationActionType;
 import kr.mywork.domain.notification.model.TargetType;
 import kr.mywork.domain.notification.service.NotificationService;
 import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
+import kr.mywork.domain.post.listener.event.PostAttachmentDeleteEvent;
 import kr.mywork.domain.post.model.Post;
+import kr.mywork.domain.post.model.PostAttachment;
+import kr.mywork.domain.post.repository.PostAttachmentRepository;
 import kr.mywork.domain.post.repository.PostIdRepository;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
@@ -55,9 +57,9 @@ public class PostService {
 	private final PostIdRepository postIdRepository;
 	private final ProjectStepRepository projectStepRepository;
 	private final ProjectRepository projectRepository;
+	private final PostAttachmentRepository postAttachmentRepository;
 	private final ApplicationEventPublisher eventPublisher;
 	private final NotificationService notificationService;
-	private final MemberRepository memberRepository;
 
 	@Transactional
 	public PostApprovalResponse approvalPost(UUID postId, PostApprovalRequest postApprovalRequest, LoginMemberDetail loginMemberDetail) {
@@ -124,7 +126,10 @@ public class PostService {
 		final Post post = postRepository.findById(postId)
 			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
 
-		return PostDetailResponse.from(post);
+		final List<PostAttachment> postAttachments =
+			postAttachmentRepository.findAllByPostIdDeletedAndActive(postId, false, true);
+
+		return PostDetailResponse.from(post, postAttachments);
 	}
 
 	@Transactional
