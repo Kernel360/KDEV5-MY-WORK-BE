@@ -25,6 +25,7 @@ import kr.mywork.domain.post.repository.PostAttachmentRepository;
 import kr.mywork.domain.post.repository.PostIdRepository;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlIssueResponse;
+import kr.mywork.domain.post.service.errors.PostAttachmentAlreadyUploadException;
 import kr.mywork.domain.post.uploader.PostAttachmentFileHandler;
 
 class PostAttachmentUploadServiceTest {
@@ -68,6 +69,7 @@ class PostAttachmentUploadServiceTest {
 		final URL uploadUrl = new URL("http://localhost:8080/upload-url/file.png");
 
 		when(postRepository.findById(any())).thenReturn(Optional.empty());
+		when(postAttachmentRepository.existsByFileNameAndDeleted(any(), any(), anyBoolean())).thenReturn(false);
 		when(postAttachmentRepository.countByDeletedAndActive(any(), anyBoolean(), anyBoolean())).thenReturn(0L);
 		when(postAttachmentRepository.save(any())).thenReturn(PostAttachment.inactivePostAttachment(postId, fileName));
 		when(postIdRepository.findById(any())).thenReturn(Optional.of(new PostId(postId)));
@@ -93,6 +95,7 @@ class PostAttachmentUploadServiceTest {
 			UUID.fromString("0197b6ab-f2ca-7ef9-aecd-819a678ca1c2"), "내용물", "PENDING", false);
 
 		when(postRepository.findById(any())).thenReturn(Optional.of(post));
+		when(postAttachmentRepository.existsByFileNameAndDeleted(any(), any(), anyBoolean())).thenReturn(false);
 		when(postAttachmentRepository.countByDeletedAndActive(any(), anyBoolean(), anyBoolean())).thenReturn(2L);
 		when(postAttachmentRepository.save(any())).thenReturn(PostAttachment.inactivePostAttachment(postId, fileName));
 		when(postAttachmentFileHandler.createUploadUrl(any(), any())).thenReturn(uploadUrl);
@@ -139,5 +142,43 @@ class PostAttachmentUploadServiceTest {
 		assertThatThrownBy(
 			() -> postAttachmentUploadService.issuePostAttachmentUploadUrl(postId, fileName))
 			.isInstanceOf(MaxPostAttachmentsException.class);
+	}
+
+	@Test
+	@DisplayName("게시글 등록 이전 기존 첨부 파일 이름이 존재하는 경우 첨부 불가")
+	void 게시글_등록_이전_기존_첨부_파일_이름이_존재하는_경우_첨부_불가() {
+		// given
+		final UUID postId = UUID.fromString("0197b69f-e45a-74ec-937e-d236bb1cdddf");
+		final String fileName = "file.png";
+
+		when(postRepository.findById(any())).thenReturn(Optional.empty());
+		when(postIdRepository.findById(any())).thenReturn(Optional.of(new PostId(postId)));
+		when(postAttachmentRepository.existsByFileNameAndDeleted(any(), any(), anyBoolean())).thenReturn(true);
+
+		// when, then
+		assertThatThrownBy(
+			() -> postAttachmentUploadService.issuePostAttachmentUploadUrl(postId, fileName))
+			.isInstanceOf(PostAttachmentAlreadyUploadException.class);
+	}
+
+	@Test
+	@DisplayName("게시글 등록 이후 기존 첨부 파일 이름이 존재하는 경우 첨부 불가")
+	void 게시글_등록_이후_기존_첨부_파일_이름이_존재하는_경우_첨부_불가() throws MalformedURLException {
+		// given
+		// given
+		final UUID postId = UUID.fromString("0197b69f-e45a-74ec-937e-d236bb1cdddf");
+		final String fileName = "file.png";
+		final URL uploadUrl = new URL("http://localhost:8080/upload-url/file.png");
+
+		final Post post = new Post(postId, UUID.fromString("0197b6ab-70f5-79b5-8826-d19fe814fce5"), "제목", "회사명", "작성자명",
+			UUID.fromString("0197b6ab-f2ca-7ef9-aecd-819a678ca1c2"), "내용물", "PENDING", false);
+
+		when(postRepository.findById(any())).thenReturn(Optional.of(post));
+		when(postAttachmentRepository.existsByFileNameAndDeleted(any(), any(), anyBoolean())).thenReturn(true);
+
+		// when, then
+		assertThatThrownBy(
+			() -> postAttachmentUploadService.issuePostAttachmentUploadUrl(postId, fileName))
+			.isInstanceOf(PostAttachmentAlreadyUploadException.class);
 	}
 }
