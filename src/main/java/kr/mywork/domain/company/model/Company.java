@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import kr.mywork.domain.company.errors.CompanyErrorType;
+import kr.mywork.domain.company.errors.CompanyImageAlreadyExistException;
 import kr.mywork.domain.company.errors.CompanyImageEmptyException;
 import kr.mywork.domain.company.service.dto.request.CompanyUpdateRequest;
 import lombok.AccessLevel;
@@ -106,10 +107,6 @@ public class Company {
 		return String.format("/%s/%s", id, fileName);
 	}
 
-	public boolean existsImage() {
-		return !(this.fileName == null || this.fileName.isEmpty());
-	}
-
 	public boolean deleteImage() {
 		if (this.fileName == null) {
 			throw new CompanyImageEmptyException(CompanyErrorType.COMPANY_IMAGE_EMPTY);
@@ -117,5 +114,14 @@ public class Company {
 
 		this.fileName = null;
 		return true;
+	}
+
+	public boolean assignLogoImage(final String fileName) {
+		if (this.fileName == null || this.fileName.isEmpty()) {
+			this.fileName = fileName;
+			return true;
+		}
+
+		throw new CompanyImageAlreadyExistException(CompanyErrorType.COMPANY_IMAGE_EXIST);
 	}
 }
