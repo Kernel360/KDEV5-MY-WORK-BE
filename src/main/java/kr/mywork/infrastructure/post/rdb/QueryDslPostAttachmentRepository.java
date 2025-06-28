@@ -31,7 +31,7 @@ public class QueryDslPostAttachmentRepository implements PostAttachmentRepositor
 	public Long countByDeletedAndActive(final UUID postId, final boolean deleted, final boolean active) {
 		return queryFactory.select(count(postAttachment.id))
 			.from(postAttachment)
-			.where(postAttachment.id.eq(postId), postAttachment.deleted.eq(deleted), postAttachment.active.eq(active))
+			.where(postAttachment.postId.eq(postId), postAttachment.deleted.eq(deleted), postAttachment.active.eq(active))
 			.fetchOne();
 	}
 
