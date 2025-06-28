@@ -49,6 +49,10 @@ public class PostAttachmentUploadService {
 	private PostAttachmentUploadUrlIssueResponse createPostAttachmentToExistingPost(
 		final UUID postId, final String fileName) {
 
+		if(isAlreadyFileUploadName(postId, fileName)) {
+			throw new PostAttachmentAlreadyUploadException(PostErrorType.ATTACHMENT_ALREADY_UPLOADED_NAME);
+		}
+
 		if (isMaxPostAttachmentCount(postId)) {
 			throw new MaxPostAttachmentsException(PostErrorType.ATTACHMENT_MAX);
 		}
@@ -64,6 +68,10 @@ public class PostAttachmentUploadService {
 	private PostAttachmentUploadUrlIssueResponse createPostAttachmentToNewPost(
 		final UUID postId, final String fileName) {
 
+		if(isAlreadyFileUploadName(postId, fileName)) {
+			throw new PostAttachmentAlreadyUploadException(PostErrorType.ATTACHMENT_ALREADY_UPLOADED);
+		}
+
 		final PostId issuedPostId = postIdRepository.findById(postId)
 			.orElseThrow(() -> new PostIdNotFoundException(PostErrorType.ID_NOT_FOUND));
 
@@ -77,6 +85,10 @@ public class PostAttachmentUploadService {
 		final URL uploadUrl = postAttachmentFileHandler.createUploadUrl(postId, fileName);
 
 		return new PostAttachmentUploadUrlIssueResponse(savedPostAttachment.getId(), uploadUrl.toString());
+	}
+
+	private boolean isAlreadyFileUploadName(final UUID postId, final String fileName) {
+		return postAttachmentRepository.existsByFileNameAndDeleted(postId, fileName, false);
 	}
 
 	private boolean isMaxPostAttachmentCount(final UUID postId) {
