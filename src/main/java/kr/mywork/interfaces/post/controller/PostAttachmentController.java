@@ -1,5 +1,6 @@
 package kr.mywork.interfaces.post.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import kr.mywork.common.api.support.response.ApiResponse;
+import kr.mywork.domain.post.model.PostAttachment;
 import kr.mywork.domain.post.service.PostAttachmentUploadService;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentActiveResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentDeleteResponse;
@@ -28,6 +30,7 @@ import kr.mywork.interfaces.post.controller.dto.response.PostAttachmentDeleteWeb
 import kr.mywork.interfaces.post.controller.dto.response.PostAttachmentDownloadWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostAttachmentUploadUrlIssueWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostAttachmentUploadUrlReissueWebResponse;
+import kr.mywork.interfaces.post.controller.dto.response.PostAttachmentsActiveWebResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -68,16 +71,19 @@ public class PostAttachmentController {
 	}
 
 	@PostMapping("/posts/attachment/active")
-	public ApiResponse<PostAttachmentActiveWebResponse> activePostAttachment(
+	public ApiResponse<PostAttachmentsActiveWebResponse> activePostAttachment(
 		@RequestBody @Valid PostAttachmentActiveWebRequest postAttachmentActiveWebRequest) {
 
-		final PostAttachmentActiveResponse postAttachmentActiveResponse = postAttachmentUploadService.updatePostAttachmentActive(
-			postAttachmentActiveWebRequest.getPostAttachmentId(),
-			postAttachmentActiveWebRequest.getActive());
+		final List<PostAttachmentActiveResponse> postAttachmentActiveResponses =
+			postAttachmentUploadService.updatePostAttachmentActive(
+				postAttachmentActiveWebRequest.getPostId(),
+				postAttachmentActiveWebRequest.getActive());
 
-		return ApiResponse.success(new PostAttachmentActiveWebResponse(
-			postAttachmentActiveResponse.postAttachmentId(),
-			postAttachmentActiveResponse.active()));
+		final List<PostAttachmentActiveWebResponse> postAttachmentActiveWebResponses = postAttachmentActiveResponses.stream()
+			.map(PostAttachmentActiveWebResponse::fromServiceDto)
+			.toList();
+
+		return ApiResponse.success(new PostAttachmentsActiveWebResponse(postAttachmentActiveWebResponses));
 	}
 
 	@GetMapping("/posts/attachment/download-url")
