@@ -50,6 +50,8 @@ post:
     endpoint: http://localhost:4566
   attachment:
     max-count: 3
+  issued-id:
+    created-limit-hour: 24
 project:
   page:
     size: 10
