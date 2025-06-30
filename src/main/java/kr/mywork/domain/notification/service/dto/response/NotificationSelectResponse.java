@@ -25,9 +25,11 @@ public class NotificationSelectResponse {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private final LocalDateTime actionTime;
 
+	private final boolean isRead;
+
 	public NotificationSelectResponse(UUID id, UUID actorId, String actorName, NotificationActionType actionType,
 		TargetType targetType, UUID targetId, String content,
-		UUID projectId, UUID projectStepId, LocalDateTime actionTime) {
+		UUID projectId, UUID projectStepId, LocalDateTime actionTime, boolean isRead) {
 		this.id = id;
 		this.actorId = actorId;
 		this.actorName = actorName;
@@ -38,5 +40,6 @@ public class NotificationSelectResponse {
 		this.projectId = projectId;
 		this.projectStepId = projectStepId;
 		this.actionTime = actionTime;
+		this.isRead = isRead;
 	}
 }
