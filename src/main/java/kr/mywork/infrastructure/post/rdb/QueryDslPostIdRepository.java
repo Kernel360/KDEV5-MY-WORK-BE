@@ -2,6 +2,7 @@ package kr.mywork.infrastructure.post.rdb;
 
 import static kr.mywork.domain.post.model.QPostId.*;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,4 +36,10 @@ public class QueryDslPostIdRepository implements PostIdRepository {
 		return Optional.ofNullable(findPostId);
 	}
 
+	@Override
+	public Long deleteIssuedPostIdsLessOrEqualLimitTime(final LocalDateTime limitTime) {
+		return queryFactory.delete(postId)
+			.where(postId.createdAt.loe(limitTime))
+			.execute();
+	}
 }
