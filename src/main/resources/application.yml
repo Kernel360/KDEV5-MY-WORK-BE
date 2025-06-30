@@ -52,6 +52,8 @@ post:
     max-count: 3
   issued-id:
     created-limit-hour: 24
+    delete:
+      cron: 0 0 4 * * *
 project:
   page:
     size: 10
