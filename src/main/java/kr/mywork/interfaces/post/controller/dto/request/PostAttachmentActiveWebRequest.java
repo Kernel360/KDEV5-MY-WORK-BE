@@ -10,6 +10,6 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor(force = true)
 @RequiredArgsConstructor
 public class PostAttachmentActiveWebRequest {
-	private final UUID postAttachmentId;
+	private final UUID postId;
 	private final Boolean active;
 }
