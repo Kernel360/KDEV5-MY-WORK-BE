@@ -15,9 +15,16 @@ import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.notification.model.NotificationActionType;
+import kr.mywork.domain.notification.model.TargetType;
+import kr.mywork.domain.notification.service.NotificationService;
+import kr.mywork.domain.post.errors.PostErrorType;
+import kr.mywork.domain.post.errors.PostNotFoundException;
 import kr.mywork.domain.post.errors.review.ReviewErrorType;
 import kr.mywork.domain.post.errors.review.ReviewNotFoundException;
+import kr.mywork.domain.post.model.Post;
 import kr.mywork.domain.post.model.Review;
+import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.repository.ReviewRepository;
 import kr.mywork.domain.post.service.dto.ReviewSelectResponse;
 import kr.mywork.domain.post.service.dto.request.ReviewCreateRequest;
@@ -26,6 +33,10 @@ import kr.mywork.domain.post.service.dto.request.ReviewModifyRequest;
 import kr.mywork.domain.post.service.dto.response.ReviewCreateResponse;
 import kr.mywork.domain.post.service.dto.response.ReviewDeleteResponse;
 import kr.mywork.domain.post.service.dto.response.ReviewModifyResponse;
+import kr.mywork.domain.project_step.errors.ProjectStepErrorType;
+import kr.mywork.domain.project_step.errors.ProjectStepNotFoundException;
+import kr.mywork.domain.project_step.model.ProjectStep;
+import kr.mywork.domain.project_step.repository.ProjectStepRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -37,15 +48,39 @@ public class ReviewService {
 	private int reviewPageSize;
 
 	private final ReviewRepository reviewRepository;
+	private final PostRepository postRepository;
+	private final ProjectStepRepository projectStepRepository;
+	private final NotificationService notificationService;
 	private final ApplicationEventPublisher eventPublisher;
 
+	@Transactional
 	public ReviewCreateResponse save(final ReviewCreateRequest reviewCreateRequest, LoginMemberDetail loginMemberDetail) {
-		// TODO Post 조회 및 검증 로직 추가 필요
+		final Post post = postRepository.findById(reviewCreateRequest.postId())
+			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
 
 		final Review review = reviewCreateRequest.toEntity();
 		final Review savedReview = reviewRepository.save(review);
 
 		eventPublisher.publishEvent(new CreateEventObject(savedReview, loginMemberDetail));
+
+		final ProjectStep projectStep = projectStepRepository.findById(post.getProjectStepId())
+			.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
+
+		if (!post.getAuthorId().equals(loginMemberDetail.memberId())) {
+			notificationService.save(
+				post.getAuthorId(),
+				post.getAuthorName(),
+				post.getTitle(),
+				loginMemberDetail.memberName(),
+				loginMemberDetail.memberId(),
+				TargetType.POST,
+				post.getId(),
+				NotificationActionType.REVIEW,
+				savedReview.getCreatedAt(),
+				projectStep.getProjectId(),
+				projectStep.getId()
+			);
+		}
 
 		return ReviewCreateResponse.fromEntity(savedReview);
 	}
