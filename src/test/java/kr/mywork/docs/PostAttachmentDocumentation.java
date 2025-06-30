@@ -30,7 +30,7 @@ import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentActiveWebR
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlIssueWebRequest;
 import kr.mywork.interfaces.post.controller.dto.request.PostAttachmentUploadUrlReissueWebRequest;
 
-public class PostUploadDocumentation extends RestDocsDocumentation {
+public class PostAttachmentDocumentation extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("파일 업로드 URL 발급 성공")
@@ -135,10 +135,10 @@ public class PostUploadDocumentation extends RestDocsDocumentation {
 		// given
 		final String accessToken = createUserAccessToken();
 
-		final UUID postAttachmentId = UUID.fromString("019790db-3830-768d-83ea-a57eeee6bbfc");
+		final UUID postId = UUID.fromString("019790da-3d89-7d84-b5e1-b5bb8109dc02");
 		final boolean active = true;
 		final PostAttachmentActiveWebRequest postAttachmentActiveWebRequest =
-			new PostAttachmentActiveWebRequest(postAttachmentId, active);
+			new PostAttachmentActiveWebRequest(postId, active);
 
 		final String requestBody = objectMapper.writeValueAsString(postAttachmentActiveWebRequest);
 
@@ -169,8 +169,11 @@ public class PostUploadDocumentation extends RestDocsDocumentation {
 					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 				.responseFields(
 					fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-					fieldWithPath("data.postAttachmentId").type(JsonFieldType.STRING).description("게시글 첨부파일 ID"),
-					fieldWithPath("data.active").type(JsonFieldType.BOOLEAN).description("게시글 첨부파일 활성화 여부"),
+					fieldWithPath("data.postAttachments").type(JsonFieldType.ARRAY).description("게시글 첨부파일 활성화 목록"),
+					fieldWithPath("data.postAttachments[].postAttachmentId").type(JsonFieldType.STRING)
+						.description("게시글 첨부파일 ID"),
+					fieldWithPath("data.postAttachments[].active").type(JsonFieldType.BOOLEAN)
+						.description("게시글 첨부파일 활성화 여부"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
