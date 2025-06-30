@@ -31,7 +31,7 @@ public class ReviewDocumentationTest extends RestDocsDocumentation {
 
 	@Test
 	@DisplayName("리뷰 생성 테스트 성공")
-	// @Sql("classpath:sql/member-test-users.sql")
+	@Sql("classpath:sql/review-create-test.sql")
 	void 리뷰_생성_테스트_성공() throws Exception {
 		// given
 		final String accessToken = createUserAccessToken();
