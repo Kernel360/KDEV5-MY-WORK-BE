@@ -2,6 +2,7 @@ package kr.mywork.domain.post.service;
 
 import java.net.URL;
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -112,14 +113,18 @@ public class PostAttachmentUploadService {
 	}
 
 	@Transactional
-	public PostAttachmentActiveResponse updatePostAttachmentActive(final UUID postAttachmentId, final Boolean active) {
+	public List<PostAttachmentActiveResponse> updatePostAttachmentActive(final UUID postId, final Boolean active) {
 
-		final PostAttachment postAttachment = postAttachmentRepository.findById(postAttachmentId)
-			.orElseThrow(() -> new PostAttachmentNotFoundException(PostErrorType.ATTACHMENT_NOT_FOUND));
+		final List<PostAttachment> postAttachments =
+			postAttachmentRepository.findAllByPostIdDeletedAndActive(postId, false, false);
 
-		postAttachment.updateActive(active);
+		for (PostAttachment postAttachment : postAttachments) {
+			postAttachment.updateActive(active);
+		}
 
-		return new PostAttachmentActiveResponse(postAttachmentId, postAttachment.isActive());
+		return postAttachments.stream()
+			.map(PostAttachmentActiveResponse::fromEntity)
+			.toList();
 	}
 
 	@Transactional
