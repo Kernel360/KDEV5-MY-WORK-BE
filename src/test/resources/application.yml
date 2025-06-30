@@ -33,6 +33,10 @@ post:
     endpoint: http://localhost:4566
   attachment:
     max-count: 3
+  issued-id:
+    delete:
+      cron: 0 0 4 * * *
+    created-limit-hour: 24
 project:
   page:
     size: 10

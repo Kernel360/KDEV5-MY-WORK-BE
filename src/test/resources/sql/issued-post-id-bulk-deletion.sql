@@ -1,0 +1,8 @@
+INSERT INTO post_id (id, created_at)
+VALUES
+    (UUID_TO_BIN('0197bfb8-c256-7099-a01a-d64a9bd5851b'), '2025-06-30 15:30:00'),
+    (UUID_TO_BIN('0197bfba-3e7a-7057-b7f9-b7e19bb9c990'), '2025-06-30 15:40:00'),
+    (UUID_TO_BIN('0197bfba-5db1-759e-824c-a4f093c10342'), '2025-06-30 15:50:00'),
+    (UUID_TO_BIN('0197bfba-a6c5-7607-843f-9de5dd547d91'), '2025-06-30 16:00:00'),
+    (UUID_TO_BIN('0197bfba-e608-7246-adac-9b3552f550ed'), '2025-06-30 16:10:00'),
+    (UUID_TO_BIN('0197bfba-f733-7e82-98a1-df182023b405'), '2025-06-30 16:20:00');
