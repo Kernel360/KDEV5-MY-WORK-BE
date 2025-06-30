@@ -10,8 +10,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.uuid.Generators;
-
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
@@ -89,12 +87,6 @@ public class PostService {
 		eventPublisher.publishEvent(new ModifyEventObject(before, post, loginMemberDetail));
 
 		return new PostApprovalResponse(post.getId(), post.getApproval());
-	}
-
-	@Transactional
-	public UUID createPostId() {
-		final UUID postId = Generators.timeBasedEpochGenerator().generate();
-		return postIdRepository.save(postId);
 	}
 
 	@Transactional

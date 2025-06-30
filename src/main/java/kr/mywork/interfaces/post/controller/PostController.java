@@ -35,7 +35,6 @@ import kr.mywork.interfaces.post.controller.dto.response.PostApprovalWebResponse
 import kr.mywork.interfaces.post.controller.dto.response.PostCreateWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostDeleteWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostDetailWebResponse;
-import kr.mywork.interfaces.post.controller.dto.response.PostIdCreateWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostListSelectWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostSelectWebResponse;
 import kr.mywork.interfaces.post.controller.dto.response.PostUpdateWebResponse;
@@ -51,12 +50,6 @@ public class PostController {
 	private static final String POST_APPROVAL_TYPE = "^(APPROVED|PENDING)?$";
 
 	private final PostService postService;
-
-	@PostMapping("/posts/id/generate")
-	public ApiResponse<PostIdCreateWebResponse> createPostId() {
-		final UUID postId = postService.createPostId();
-		return ApiResponse.success(new PostIdCreateWebResponse(postId));
-	}
 
 	@PostMapping("/projects/{project-id}/posts")
 	public ApiResponse<PostCreateWebResponse> createPost(
