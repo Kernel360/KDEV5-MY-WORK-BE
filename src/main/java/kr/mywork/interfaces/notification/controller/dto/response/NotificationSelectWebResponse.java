@@ -9,7 +9,7 @@ import kr.mywork.domain.notification.service.dto.response.NotificationSelectResp
 
 public record NotificationSelectWebResponse (UUID id, UUID actorId, String actorName, String actionType,
 											 String targetType, UUID targetId, String content, UUID projectId, UUID projectStepId,
-											 @JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime actionTime) {
+											 @JsonFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime actionTime, boolean isRead) {
 
 	public static NotificationSelectWebResponse from(NotificationSelectResponse response) {
 		return new NotificationSelectWebResponse(
@@ -22,7 +22,8 @@ public record NotificationSelectWebResponse (UUID id, UUID actorId, String actor
 			response.getContent(),
 			response.getProjectId(),
 			response.getProjectStepId(),
-			response.getActionTime()
+			response.getActionTime(),
+			response.isRead()
 		);
 	}
 }

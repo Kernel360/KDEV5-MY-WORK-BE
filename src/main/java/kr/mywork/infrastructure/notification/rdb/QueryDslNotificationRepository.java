@@ -55,7 +55,8 @@ public class QueryDslNotificationRepository implements NotificationRepository {
 				notification.notificationContent,
 				notification.projectId,
 				notification.projectStepId,
-				notification.actionDate
+				notification.actionDate,
+				notification.isRead
 			))
 			.from(notification)
 			.where(
