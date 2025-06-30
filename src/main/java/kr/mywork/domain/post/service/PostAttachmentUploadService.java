@@ -113,7 +113,7 @@ public class PostAttachmentUploadService {
 	}
 
 	@Transactional
-	public List<PostAttachmentActiveResponse> updatePostAttachmentActive(final UUID postId, final Boolean active) {
+	public List<PostAttachmentActiveResponse> updatePostAttachmentsActive(final UUID postId, final Boolean active) {
 
 		final List<PostAttachment> postAttachments =
 			postAttachmentRepository.findAllByPostIdDeletedAndActive(postId, false, false);

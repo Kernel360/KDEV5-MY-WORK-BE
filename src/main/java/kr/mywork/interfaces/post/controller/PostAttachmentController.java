@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import kr.mywork.common.api.support.response.ApiResponse;
-import kr.mywork.domain.post.model.PostAttachment;
 import kr.mywork.domain.post.service.PostAttachmentUploadService;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentActiveResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentDeleteResponse;
@@ -70,12 +69,12 @@ public class PostAttachmentController {
 			postAttachmentUploadUrlIssueWebRequest.getFileName()));
 	}
 
-	@PostMapping("/posts/attachment/active")
-	public ApiResponse<PostAttachmentsActiveWebResponse> activePostAttachment(
+	@PostMapping("/posts/attachments/active")
+	public ApiResponse<PostAttachmentsActiveWebResponse> activePostAttachments(
 		@RequestBody @Valid PostAttachmentActiveWebRequest postAttachmentActiveWebRequest) {
 
 		final List<PostAttachmentActiveResponse> postAttachmentActiveResponses =
-			postAttachmentUploadService.updatePostAttachmentActive(
+			postAttachmentUploadService.updatePostAttachmentsActive(
 				postAttachmentActiveWebRequest.getPostId(),
 				postAttachmentActiveWebRequest.getActive());
 

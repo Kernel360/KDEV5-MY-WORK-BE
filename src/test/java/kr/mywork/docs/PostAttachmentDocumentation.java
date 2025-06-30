@@ -144,7 +144,7 @@ public class PostAttachmentDocumentation extends RestDocsDocumentation {
 
 		// when
 		final ResultActions result = mockMvc.perform(
-			post("/api/posts/attachment/active")
+			post("/api/posts/attachments/active")
 				.content(requestBody)
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
@@ -162,8 +162,8 @@ public class PostAttachmentDocumentation extends RestDocsDocumentation {
 		return resource(
 			ResourceSnippetParameters.builder()
 				.tag("Post API")
-				.summary("게시글 파일 업로드 완료 상태 변경 API 개발")
-				.description("게시글 파일 업로드 완료 상태를 변경한다.")
+				.summary("게시글 파일 업로드 완료 상태 일괄 변경 API 개발")
+				.description("게시글 파일 업로드 완료 상태를 일괄 변경한다.")
 				.requestHeaders(
 					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
 					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
