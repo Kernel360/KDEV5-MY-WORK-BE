@@ -109,32 +109,32 @@ insert into project_step (project_id, order_num, created_at, id, title)
 values (UNHEX(REPLACE('01975454-e57b-7df5-acb8-598c64aaf54e', '-', '')),2, '2025-06-02 11:10:00', UNHEX(REPLACE('019739d7-54f3-7807-b0c0-d8017fc30c5a', '-', '')), '개발');
 
 -- post_id 테이블에 25개 UUID 삽입
-INSERT INTO post_id VALUES
-    (UNHEX(REPLACE('019739ca-e6ad-7166-b87b-2bd4886f55d7', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7751-85fb-0f9f8bc7e742', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-72ee-9bdd-1b88fac0bb08', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7018-a2f2-d21456485685', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-76a0-aff6-48f13445d6c8', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7c39-bf5b-4791155e938b', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7d30-aaed-24a437fc2ea3', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7234-9c6a-6a4735a8bddc', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-76b1-9f27-244bf13ab263', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-717e-8fe1-19aa3400ea9d', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-73b6-a247-2c5ad94c29b3', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7406-ae0f-b2a5cefd4569', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-72f6-9f30-6fa46e733c06', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7fb2-8441-d3417c402491', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7b88-b393-fe30946e64ee', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7f20-9aa8-6f79275670a8', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-77cb-8c4b-2f38c456eb3f', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7e84-84c7-158621d10c3b', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-71ea-a780-64b15e3ea214', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7f7d-a35e-e5608fe0e141', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-795d-99c1-23e7fe40f3dd', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7702-adfc-79faaddde3c4', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7420-b8ec-be8659db84e6', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-73c4-9b35-e35a81d2390d', '-', ''))),
-    (UNHEX(REPLACE('019739ca-e6ad-7453-9008-b2dc67b222a3', '-', '')));
+INSERT INTO post_id (id, created_at) VALUES
+    (UNHEX(REPLACE('019739ca-e6ad-7166-b87b-2bd4886f55d7', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7751-85fb-0f9f8bc7e742', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-72ee-9bdd-1b88fac0bb08', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7018-a2f2-d21456485685', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-76a0-aff6-48f13445d6c8', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7c39-bf5b-4791155e938b', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7d30-aaed-24a437fc2ea3', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7234-9c6a-6a4735a8bddc', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-76b1-9f27-244bf13ab263', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-717e-8fe1-19aa3400ea9d', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-73b6-a247-2c5ad94c29b3', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7406-ae0f-b2a5cefd4569', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-72f6-9f30-6fa46e733c06', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7fb2-8441-d3417c402491', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7b88-b393-fe30946e64ee', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7f20-9aa8-6f79275670a8', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-77cb-8c4b-2f38c456eb3f', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7e84-84c7-158621d10c3b', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-71ea-a780-64b15e3ea214', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7f7d-a35e-e5608fe0e141', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-795d-99c1-23e7fe40f3dd', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7702-adfc-79faaddde3c4', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7420-b8ec-be8659db84e6', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-73c4-9b35-e35a81d2390d', '-', '')), CURRENT_TIMESTAMP),
+    (UNHEX(REPLACE('019739ca-e6ad-7453-9008-b2dc67b222a3', '-', '')), CURRENT_TIMESTAMP);
 
 -- post 테이블에 25개 레코드 삽입 (project_step_id는 두 종류로 삽입)
 INSERT INTO post (id, project_step_id, title, company_name, author_name, content, approval, deleted, modified_at, created_at) VALUES

@@ -1,5 +1,5 @@
-INSERT INTO post_id
-VALUES (UNHEX(REPLACE('1234a9a9-90b6-9898-a9dc-92c9861aa98c', '-', '')));
+INSERT INTO post_id (id, created_at)
+VALUES (UNHEX(REPLACE('1234a9a9-90b6-9898-a9dc-92c9861aa98c', '-', '')), CURRENT_TIMESTAMP);
 
 INSERT INTO post (id,
                   project_step_id,
