@@ -19,6 +19,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class Post {
 
+	private static final String APPROVED = "APPROVED";
+
 	@Id
 	private UUID id;
 
@@ -90,5 +92,9 @@ public class Post {
 
 	public boolean isDeleted() {
 		return this.deleted;
+	}
+
+	public boolean isApproved() {
+		return this.approval.equals(APPROVED);
 	}
 }
