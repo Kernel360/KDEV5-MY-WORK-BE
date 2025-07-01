@@ -83,7 +83,8 @@ public class PostService {
 			projectStep.getProjectId(),
 			projectStep.getId());
 
-		eventPublisher.publishEvent(postApprovalAlarmEvent);
+		if (!post.getAuthorId().equals(loginMemberDetail.memberId()))
+			eventPublisher.publishEvent(postApprovalAlarmEvent);
 		eventPublisher.publishEvent(new ModifyEventObject(before, post, loginMemberDetail));
 
 		return new PostApprovalResponse(post.getId(), post.getApproval());
