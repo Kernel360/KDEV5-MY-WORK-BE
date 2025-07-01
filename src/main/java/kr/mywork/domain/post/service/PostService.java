@@ -16,11 +16,11 @@ import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
 import kr.mywork.domain.notification.model.NotificationActionType;
 import kr.mywork.domain.notification.model.TargetType;
-import kr.mywork.domain.notification.service.NotificationService;
 import kr.mywork.domain.post.errors.PostDeletedException;
 import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
+import kr.mywork.domain.post.listener.event.PostApprovalAlarmEvent;
 import kr.mywork.domain.post.listener.event.PostAttachmentDeleteEvent;
 import kr.mywork.domain.post.listener.event.PostReviewsDeleteEvent;
 import kr.mywork.domain.post.model.Post;
@@ -59,7 +59,6 @@ public class PostService {
 	private final ProjectRepository projectRepository;
 	private final PostAttachmentRepository postAttachmentRepository;
 	private final ApplicationEventPublisher eventPublisher;
-	private final NotificationService notificationService;
 
 	@Transactional
 	public PostApprovalResponse approvalPost(UUID postId, PostApprovalRequest postApprovalRequest, LoginMemberDetail loginMemberDetail) {
@@ -72,20 +71,19 @@ public class PostService {
 
 		post.changeApproval(postApprovalRequest.getApprovalStatus());
 
-		notificationService.save(
-			post.getAuthorId(),
-			post.getAuthorName(),
+		final PostApprovalAlarmEvent postApprovalAlarmEvent = new PostApprovalAlarmEvent(
+			post.getAuthorId(), post.getAuthorName(),
 			post.getTitle(),
-			loginMemberDetail.memberName(),
 			loginMemberDetail.memberId(),
+			loginMemberDetail.memberName(),
 			TargetType.POST,
 			post.getId(),
 			post.isApproved() ? NotificationActionType.APPROVED : NotificationActionType.PENDING,
 			post.getModifiedAt(),
 			projectStep.getProjectId(),
-			projectStep.getId()
-		);
+			projectStep.getId());
 
+		eventPublisher.publishEvent(postApprovalAlarmEvent);
 		eventPublisher.publishEvent(new ModifyEventObject(before, post, loginMemberDetail));
 
 		return new PostApprovalResponse(post.getId(), post.getApproval());
