@@ -2519,6 +2519,11 @@ INSERT INTO mywork_db.post (deleted, created_at, modified_at, author_id, id, pro
 (false, '2025-06-08 22:25:00.160807', '2025-06-09 00:12:00.693598', 0x01975D6F5C73745BAB0E6963E47BC66C, 0xFDA5685B2B5E49A197D81BC3E7E3B8A7, 0x01975DBF6FBE7B84A0D3FF0389242B2B, 'APPROVED', '박지후', '주식회사 에코트레이드', '법적 검토 사항 정리', '서비스 운영 시 고려해야 할 법적/규제사항 정리하여 법무팀과 검토 진행 중.'),
 (false, '2025-05-13 17:26:21.000000', '2025-05-13 17:26:21.000000', 0x01975D05CF27736BA5E6E3E98B874528, 0xFDBECB8D2FE444289AD6F8B9149FE4DC, 0x01975DBF6FBE7E638D19125A3162689A, 'PENDING', '하수현', '주식회사 오아시스문화', '배포 자동화 방안 검토', '배포 자동화 방안 검토 후 최종 방향성을 확정하였습니다.');
 
+-- 관리자 회사생성 01976356-dfbe-78af-942a-725910736950
+INSERT INTO mywork_db.company(id,name,contact_phone_number,business_number,address,contact_email,detail,file_name,type,created_at,modified_at,deleted)
+VALUES
+    (UNHEX(REPLACE('01976356-dfbe-78af-942a-725910736950','-','')),'주식회사 관리자','02-0000-0001','000-00-00001','서울특별시 강남구 테헤란로 123','admin@admin.com','관리자 회사 입니다.','/devkorea.png','SYSTEM',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,b'0');
+
 -- 관리자 생성  회사 ID (01976356-dfbe-78af-942a-725910736950) 기준 user 10명
 INSERT INTO member(id,company_id,name,department,position,role,phone_number,email,password,deleted,birth_date,created_at,modified_at)
 VALUES
