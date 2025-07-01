@@ -12,6 +12,7 @@ public class CompanyCreateRequest {
 	private final UUID id;
 	private final String name;
 	private final String detail;
+	@Getter
 	private final String businessNumber;
 	private final String address;
 	private final String type;
