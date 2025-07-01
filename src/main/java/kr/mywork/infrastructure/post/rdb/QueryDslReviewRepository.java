@@ -84,4 +84,11 @@ public class QueryDslReviewRepository implements ReviewRepository {
 			.orderBy(review.createdAt.desc())
 			.fetch();
 	}
+
+	@Override
+	public Long deletePostReviews(final UUID postId) {
+		return queryFactory.delete(review)
+			.where(review.postId.eq(postId))
+			.execute();
+	}
 }
