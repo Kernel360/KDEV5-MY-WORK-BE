@@ -87,4 +87,8 @@ public class Post {
 	public void changeApproval(String approval) {
 		this.approval = approval;
 	}
+
+	public boolean isDeleted() {
+		return this.deleted;
+	}
 }
