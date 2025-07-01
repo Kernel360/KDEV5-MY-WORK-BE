@@ -1,0 +1,58 @@
+spring:
+  jpa:
+    show-sql: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:tc:mysql:8://mywork_rdb
+    username: root
+    password: cooper2025
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  cloud:
+    aws:
+      s3:
+        region: us-east-1 # TODO 운영용은 별도로 선언
+      credentials:
+        access-key: test # TODO 운영용은 별도로 선언
+        secret-key: test # TODO 운영용은 별도로 선언
+company:
+  page:
+    size: 10
+  upload:
+    duration: 3m
+member:
+  page:
+    size: 10
+post:
+  page:
+    size: 10
+  upload:
+    bucket-name: mywork-upload-bucket
+    duration: 3m
+    endpoint: http://localhost:4566
+  attachment:
+    max-count: 3
+  issued-id:
+    delete:
+      cron: 0 0 4 * * *
+    created-limit-hour: 24
+project:
+  page:
+    size: 10
+review:
+  page:
+    size: 10
+activityLog:
+  page:
+    size: 10
+dashboard:
+  page:
+    size: 5
+jwt:
+  access-token:
+    private-key: 126cab8a5d9087a27be4e2a0599682e2bab38e80201d1befa2dd9d55ecbdeac58bab0c84301ad9f9f8a71836825e5a7214e7a9fb17a8578418de6cfe9a15cbc7
+    expiration: 3600000
+  refresh-token:
+    private-key: 408a96ae4affd8bce03d11385d9a8dfbd4c0cbc9c5a83675864192dbb50eaa965acf2ef84e60bb1a38798f612caed4f383466a4be14957bf87370b62be71c2e1
+    expiration: 86400000
