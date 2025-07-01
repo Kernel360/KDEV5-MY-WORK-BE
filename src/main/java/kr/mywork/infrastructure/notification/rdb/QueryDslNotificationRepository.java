@@ -76,4 +76,17 @@ public class QueryDslNotificationRepository implements NotificationRepository {
 
 		return notification.isRead.eq(isRead);
 	}
+
+	@Override
+	public long countByMemberIdAndIsReadFalse(UUID memberId) {
+		return queryFactory
+			.select(notification.count())
+			.from(notification)
+			.where(
+				notification.receiverMemberId.eq(memberId),
+				notification.isRead.isFalse()
+			)
+			.fetchOne();
+	}
+
 }

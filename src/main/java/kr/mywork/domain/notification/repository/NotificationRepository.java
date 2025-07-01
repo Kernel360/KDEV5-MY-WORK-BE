@@ -12,4 +12,6 @@ public interface NotificationRepository {
 	List<NotificationSelectResponse> findByConditionWithPaging(int page, Boolean isRead, UUID memberId);
 
 	Notification findById(UUID id);
+
+	long countByMemberIdAndIsReadFalse(UUID memberId);
 }

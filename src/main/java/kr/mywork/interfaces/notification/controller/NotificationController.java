@@ -60,4 +60,9 @@ public class NotificationController {
 		return ApiResponse.success(new NotificationReadWebResponse(notificationReadResponse.getId()));
 	}
 
+	@GetMapping("/unread-count")
+	public ApiResponse<Long> getUnreadNotificationCount(@LoginMember LoginMemberDetail loginMemberDetail) {
+		long count = notificationService.countUnreadNotifications(loginMemberDetail.memberId());
+		return ApiResponse.success(count);
+	}
 }

@@ -41,4 +41,9 @@ public class NotificationService {
 		notification.markAsRead();
 		return new NotificationReadResponse(notification.getId());
 	}
+
+	public long countUnreadNotifications(UUID memberId) {
+		return notificationRepository.countByMemberIdAndIsReadFalse(memberId);
+	}
+
 }
