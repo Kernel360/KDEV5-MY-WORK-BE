@@ -14,6 +14,7 @@ import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.company.errors.CompanyAlreadyExistException;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyIdNotFoundException;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
@@ -48,6 +49,13 @@ public class CompanyService {
 	public UUID createCompany(final CompanyCreateRequest companyCreateRequest, LoginMemberDetail loginMemberDetail) {
 		companyIdRepository.findById(companyCreateRequest.getId())
 			.orElseThrow(() -> new CompanyIdNotFoundException(CompanyErrorType.ID_NOT_FOUND));
+
+		final boolean businessNumberCompanyExistence = companyRepository.existsByBusinessNumber(
+			companyCreateRequest.getBusinessNumber());
+
+		if (businessNumberCompanyExistence) {
+			throw new CompanyAlreadyExistException(CompanyErrorType.COMPANY_BUSINESS_NUMBER_EXIST);
+		}
 
 		final Company savedCompany = companyRepository.save(companyCreateRequest);
 
@@ -98,11 +106,13 @@ public class CompanyService {
 	}
 
 	@Transactional(readOnly = true)
-	public Long countTotalCompaniesByCondition(String companyType, String keywordType, String keyword, Boolean deleted) {
+	public Long countTotalCompaniesByCondition(String companyType, String keywordType, String keyword,
+		Boolean deleted) {
 		return companyRepository.countTotalCompaniesByCondition(companyType, keywordType, keyword, deleted);
 	}
+
 	@Transactional(readOnly = true)
-	public List<CompanyNameResponse> findCompanyNamesByCompanyType(final String companyType){
+	public List<CompanyNameResponse> findCompanyNamesByCompanyType(final String companyType) {
 		return companyRepository.findCompanyNamesByCompanyType(companyType);
 	}
 

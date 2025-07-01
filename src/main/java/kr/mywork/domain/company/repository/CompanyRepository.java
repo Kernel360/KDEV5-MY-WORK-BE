@@ -27,4 +27,6 @@ public interface CompanyRepository {
 	List<Company> findAllByIds(List<UUID> devCompanyIds);
 
 	List<Company> findAllByNameAndType(String companyName, String type);
+
+	boolean existsByBusinessNumber(String businessNumber);
 }
