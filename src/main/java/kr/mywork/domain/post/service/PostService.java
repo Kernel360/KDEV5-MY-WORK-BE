@@ -80,7 +80,7 @@ public class PostService {
 			loginMemberDetail.memberId(),
 			TargetType.POST,
 			post.getId(),
-			NotificationActionType.APPROVED,
+			post.isApproved() ? NotificationActionType.APPROVED : NotificationActionType.PENDING,
 			post.getModifiedAt(),
 			projectStep.getProjectId(),
 			projectStep.getId()
