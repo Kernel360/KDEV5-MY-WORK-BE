@@ -29,7 +29,8 @@ INSERT INTO post (id,
                   approval,
                   deleted,
                   modified_at,
-                  created_at
+                  created_at,
+                  author_id
 ) VALUES (
              UNHEX(REPLACE('1234a9a9-90b6-9898-a9dc-92c9861aa98c', '-', '')),
              UNHEX(REPLACE('01991f58-8a6a-7a18-8cfe-1f2bfa6a5e01', '-', '')),
@@ -40,5 +41,6 @@ INSERT INTO post (id,
              '승인여부',
              FALSE,
              NOW(),
-             NOW()
+             NOW(),
+             UNHEX(REPLACE('0197c5d8-53c8-7c2d-bffb-c05664767617', '-', ''))
          );
