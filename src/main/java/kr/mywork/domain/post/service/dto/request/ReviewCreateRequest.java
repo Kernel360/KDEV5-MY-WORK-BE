@@ -8,6 +8,6 @@ public record ReviewCreateRequest(UUID postId, UUID parentId, UUID memberId, Str
 								  String authorName, String companyName) {
 
 	public Review toEntity() {
-		return new Review(postId, parentId, memberId, comment, authorName, companyName);
+		return new Review(postId, parentId, memberId, comment, companyName, authorName);
 	}
 }
