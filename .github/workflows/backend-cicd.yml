@@ -3,7 +3,7 @@ name: mywork ci/cd workflows
 on:
   push:
     branches:
-      - dev
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
