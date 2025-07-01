@@ -68,6 +68,18 @@ public class QueryDslPostAttachmentRepository implements PostAttachmentRepositor
 			.fetch();
 	}
 
+	@Override
+	public List<PostAttachment> findAllInPostAttachmentIdsByDeletedAndActive(final List<UUID> postAttachmentIds,
+		final Boolean deleted, final Boolean active) {
+
+		return queryFactory.selectFrom(postAttachment)
+			.where(
+				postAttachment.id.in(postAttachmentIds),
+				eqDeleted(deleted),
+				eqActive(active))
+			.fetch();
+	}
+
 	private BooleanExpression eqDeleted(final Boolean deleted) {
 		if (deleted == null) {
 			return null;
