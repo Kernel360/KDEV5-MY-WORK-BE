@@ -12,4 +12,5 @@ public interface PostAttachmentRepository {
 	Optional<PostAttachment> findById(UUID postAttachmentId);
 	boolean existsByFileNameAndDeleted(UUID postId, String fileName, boolean deleted);
 	List<PostAttachment> findAllByPostIdDeletedAndActive(UUID postId, Boolean deleted, Boolean active);
+	List<PostAttachment> findAllInPostAttachmentIdsByDeletedAndActive(List<UUID> postAttachmentIds, Boolean deleted, Boolean active);
 }

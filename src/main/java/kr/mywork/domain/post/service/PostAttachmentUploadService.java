@@ -50,7 +50,7 @@ public class PostAttachmentUploadService {
 	private PostAttachmentUploadUrlIssueResponse createPostAttachmentToExistingPost(
 		final UUID postId, final String fileName) {
 
-		if(isAlreadyFileUploadName(postId, fileName)) {
+		if (isAlreadyFileUploadName(postId, fileName)) {
 			throw new PostAttachmentAlreadyUploadException(PostErrorType.ATTACHMENT_ALREADY_UPLOADED_NAME);
 		}
 
@@ -69,7 +69,7 @@ public class PostAttachmentUploadService {
 	private PostAttachmentUploadUrlIssueResponse createPostAttachmentToNewPost(
 		final UUID postId, final String fileName) {
 
-		if(isAlreadyFileUploadName(postId, fileName)) {
+		if (isAlreadyFileUploadName(postId, fileName)) {
 			throw new PostAttachmentAlreadyUploadException(PostErrorType.ATTACHMENT_ALREADY_UPLOADED);
 		}
 
@@ -113,10 +113,16 @@ public class PostAttachmentUploadService {
 	}
 
 	@Transactional
-	public List<PostAttachmentActiveResponse> updatePostAttachmentsActive(final UUID postId, final Boolean active) {
+	public List<PostAttachmentActiveResponse> updatePostAttachmentsActive(
+		final UUID postId, final List<UUID> postAttachmentIds, final Boolean active) {
+
+		final Long currentActiveCount = postAttachmentRepository.countByDeletedAndActive(postId, false, true);
+		if (currentActiveCount + postAttachmentIds.size() > postAttachmentMaxCount) {
+			throw new MaxPostAttachmentsException(PostErrorType.ATTACHMENT_MAX);
+		}
 
 		final List<PostAttachment> postAttachments =
-			postAttachmentRepository.findAllByPostIdDeletedAndActive(postId, false, false);
+			postAttachmentRepository.findAllInPostAttachmentIdsByDeletedAndActive(postAttachmentIds, false, false);
 
 		for (PostAttachment postAttachment : postAttachments) {
 			postAttachment.updateActive(active);

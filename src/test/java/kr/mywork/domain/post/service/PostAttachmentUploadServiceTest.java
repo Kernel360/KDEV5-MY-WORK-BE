@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ import kr.mywork.domain.post.model.PostId;
 import kr.mywork.domain.post.repository.PostAttachmentRepository;
 import kr.mywork.domain.post.repository.PostIdRepository;
 import kr.mywork.domain.post.repository.PostRepository;
+import kr.mywork.domain.post.service.dto.response.PostAttachmentActiveResponse;
 import kr.mywork.domain.post.service.dto.response.PostAttachmentUploadUrlIssueResponse;
 import kr.mywork.domain.post.service.errors.PostAttachmentAlreadyUploadException;
 import kr.mywork.domain.post.uploader.PostAttachmentFileHandler;
@@ -180,5 +182,72 @@ class PostAttachmentUploadServiceTest {
 		assertThatThrownBy(
 			() -> postAttachmentUploadService.issuePostAttachmentUploadUrl(postId, fileName))
 			.isInstanceOf(PostAttachmentAlreadyUploadException.class);
+	}
+
+	@Test
+	@DisplayName("첨부파일 일괄 활성화 성공")
+	void 첨부파일_일괄_활성화_성공() {
+		// given
+		final UUID postId = UUID.fromString("0197b69f-e45a-74ec-937e-d236bb1cdddf");
+		final List<UUID> postAttachmentIds = List.of(
+			UUID.fromString("0197c38f-9ed6-727c-9d9a-aa7fc12c8b03"),
+			UUID.fromString("0197c38f-e1c3-72f8-8715-2252f340b3a7"),
+			UUID.fromString("0197c390-0baa-7684-b995-023e1ff55e9c"));
+
+		List<PostAttachment> postAttachments = List.of(
+			PostAttachment.inactivePostAttachment(postId, "file01.png"),
+			PostAttachment.inactivePostAttachment(postId, "file02.png"),
+			PostAttachment.inactivePostAttachment(postId, "file03.png"));
+
+		when(postAttachmentRepository.countByDeletedAndActive(any(), anyBoolean(), anyBoolean()))
+			.thenReturn(0L);
+		when(postAttachmentRepository.findAllInPostAttachmentIdsByDeletedAndActive(any(), anyBoolean(), anyBoolean()))
+			.thenReturn(postAttachments);
+
+		// when
+		final List<PostAttachmentActiveResponse> postAttachmentActiveResponses =
+			postAttachmentUploadService.updatePostAttachmentsActive(postId, postAttachmentIds, true);
+
+		// then
+		assertThat(postAttachmentActiveResponses.size()).isEqualTo(3);
+	}
+
+	@Test
+	@DisplayName("첨부파일 일괄 활성화 요청 수 초과로 실패")
+	void 첨부파일_일괄_활성화_요청_수_초과로_실패() {
+		// given
+		final UUID postId = UUID.fromString("0197b69f-e45a-74ec-937e-d236bb1cdddf");
+		final List<UUID> postAttachmentIds = List.of(
+			UUID.fromString("0197c38f-9ed6-727c-9d9a-aa7fc12c8b03"),
+			UUID.fromString("0197c38f-e1c3-72f8-8715-2252f340b3a7"));
+
+		when(postAttachmentRepository.countByDeletedAndActive(any(), anyBoolean(), anyBoolean()))
+			.thenReturn(2L);
+
+		// when, then
+		assertThatThrownBy(
+			() -> postAttachmentUploadService.updatePostAttachmentsActive(postId, postAttachmentIds, true))
+			.isInstanceOf(MaxPostAttachmentsException.class);
+	}
+
+	@Test
+	@DisplayName("기존 첨부파일 활성화 수 최대로 인해 실패")
+	void 기존_첨부파일_활성화_수_최대로_인해_실패() {
+		// given
+		final UUID postId = UUID.fromString("0197b69f-e45a-74ec-937e-d236bb1cdddf");
+
+		final List<UUID> postAttachmentIds = List.of(
+			UUID.fromString("0197c38f-9ed6-727c-9d9a-aa7fc12c8b03"));
+
+		final PostAttachment postAttachment01 = PostAttachment.inactivePostAttachment(postId, "file01.png");
+		postAttachment01.updateActive(true);
+
+		when(postAttachmentRepository.countByDeletedAndActive(any(), anyBoolean(), anyBoolean()))
+			.thenReturn(3L);
+
+		// when, then
+		assertThatThrownBy(
+			() -> postAttachmentUploadService.updatePostAttachmentsActive(postId, postAttachmentIds, true))
+			.isInstanceOf(MaxPostAttachmentsException.class);
 	}
 }
