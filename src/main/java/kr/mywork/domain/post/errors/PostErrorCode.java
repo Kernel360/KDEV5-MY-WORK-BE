@@ -9,4 +9,5 @@ public enum PostErrorCode {
 	ERROR_POST06,
 	ERROR_POST07,
 	ERROR_POST08,
+	ERROR_POST09,
 }

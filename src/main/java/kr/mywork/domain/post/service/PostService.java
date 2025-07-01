@@ -17,6 +17,7 @@ import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
 import kr.mywork.domain.notification.model.NotificationActionType;
 import kr.mywork.domain.notification.model.TargetType;
 import kr.mywork.domain.notification.service.NotificationService;
+import kr.mywork.domain.post.errors.PostDeletedException;
 import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
@@ -117,6 +118,10 @@ public class PostService {
 	public PostDetailResponse getPostDetail(UUID postId) {
 		final Post post = postRepository.findById(postId)
 			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
+
+		if (post.isDeleted()) {
+			throw new PostDeletedException(PostErrorType.POST_DELETED);
+		}
 
 		final List<PostAttachment> postAttachments =
 			postAttachmentRepository.findAllByPostIdDeletedAndActive(postId, false, true);
