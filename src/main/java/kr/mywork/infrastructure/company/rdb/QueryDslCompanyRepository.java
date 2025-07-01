@@ -135,6 +135,14 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 			.fetch();
 	}
 
+	@Override
+	public boolean existsByBusinessNumber(final String businessNumber) {
+		return queryFactory.select(company.id)
+			.from(company)
+			.where(company.businessNumber.eq(businessNumber))
+			.fetchFirst() != null;
+	}
+
 	public BooleanExpression eqCompanyType(final String companyType) {
 		return (companyType == null) ? null : company.type.stringValue().eq(companyType);
 	}
