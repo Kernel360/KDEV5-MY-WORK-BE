@@ -25,4 +25,12 @@ values (UUID_TO_BIN('019790db-3830-768d-83ea-a57eeee6bbfc'),
         FALSE,
         FALSE,
         '2025-06-21 14:00:00',
+        '2025-06-21 14:00:00'),
+       (UUID_TO_BIN('0197c396-8cee-7f36-94b6-1047bf6fe161'),
+        UUID_TO_BIN('019790da-3d89-7d84-b5e1-b5bb8109dc02'),
+        'mywork-image03.jpg',
+        FALSE,
+        FALSE,
+        '2025-06-21 14:00:00',
         '2025-06-21 14:00:00');
+

@@ -11,6 +11,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Disabled;
@@ -134,11 +135,16 @@ public class PostAttachmentDocumentation extends RestDocsDocumentation {
 	void 파일_업로드_완료_상태_변경_성공() throws Exception {
 		// given
 		final String accessToken = createUserAccessToken();
-
 		final UUID postId = UUID.fromString("019790da-3d89-7d84-b5e1-b5bb8109dc02");
+		final List<UUID> postAttachmentIds = List.of(
+			UUID.fromString("019790db-3830-768d-83ea-a57eeee6bbfc"),
+			UUID.fromString("0197bf6c-5300-7881-a5ee-96fa3642c62f"),
+			UUID.fromString("0197c396-8cee-7f36-94b6-1047bf6fe161"));
+
 		final boolean active = true;
+
 		final PostAttachmentActiveWebRequest postAttachmentActiveWebRequest =
-			new PostAttachmentActiveWebRequest(postId, active);
+			new PostAttachmentActiveWebRequest(postId, postAttachmentIds, active);
 
 		final String requestBody = objectMapper.writeValueAsString(postAttachmentActiveWebRequest);
 
