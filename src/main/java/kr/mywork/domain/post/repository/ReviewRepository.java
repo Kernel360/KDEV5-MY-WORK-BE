@@ -14,4 +14,6 @@ public interface ReviewRepository {
 	List<ReviewSelectResponse> findParentReviewsWithPaging(UUID postId, Integer pageNumber, int pageSize);
 
 	List<ReviewSelectResponse> findByIds(UUID postId, List<UUID> parentIds);
+
+	Long deletePostReviews(UUID postId);
 }

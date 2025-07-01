@@ -130,4 +130,8 @@ public class ReviewService {
 
 		return parentReviews;
 	}
+
+	public Long deletePostReviews(final UUID postId) {
+		return reviewRepository.deletePostReviews(postId);
+	}
 }

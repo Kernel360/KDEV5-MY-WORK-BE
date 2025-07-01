@@ -22,6 +22,7 @@ import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
 import kr.mywork.domain.post.listener.event.PostAttachmentDeleteEvent;
+import kr.mywork.domain.post.listener.event.PostReviewsDeleteEvent;
 import kr.mywork.domain.post.model.Post;
 import kr.mywork.domain.post.model.PostAttachment;
 import kr.mywork.domain.post.repository.PostAttachmentRepository;
@@ -184,6 +185,7 @@ public class PostService {
 
 		eventPublisher.publishEvent(new DeleteEventObject(post, loginMemberDetail));
 		eventPublisher.publishEvent(new PostAttachmentDeleteEvent(postId));
+		eventPublisher.publishEvent(new PostReviewsDeleteEvent(postId));
 
 		return post.getId();
 	}
