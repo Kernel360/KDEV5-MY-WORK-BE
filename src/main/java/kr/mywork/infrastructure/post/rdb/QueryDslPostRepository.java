@@ -225,7 +225,8 @@ public class QueryDslPostRepository implements PostRepository {
 				post.count()
 			))
 			.from(post)
-			.where(post.projectStepId.in(projectStepIds))
+			.where(post.projectStepId.in(projectStepIds),
+					post.deleted.eq(false))
 			.groupBy(post.projectStepId)
 			.fetch();
 	}
