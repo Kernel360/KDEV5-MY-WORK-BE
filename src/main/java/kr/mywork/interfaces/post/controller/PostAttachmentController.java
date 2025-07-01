@@ -76,6 +76,7 @@ public class PostAttachmentController {
 		final List<PostAttachmentActiveResponse> postAttachmentActiveResponses =
 			postAttachmentUploadService.updatePostAttachmentsActive(
 				postAttachmentActiveWebRequest.getPostId(),
+				postAttachmentActiveWebRequest.getPostAttachmentIds(),
 				postAttachmentActiveWebRequest.getActive());
 
 		final List<PostAttachmentActiveWebResponse> postAttachmentActiveWebResponses = postAttachmentActiveResponses.stream()
