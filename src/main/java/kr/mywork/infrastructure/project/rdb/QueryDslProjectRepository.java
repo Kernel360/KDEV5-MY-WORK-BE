@@ -3,11 +3,13 @@ package kr.mywork.infrastructure.project.rdb;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import jakarta.annotation.Nullable;
 import kr.mywork.domain.member.service.dto.response.MemberProjectInfoResponse;
 import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,14 +63,12 @@ public class QueryDslProjectRepository implements ProjectRepository {
 		return queryFactory.select(Projections.constructor(
 				MemberProjectInfoResponse.class,
 				projectMember.projectId,
-				project.name
-			))
+				project.name))
 			.from(projectMember)
 			.leftJoin(project).on(projectMember.projectId.eq(project.id))
 			.where(
 				eqMember(memberId),
-				eqDeleted(false)
-			)
+				eqDeleted(false))
 			.fetch();
 	}
 
@@ -131,15 +131,17 @@ public class QueryDslProjectRepository implements ProjectRepository {
 	}
 
 	@Override
-	public List<Project> findAllNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, int page, int pageSize, LocalDateTime now) {
+	public List<Project> findAllNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, int page, int pageSize,
+		LocalDateTime baseDate) {
 		final int offset = (page - 1) * pageSize;
 		return queryFactory
 			.selectFrom(project)
 			.where(
-				project.id.in(projectIds)
-					.and(project.deleted.isFalse())
-					.and(project.endAt.goe(now))
-			)
+				project.id.in(projectIds),
+				project.deleted.isFalse(),
+				project.endAt.between(
+					baseDate.toLocalDate().atStartOfDay(),
+					baseDate.plusDays(5).toLocalDate().atTime(23, 59, 59)))
 			.orderBy(project.endAt.asc())
 			.offset(offset)
 			.limit(pageSize)
@@ -158,7 +160,6 @@ public class QueryDslProjectRepository implements ProjectRepository {
 			.fetchOne();
 	}
 
-
 	@Override
 	public Long countNearDeadlineProjectsByProjectIds(Collection<UUID> projectIds, LocalDate baseDate) {
 		if (projectIds == null || projectIds.isEmpty()) {
@@ -175,7 +176,6 @@ public class QueryDslProjectRepository implements ProjectRepository {
 			.fetchOne();
 	}
 
-
 	@Override
 	public List<Project> findProjectsNameById(List<UUID> mostPostProjectIds) {
 		return queryFactory
@@ -184,25 +184,24 @@ public class QueryDslProjectRepository implements ProjectRepository {
 			.fetch();
 	}
 
-
 	@Override
 	public List<Project> findProjectsByIds(List<UUID> projectIds) {
 		return queryFactory
-				.selectFrom(project)
-				.where(project.id.in(projectIds))
-				.fetch();
+			.selectFrom(project)
+			.where(project.id.in(projectIds))
+			.fetch();
 	}
 
 	@Override
 	public List<Project> findCompletedProjectsByIdsWithDate(List<UUID> projectIds, LocalDateTime startDate,String status){
 		return queryFactory
-				.selectFrom(project)
-				.where(
-						project.id.in(projectIds),
-						project.endAt.goe(startDate),
-						project.step.eq(status)
-				)
-				.fetch();
+			.selectFrom(project)
+			.where(
+				project.id.in(projectIds),
+				project.endAt.goe(startDate),
+				project.step.eq(status)
+			)
+			.fetch();
 	}
 
 	private BooleanExpression eqProjectStep(final String step) {
@@ -238,35 +237,35 @@ public class QueryDslProjectRepository implements ProjectRepository {
 	@Override
 	public Long getSummaryProjectTotalCount(@Nullable List<UUID> projectIds) {
 		return queryFactory.select(project.count())
-				.from(project)
-				.where(
-						projectAccessConditionByIds(projectIds),
-						project.deleted.isFalse()
-				)
-				.fetchOne();
+			.from(project)
+			.where(
+				projectAccessConditionByIds(projectIds),
+				project.deleted.isFalse()
+			)
+			.fetchOne();
 	}
 	@Override
-	public Long getSummaryInProgressProjectTotalCount(@Nullable List<UUID> projectIds,LocalDateTime now) {
+	public Long getSummaryInProgressProjectTotalCount(@Nullable List<UUID> projectIds, LocalDateTime now) {
 		return queryFactory.select(project.count())
-				.from(project)
-				.where(
-						projectAccessConditionByIds(projectIds),
-						project.deleted.isFalse(),
-						project.startAt.before(now),
-						project.endAt.after(now)
-				)
-				.fetchOne();
+			.from(project)
+			.where(
+				projectAccessConditionByIds(projectIds),
+				project.deleted.isFalse(),
+				project.startAt.before(now),
+				project.endAt.after(now)
+			)
+			.fetchOne();
 	}
 	@Override
 	public Long getSummaryCompletedProjectTotalCount(@Nullable List<UUID> projectIds, LocalDateTime now) {
 		return queryFactory.select(project.count())
-				.from(project)
-				.where(
-						projectAccessConditionByIds(projectIds),
-						project.deleted.isFalse(),
-						project.endAt.before(now)
-				)
-				.fetchOne();
+			.from(project)
+			.where(
+				projectAccessConditionByIds(projectIds),
+				project.deleted.isFalse(),
+				project.endAt.before(now)
+			)
+			.fetchOne();
 	}
 	private BooleanExpression projectAccessConditionByIds(@Nullable List<UUID> projectIds) {
 
