@@ -1,0 +1,20 @@
+-- 프로젝트
+INSERT INTO project (deleted, created_at, end_at, modified_at, start_at, id, name, step, detail, project_amount)
+VALUES (0, NOW(), '2025-07-01 14:00:00', NOW(), NOW(),
+        UUID_TO_BIN('0197ce0a-0573-7aed-ac15-10384b9a21ec'),
+        '프로젝트1', 'IN_PROGRESS', '프로젝트 상세 내용1.', 100),
+       (0, NOW(), '2025-07-02 14:00:00', NOW(), NOW(),
+        UUID_TO_BIN('0197ce0a-38b4-76d1-ba71-a3913e0373da'),
+        '프로젝트2', 'IN_PROGRESS', '프로젝트 상세 내용2.', 100),
+       (0, NOW(), '2025-07-07 14:00:00', NOW(), NOW(),
+        UUID_TO_BIN('0197ce0a-b5fd-776e-a304-b90e2441b143'),
+        '프로젝트7', 'IN_PROGRESS', '프로젝트 상세 내용8.', 100),
+       (0, NOW(), '2025-07-08 14:00:00', NOW(), NOW(),
+        UUID_TO_BIN('0197ce0a-d6e7-752e-97f6-765a92821508'),
+        '프로젝트8', 'IN_PROGRESS', '프로젝트 상세 내용8.', 100),
+       (0, NOW(), '2025-07-09 14:00:00', NOW(), NOW(),
+        UUID_TO_BIN('0197ce0a-eba0-7601-9edf-2143363d3a4f'),
+        '프로젝트9', 'IN_PROGRESS', '프로젝트 상세 내용9.', 100),
+       (0, NOW(), '2025-07-10 14:00:00', NOW(), NOW(),
+        UUID_TO_BIN('0197ce0a-fa9c-78e2-86c1-b280542ebcb0'),
+        '프로젝트10', 'IN_PROGRESS', '프로젝트 상세 내용10.', 100);
