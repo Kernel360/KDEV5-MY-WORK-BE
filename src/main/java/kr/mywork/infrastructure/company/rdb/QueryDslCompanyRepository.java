@@ -46,8 +46,10 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 	@Override
 	public List<CompanySelectResponse> findCompaniesBySearchConditionWithPaging(final int page,
 		final int companyPageSize,
-		final String companyType, final String keywordType, String keyword, Boolean deleted) {
-
+		final String companyType,
+		final String keywordType,
+		final String keyword,
+		final Boolean deleted) {
 		final int offset = (page - 1) * companyPageSize;
 
 		return queryFactory.select(Projections.constructor(CompanySelectResponse.class,
@@ -60,9 +62,10 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 				company.createdAt))
 			.from(company)
 			.where(
-				company.type.stringValue().eq(companyType),
+				eqCompanyType(companyType),
 				eqDeleted(deleted),
-				containsKeyword(keywordType, keyword))
+				containsKeyword(keywordType, keyword)
+			)
 			.offset(offset)
 			.limit(companyPageSize)
 			.fetch();
@@ -92,7 +95,7 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 		return queryFactory.select(company.id.count())
 			.from(company)
 			.where(
-				company.type.stringValue().eq(companyType),
+				eqCompanyType(companyType),
 				eqDeleted(deleted),
 				containsKeyword(keywordType, keyword))
 			.fetchOne();
