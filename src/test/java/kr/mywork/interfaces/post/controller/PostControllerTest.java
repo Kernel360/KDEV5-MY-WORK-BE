@@ -3,6 +3,7 @@ package kr.mywork.interfaces.post.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.mywork.common.api.support.response.ResultType;
 import kr.mywork.domain.project.service.ProjectService;
+import kr.mywork.domain.project_member.service.ProjectMemberService;
 import kr.mywork.interfaces.project.controller.ProjectController;
 import kr.mywork.interfaces.project.controller.dto.request.ProjectCreateWebRequest;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +46,9 @@ class PostControllerTest {
 
 	@MockitoBean
 	private ProjectService projectService;
+
+	@MockitoBean
+	private ProjectMemberService projectMemberService;
 
 	@Test
 	@DisplayName("프로젝트 생성 성공")
