@@ -58,7 +58,6 @@ public class ProjectDashBoardService {
 		final UUID memberId = loginMemberDetail.memberId();
 
 		if (MemberRole.SYSTEM_ADMIN.isSameRoleName(userType)) {
-
 			return fetchProjectSummaryByProjectIds(null);
 
 		} else if (MemberRole.DEV_ADMIN.isSameRoleName(userType) || MemberRole.CLIENT_ADMIN.isSameRoleName(userType)
@@ -95,24 +94,24 @@ public class ProjectDashBoardService {
 
 	@Transactional
 	public List<DashboardPopularProjectsResponse> getMostPostProjectsTopFive(LoginMemberDetail memberDetail) {
-		final String memberRole = memberDetail.roleName();
-		//가져온 프로젝트들의 ID에 이름을 과 순서를 매칭 해주는 메소드 [ buildPopularResponse ]
-		if(MemberRole.SYSTEM_ADMIN.isSameRoleName(memberRole)){
-			return buildPopularResponse(postRepository.findMostPostProjectTopFive(null));
-		}
-		if(MemberRole.CLIENT_ADMIN.isSameRoleName(memberRole) || MemberRole.DEV_ADMIN.isSameRoleName(memberRole)){
-			final UUID companyId = memberDetail.companyId(); //회사 기준으로 -> 프로젝트 ID들 가져와야함.
-			final List<UUID> companyProjectIds = projectAssignRepository.findCompanyProjectsByCompanyId(companyId,memberRole);
+		List<UUID> projectIds = findProjectIdsByMemberRole(memberDetail);
+		return buildPopularResponse(postRepository.findMostPostProjectTopFive(projectIds));
+	}
 
-			return buildPopularResponse(postRepository.findMostPostProjectTopFive(companyProjectIds));
-		}
-		if(MemberRole.USER.isSameRoleName(memberRole)){
-			UUID memberId = memberDetail.memberId(); //멤버 아이디 기준으로 프로젝트 ID를 가져와야함
-			final List<UUID> memberProjectIds = projectMemberRepository.findProjectIdsByMemberId(memberId);
-
-			return buildPopularResponse(postRepository.findMostPostProjectTopFive(memberProjectIds));
-		}
-		throw new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND);
+	private List<UUID> findProjectIdsByMemberRole(final LoginMemberDetail memberDetail) {
+		final MemberRole memberRole = MemberRole.fromRoleName(memberDetail.roleName());
+		return switch (memberRole) {
+			case SYSTEM_ADMIN -> null;
+			case CLIENT_ADMIN, DEV_ADMIN ->
+				projectAssignRepository.findCompanyProjectsByCompanyId(
+					memberDetail.companyId(),
+					memberDetail.roleName()
+				);
+			case USER ->
+				projectMemberRepository.findProjectIdsByMemberId(memberDetail.memberId());
+			default ->
+				throw new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND);
+		};
 	}
 
 	private List<DashboardPopularProjectsResponse> buildPopularResponse(List<DashboardMostPostProjectResponse> mostPostProjects) {
