@@ -147,7 +147,7 @@ public class QueryDslMemberRepository implements MemberRepository {
 			.from(member)
 			.join(company).on(member.companyId.eq(company.id))
 			.where(builder)
-			.orderBy(member.id.desc())
+			.orderBy(member.createdAt.desc())
 			.offset(offset)
 			.limit(memberPageSize)
 			.fetch();

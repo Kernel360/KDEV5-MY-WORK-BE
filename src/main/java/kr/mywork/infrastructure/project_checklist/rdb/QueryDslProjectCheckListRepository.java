@@ -71,6 +71,7 @@ public class QueryDslProjectCheckListRepository implements ProjectCheckListRepos
 			.from(projectCheckList)
 			.join(projectStep).on(projectCheckList.projectStepId.eq(projectStep.id))
 			.where(projectStep.projectId.eq(projectId), eqProjectStepId(projectStepId))
+			.orderBy(projectCheckList.createdAt.desc())
 			.fetch();
 	}
 
