@@ -71,7 +71,7 @@ public class Member {
 		this.name = name;
 		this.department = department;
 		this.position = position;
-		this.role = MemberRole.from(role);
+		this.role = MemberRole.fromName(role);
 		this.phoneNumber = phoneNumber;
 		this.email = email;
 		this.password = password;
@@ -108,7 +108,7 @@ public class Member {
 		this.name = name;
 		this.department = department;
 		this.position = position;
-		this.role = MemberRole.from(role);
+		this.role = MemberRole.fromName(role);
 		this.phoneNumber = phoneNumber;
 		this.email = email;
 		this.birthDate = birthDate;

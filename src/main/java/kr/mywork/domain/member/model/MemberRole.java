@@ -18,16 +18,16 @@ public enum MemberRole {
 
 	private final String roleName;
 
-	public static MemberRole of(final String inputRole) {
+	public static MemberRole fromRoleName(final String inputRoleName) {
 		return Arrays.stream(values())
-			.filter(role -> role.getRoleName().equalsIgnoreCase(inputRole))
+			.filter(role -> role.getRoleName().equalsIgnoreCase(inputRoleName))
 			.findFirst()
-			.orElseThrow(() -> new IllegalArgumentException("invalid role name: " + inputRole));
+			.orElseThrow(() -> new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND));
 	}
 
-	public static MemberRole from(String value) {
+	public static MemberRole fromName(final String name) {
 		return Arrays.stream(MemberRole.values())
-			.filter(memberRole -> memberRole.name().equals(value))
+			.filter(memberRole -> memberRole.name().equals(name))
 			.findAny()
 			.orElseThrow(() -> new MemberTypeNotFoundException(MemberErrorType.TYPE_NOT_FOUND));
 	}
