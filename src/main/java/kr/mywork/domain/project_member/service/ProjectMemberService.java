@@ -8,6 +8,7 @@ import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project_member.error.ProjectMemberErrorType;
 import kr.mywork.domain.project_member.error.ProjectMemberNotFoundException;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
+import kr.mywork.domain.project_member.service.dto.request.ProjectManagerUpdateRequest;
 import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
