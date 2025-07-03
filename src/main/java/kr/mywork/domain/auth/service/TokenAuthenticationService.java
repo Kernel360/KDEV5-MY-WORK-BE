@@ -23,7 +23,7 @@ public class TokenAuthenticationService {
 		String email = claims.get("email", String.class);
 		String role = claims.get("role", String.class);
 		String name = claims.get("name", String.class);
-		MemberRole memberRole = MemberRole.of(role);
+		MemberRole memberRole = MemberRole.fromRoleName(role);
 		UUID companyId = UUID.fromString(claims.get("companyId", String.class));
 		String companyName = claims.get("companyName", String.class);
 		String logoImagePath = claims.get("logoImagePath", String.class);
