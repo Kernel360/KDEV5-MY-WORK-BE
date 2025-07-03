@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -72,5 +73,24 @@ public class ProjectMemberService {
 		eventPublisher.publishEvent(new DeleteEventObject(projectMember, loginMemberDetail));
 
 		return projectMember.getId();
+	}
+	@Transactional
+	public Optional<ProjectMember> findProjectManagerByMemberIdAndProjectId(UUID memberId, UUID projectId){
+		return projectMemberRepository.findProjectManagerByMemberIdAndProjectId(memberId,projectId);
+	}
+
+	@Transactional
+	public UUID updateProjectManager(ProjectManagerUpdateRequest projectManagerUpdateRequest){
+		UUID memberId = projectManagerUpdateRequest.memberId();
+		UUID projectId = projectManagerUpdateRequest.projectId();
+
+		ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(memberId, projectId)
+				.orElseThrow(() -> new ProjectMemberNotFoundException(ProjectMemberErrorType.PROJECT_MEMBER_NOT_FOUND));
+
+		//true -> false , false -> true
+		projectMember.changeManager(projectMember.getManager());
+
+
+		return projectMember.getMemberId();
 	}
 }
