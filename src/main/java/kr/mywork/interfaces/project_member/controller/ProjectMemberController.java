@@ -4,8 +4,11 @@ import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.common.auth.components.annotation.LoginMember;
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.project_member.service.ProjectMemberService;
+import kr.mywork.domain.project_member.service.dto.request.ProjectManagerUpdateRequest;
 import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
+import kr.mywork.interfaces.project_member.controller.dto.request.ProjectManagerUpdateWebRequest;
 import kr.mywork.interfaces.project_member.controller.dto.response.CompanyMembersInProjectWebResponse;
+import kr.mywork.interfaces.project_member.controller.dto.response.ProjectManagerUpdateWebResponse;
 import kr.mywork.interfaces.project_member.controller.dto.response.ProjectMemberAddWebResponse;
 import kr.mywork.interfaces.project_member.controller.dto.response.ProjectMemberDeleteWebResponse;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +58,18 @@ public class ProjectMemberController {
 		final ProjectMemberDeleteWebResponse projectMemberDeleteWebResponse = new ProjectMemberDeleteWebResponse(deletedMemberId);
 
 		return ApiResponse.success(projectMemberDeleteWebResponse);
+	}
+	@PutMapping("/manager")
+	public ApiResponse<ProjectManagerUpdateWebResponse> projectManagerUpdateWebResponseApiResponse(
+			@RequestBody ProjectManagerUpdateWebRequest projectManagerUpdateWebRequest
+	){
+		final ProjectManagerUpdateRequest projectManagerUpdateRequest = projectManagerUpdateWebRequest.toServiceDto();
+
+		final UUID updatedManagerId = projectMemberService.updateProjectManager(projectManagerUpdateRequest);
+
+		final ProjectManagerUpdateWebResponse projectManagerUpdateWebResponse = new ProjectManagerUpdateWebResponse(updatedManagerId);
+
+		return ApiResponse.success(projectManagerUpdateWebResponse);
 	}
 }
 
