@@ -66,6 +66,7 @@ public class QueryDslCompanyRepository implements CompanyRepository {
 				eqDeleted(deleted),
 				containsKeyword(keywordType, keyword)
 			)
+			.orderBy(company.createdAt.desc())
 			.offset(offset)
 			.limit(companyPageSize)
 			.fetch();

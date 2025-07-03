@@ -131,7 +131,6 @@ public class ProjectService {
 				projectRepository.findAllByStepAndNameWithPaging(step, null, page, projectPageSize);
 
 			final List<UUID> projectIds = projects.stream().map(Project::getId).toList();
-			projects.sort(Comparator.comparing(Project::getId));
 
 			final Map<UUID, ProjectAssign> projectIdAssignMap =
 				transformProjectAssignMap(projectAssignRepository.findAllByProjectIds(projectIds));

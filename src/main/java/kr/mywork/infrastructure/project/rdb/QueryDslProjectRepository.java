@@ -80,6 +80,7 @@ public class QueryDslProjectRepository implements ProjectRepository {
 
 		return queryFactory.selectFrom(project)
 			.where(eqDeleted(false), eqProjectStep(step), containsProjectName(projectName))
+			.orderBy(project.createdAt.desc())
 			.limit(size)
 			.offset(offset)
 			.fetch();
@@ -189,6 +190,7 @@ public class QueryDslProjectRepository implements ProjectRepository {
 		return queryFactory
 			.selectFrom(project)
 			.where(project.id.in(projectIds))
+			.orderBy(project.createdAt.desc())
 			.fetch();
 	}
 
