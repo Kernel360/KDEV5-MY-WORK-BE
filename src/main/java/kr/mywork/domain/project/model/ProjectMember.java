@@ -61,6 +61,9 @@ public class ProjectMember {
 	}
 
 	public void changeManager(Boolean isManager){
+		if(isManager == null){
+			isManager = false;
+		}
 		this.manager = !isManager;
 	}
 }
