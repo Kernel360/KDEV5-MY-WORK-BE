@@ -25,12 +25,9 @@ import kr.mywork.domain.project.repository.ProjectAssignRepository;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
-import kr.mywork.domain.project.service.dto.response.MyProjectSelectResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
+import kr.mywork.domain.project.service.dto.response.*;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
+import kr.mywork.interfaces.project.controller.dto.response.ProjectStatusUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -348,12 +345,12 @@ public class ProjectService {
 				.toList();
 	}
 	@Transactional
-	public UUID updateProjectStatus(UUID projectId, String status){
+	public ProjectStatusUpdateResponse updateProjectStatus(UUID projectId, String status){
 		final Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
 
 		project.updateStatus(status);
 
-		return project.getId();
+		return new  ProjectStatusUpdateResponse(project.getId(),project.getStep());
 	}
 }
