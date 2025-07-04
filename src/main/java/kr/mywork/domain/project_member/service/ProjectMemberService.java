@@ -10,6 +10,7 @@ import kr.mywork.domain.project_member.error.ProjectMemberNotFoundException;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import kr.mywork.domain.project_member.service.dto.request.ProjectManagerUpdateRequest;
 import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
+import kr.mywork.domain.project_member.service.dto.response.ProjectMemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -75,8 +76,9 @@ public class ProjectMemberService {
 		return projectMember.getId();
 	}
 	@Transactional
-	public Optional<ProjectMember> findProjectManagerByMemberIdAndProjectId(UUID memberId, UUID projectId){
-		return projectMemberRepository.findProjectManagerByMemberIdAndProjectId(memberId,projectId);
+	public Optional<ProjectMemberDto> findProjectManagerByMemberIdAndProjectId(UUID memberId, UUID projectId){
+
+        return projectMemberRepository.findProjectManagerByMemberIdAndProjectId(memberId,projectId);
 	}
 
 	@Transactional

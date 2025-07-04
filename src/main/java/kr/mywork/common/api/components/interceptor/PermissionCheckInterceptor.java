@@ -7,8 +7,8 @@ import kr.mywork.common.api.support.response.ApiResponse;
 import kr.mywork.domain.auth.dto.MemberDetails;
 import kr.mywork.domain.member.model.MemberRole;
 import kr.mywork.domain.project.errors.ProjectErrorType;
-import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project_member.service.ProjectMemberService;
+import kr.mywork.domain.project_member.service.dto.response.ProjectMemberDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -43,8 +43,8 @@ public class PermissionCheckInterceptor implements HandlerInterceptor {
         }
 
         if (!request.getMethod().equalsIgnoreCase("GET")) {
-            Optional<ProjectMember> projectManager = projectMemberService.findProjectManagerByMemberIdAndProjectId(memberId, projectId);
-            if (projectManager.isEmpty()) {
+            Optional<ProjectMemberDto> projectMemberDto = projectMemberService.findProjectManagerByMemberIdAndProjectId(memberId, projectId);
+            if (projectMemberDto.isEmpty()) {
                 writeErrorResponse(response);
                 return false;
 
