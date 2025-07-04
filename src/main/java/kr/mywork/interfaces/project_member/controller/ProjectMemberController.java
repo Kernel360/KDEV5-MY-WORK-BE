@@ -59,7 +59,7 @@ public class ProjectMemberController {
 
 		return ApiResponse.success(projectMemberDeleteWebResponse);
 	}
-	@PutMapping("/manager")
+	@PutMapping("/updateProjectManager")
 	public ApiResponse<ProjectManagerUpdateWebResponse> projectManagerUpdateWebResponseApiResponse(
 			@RequestBody ProjectManagerUpdateWebRequest projectManagerUpdateWebRequest
 	){
