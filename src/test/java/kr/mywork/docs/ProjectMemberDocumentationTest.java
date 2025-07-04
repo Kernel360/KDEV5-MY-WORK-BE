@@ -3,6 +3,7 @@ package kr.mywork.docs;
 import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.project_member.controller.dto.request.ProjectManagerUpdateWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -161,10 +162,11 @@ public class ProjectMemberDocumentationTest extends RestDocsDocumentation {
 		final UUID projectId = UUID.fromString("01974f0b-5c7a-7fa2-9aba-1323490b77e9");
 		final UUID memberId = UUID.fromString("019739ea-e7eb-76b7-b5e1-b9dc3ea1e9c2");
 
+		final ProjectManagerUpdateWebRequest request =  new ProjectManagerUpdateWebRequest(memberId,projectId);
+
 		// when
-		final ResultActions result = mockMvc.perform(delete("/api/project-member")
-				.param("memberId", memberId.toString())
-				.param("projectId", projectId.toString())
+		final ResultActions result = mockMvc.perform(put("/api/project-member/updateProjectManager")
+				.content(objectMapper.writeValueAsString(request))
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.contentType(MediaType.APPLICATION_JSON));
 
@@ -188,7 +190,7 @@ public class ProjectMemberDocumentationTest extends RestDocsDocumentation {
 								headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
 						.responseFields(
 								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
-								fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("삭제된 프로젝트 멤버 아이디"),
+								fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("멤버 아이디"),
 								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 						.build());
 	}
