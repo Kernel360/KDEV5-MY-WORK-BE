@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
 import kr.mywork.domain.project_member.service.dto.response.CompanyMemberInProjectResponse;
+import kr.mywork.domain.project_member.service.dto.response.ProjectMemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -92,15 +93,23 @@ public class QueryDslProjectMemberRepository implements ProjectMemberRepository 
 	}
 
 	@Override
-	public Optional<ProjectMember> findProjectManagerByMemberIdAndProjectId(UUID memberId, UUID projectId) {
-		return Optional.ofNullable
-			(queryFactory
-				.selectFrom(projectMember)
+	public Optional<ProjectMemberDto> findProjectManagerByMemberIdAndProjectId(UUID memberId, UUID projectId) {
+		ProjectMemberDto dto = queryFactory
+				.select(Projections.constructor(
+						ProjectMemberDto.class,
+						projectMember.memberId,
+						projectMember.projectId,
+						projectMember.id,
+						projectMember.manager
+				))
+				.from(projectMember)
 				.where(
-					projectMember.memberId.eq(memberId)
-						.and(projectMember.projectId.eq(projectId))
-						.and(projectMember.manager.isTrue())
-				).fetchOne());
-	}
+						projectMember.memberId.eq(memberId)
+								.and(projectMember.projectId.eq(projectId))
+								.and(projectMember.manager.isTrue())
+				)
+				.fetchOne();
 
+		return Optional.ofNullable(dto);
+	}
 }
