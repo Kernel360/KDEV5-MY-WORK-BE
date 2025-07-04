@@ -3,6 +3,7 @@ package kr.mywork.docs;
 import com.epages.restdocs.apispec.ResourceSnippet;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.project_member.controller.dto.request.ProjectManagerUpdateWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -149,5 +150,48 @@ public class ProjectMemberDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("삭제된 프로젝트 멤버 아이디"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build());
+	}
+
+	@Test
+	@DisplayName("프로젝트 매니저 권한 수정 성공")
+	@Sql("classpath:sql/project-manager.sql")
+	void 프로젝트_매니저_권한_수정_성공() throws Exception {
+		// given
+		final String accessToken = createDevAdminAccessToken();
+
+		final UUID projectId = UUID.fromString("01974f0b-5c7a-7fa2-9aba-1323490b77e9");
+		final UUID memberId = UUID.fromString("019739ea-e7eb-76b7-b5e1-b9dc3ea1e9c2");
+
+		final ProjectManagerUpdateWebRequest request =  new ProjectManagerUpdateWebRequest(memberId,projectId);
+
+		// when
+		final ResultActions result = mockMvc.perform(put("/api/project-member/updateProjectManager")
+				.content(objectMapper.writeValueAsString(request))
+				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
+				.contentType(MediaType.APPLICATION_JSON));
+
+		// then
+		result.andExpectAll(
+						status().isOk(),
+						jsonPath("$.result").value(ResultType.SUCCESS.name()),
+						jsonPath("$.data").exists(),
+						jsonPath("$.error").doesNotExist())
+				.andDo(document("project-manager-update-success", projectManagerUpdateSuccessResource()));
+	}
+
+	private ResourceSnippet projectManagerUpdateSuccessResource() {
+		return resource(
+				ResourceSnippetParameters.builder()
+						.tag("Project Member API")
+						.summary("프로젝트 매니저 권한 수정 API")
+						.description("프로젝트 매니저 권한 수정한다")
+						.requestHeaders(
+								headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
+								headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
+						.responseFields(
+								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
+								fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("멤버 아이디"),
+								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
+						.build());
 	}
 }

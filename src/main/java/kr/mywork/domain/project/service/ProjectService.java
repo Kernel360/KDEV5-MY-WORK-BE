@@ -1,16 +1,5 @@
 package kr.mywork.domain.project.service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
 import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
@@ -36,13 +25,20 @@ import kr.mywork.domain.project.repository.ProjectAssignRepository;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project.service.dto.request.ProjectCreateRequest;
 import kr.mywork.domain.project.service.dto.request.ProjectUpdateRequest;
-import kr.mywork.domain.project.service.dto.response.MyProjectSelectResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectDetailResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectMemberResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectSelectResponse;
-import kr.mywork.domain.project.service.dto.response.ProjectUpdateResponse;
+import kr.mywork.domain.project.service.dto.response.*;
 import kr.mywork.domain.project_member.repository.ProjectMemberRepository;
+import kr.mywork.interfaces.project.controller.dto.response.ProjectStatusUpdateResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -346,5 +342,14 @@ public class ProjectService {
 						project.getEndAt()
 				))
 				.toList();
+	}
+	@Transactional
+	public ProjectStatusUpdateResponse updateProjectStatus(UUID projectId, String status){
+		final Project project = projectRepository.findById(projectId)
+				.orElseThrow(() -> new ProjectNotFoundException(ProjectErrorType.PROJECT_NOT_FOUND));
+
+		project.updateStatus(status);
+
+		return new  ProjectStatusUpdateResponse(project.getId(),project.getStep());
 	}
 }

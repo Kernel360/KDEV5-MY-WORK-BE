@@ -90,4 +90,7 @@ public class Project {
 		this.deleted = request.deleted();
 		this.projectAmount = request.projectAmount();
 	}
+	public void updateStatus(String status){
+		this.step = status;
+	}
 }

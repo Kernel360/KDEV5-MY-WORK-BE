@@ -132,4 +132,18 @@ public class ProjectController {
 
 		return ApiResponse.success(new MyProjectListWebResponse(webList));
 	}
+	@PutMapping("/project-status")
+	public ApiResponse<ProjectStatusUpdateWebResponse> updateProjectStatus(
+			@RequestParam UUID projectId,
+			@RequestParam(name = "status", required = false)
+			@Pattern(regexp = PROJECT_STEP_TYPE, message = "{project.invalid-status}") final String status
+	){
+		final ProjectStatusUpdateResponse response = projectService.updateProjectStatus(projectId,status);
+
+		final ProjectStatusUpdateWebResponse projectStatusUpdateWebResponse =  new ProjectStatusUpdateWebResponse(response.projectId() ,response.status());
+
+		return ApiResponse.success(projectStatusUpdateWebResponse);
+
+	}
+
 }
