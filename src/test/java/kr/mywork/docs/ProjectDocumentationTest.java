@@ -399,7 +399,7 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 
 		//when
 		final ResultActions result = mockMvc.perform(
-				post("/api/projects/project-status")
+				put("/api/projects/project-status")
 						.param("projectId", projectId.toString())
 						.param("status","COMPLETED")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -426,6 +426,7 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 						.responseFields(
 								fieldWithPath("result").type(JsonFieldType.STRING).description("응답 결과"),
 								fieldWithPath("data.projectId").type(JsonFieldType.STRING).description("프로젝트 id"),
+								fieldWithPath("data.status").type(JsonFieldType.STRING).description("프로젝트 상태"),
 								fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 						.build());
 	}
@@ -440,7 +441,7 @@ public class ProjectDocumentationTest extends RestDocsDocumentation {
 
 		//when
 		final ResultActions result = mockMvc.perform(
-				post("/api/projects/project-status")
+				put("/api/projects/project-status")
 						.param("projectId", projectId.toString())
 						.param("status","COMPLETED")
 						.contentType(MediaType.APPLICATION_JSON)
