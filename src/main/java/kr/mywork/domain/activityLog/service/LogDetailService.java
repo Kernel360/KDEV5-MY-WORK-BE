@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
 import kr.mywork.domain.activityLog.model.FieldType;
 import kr.mywork.domain.activityLog.model.LogDetail;
 import kr.mywork.domain.activityLog.repository.LogDetailRepository;
@@ -30,9 +30,9 @@ public class LogDetailService {
 
 	private final LogDetailRepository logDetailRepository;
 
-	public List<LogDetail> makeLogDetails(ModifyEventObject event, UUID activityLogId) {
+	public List<LogDetail> makeLogDetails(ActivityModifyEvent event, UUID activityLogId) {
 
-		Class<?> clazz = event.getBefore().getClass();
+		Class<?> clazz = event.before().getClass();
 
 		List<LogDetail> diffValue = new ArrayList<>();
 
@@ -40,8 +40,8 @@ public class LogDetailService {
 			field.setAccessible(true);
 			try {
 
-				Object beforeValue = field.get(event.getBefore());
-				Object afterValue = field.get(event.getAfter());
+				Object beforeValue = field.get(event.before());
+				Object afterValue = field.get(event.after());
 
 				if (!java.util.Objects.equals(beforeValue, afterValue)) {
 					final String fieldName = field.getName();
@@ -50,7 +50,7 @@ public class LogDetailService {
 						fieldName.equals("deleted") || fieldName.equals("createdAt") || fieldName.equals("id"))
 						continue;
 
-					FieldType fieldType = typeCheckAndReturn(event.getBefore(), field.getName());
+					FieldType fieldType = typeCheckAndReturn(event.before(), field.getName());
 
 					diffValue.add(new LogDetail(activityLogId, fieldType, convertToString(beforeValue), convertToString(afterValue)));
 				}

@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
-import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogDeleteEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
 import kr.mywork.domain.notification.model.NotificationActionType;
 import kr.mywork.domain.notification.model.TargetType;
 import kr.mywork.domain.post.errors.PostDeletedException;
@@ -85,7 +85,7 @@ public class PostService {
 
 		if (!post.getAuthorId().equals(loginMemberDetail.memberId()))
 			eventPublisher.publishEvent(postApprovalAlarmEvent);
-		eventPublisher.publishEvent(new ModifyEventObject(before, post, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityModifyEvent(before, post, loginMemberDetail));
 
 		return new PostApprovalResponse(post.getId(), post.getApproval());
 	}
@@ -97,7 +97,7 @@ public class PostService {
 
 		final Post savedPost = postRepository.save(postCreateRequest);
 
-		eventPublisher.publishEvent(new CreateEventObject(savedPost, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogCreateEvent(savedPost, loginMemberDetail));
 
 		return savedPost.getId();
 	}
@@ -110,7 +110,7 @@ public class PostService {
 		Post before = Post.copyOf(post);
 		post.update(postUpdateRequest);
 
-		eventPublisher.publishEvent(new ModifyEventObject(before, post, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityModifyEvent(before, post, loginMemberDetail));
 		return PostUpdateResponse.from(post);
 	}
 
@@ -182,7 +182,7 @@ public class PostService {
 
 		post.delete();
 
-		eventPublisher.publishEvent(new DeleteEventObject(post, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogDeleteEvent(post, loginMemberDetail));
 		eventPublisher.publishEvent(new PostAttachmentDeleteEvent(postId));
 		eventPublisher.publishEvent(new PostReviewsDeleteEvent(postId));
 

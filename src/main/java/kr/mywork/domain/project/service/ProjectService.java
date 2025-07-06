@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
-import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogDeleteEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyNotFoundException;
 import kr.mywork.domain.company.model.Company;
@@ -72,7 +72,7 @@ public class ProjectService {
 		projectAssignRepository.save(
 			new ProjectAssign(savedProject.getId(), request.devCompanyId(), request.clientCompanyId()));
 
-		eventPublisher.publishEvent(new CreateEventObject(savedProject, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogCreateEvent(savedProject, loginMemberDetail));
 
 		return savedProject.getId();
 	}
@@ -84,7 +84,7 @@ public class ProjectService {
 
 		project.setDeleted(true);
 
-		eventPublisher.publishEvent(new DeleteEventObject(project, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogDeleteEvent(project, loginMemberDetail));
 
 		return project.getId();
 	}
@@ -98,7 +98,7 @@ public class ProjectService {
 
 		project.updateFrom(request);
 
-		eventPublisher.publishEvent(new ModifyEventObject(before, project, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityModifyEvent(before, project, loginMemberDetail));
 
 		return ProjectUpdateResponse.from(project);
 	}

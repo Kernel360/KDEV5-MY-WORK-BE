@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
-import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
 import kr.mywork.domain.project_step.model.ProjectStep;
 import kr.mywork.domain.project_step.repository.ProjectStepRepository;
 import kr.mywork.domain.project_step.serivce.dto.request.ProjectStepCreateRequest;
@@ -40,7 +40,7 @@ public class ProjectStepService {
 		final List<ProjectStep> savedProjectSteps = projectStepRepository.saveAll(projectSteps);
 
 		projectSteps.forEach(projectStep -> {
-			eventPublisher.publishEvent(new CreateEventObject(projectStep, loginMemberDetail));
+			eventPublisher.publishEvent(new ActivityLogCreateEvent(projectStep, loginMemberDetail));
 		});
 
 		return savedProjectSteps.size();
@@ -63,7 +63,7 @@ public class ProjectStepService {
 
 			ProjectStep before = ProjectStep.copyOf(projectStep);
 			projectStep.update(projectStepUpdateRequest.title(), projectStepUpdateRequest.orderNum());
-			eventPublisher.publishEvent(new ModifyEventObject(before, projectStep, loginMemberDetail));
+			eventPublisher.publishEvent(new ActivityModifyEvent(before, projectStep, loginMemberDetail));
 		});
 
 		return projectSteps.stream().map(ProjectStepUpdateResponse::fromEntity).toList();
