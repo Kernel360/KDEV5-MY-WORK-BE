@@ -1,5 +1,6 @@
 package kr.mywork.domain.post.service;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,6 @@ import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
 import kr.mywork.domain.notification.listener.event.NotificationCreateEvent;
 import kr.mywork.domain.notification.model.NotificationActionType;
 import kr.mywork.domain.notification.model.TargetType;
-import kr.mywork.domain.notification.service.NotificationService;
 import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostNotFoundException;
 import kr.mywork.domain.post.errors.review.ReviewErrorType;
@@ -51,11 +51,11 @@ public class ReviewService {
 	private final ReviewRepository reviewRepository;
 	private final PostRepository postRepository;
 	private final ProjectStepRepository projectStepRepository;
-	private final NotificationService notificationService;
 	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
-	public ReviewCreateResponse save(final ReviewCreateRequest reviewCreateRequest, LoginMemberDetail loginMemberDetail) {
+	public ReviewCreateResponse save(final ReviewCreateRequest reviewCreateRequest,
+		LoginMemberDetail loginMemberDetail) {
 		final Post post = postRepository.findById(reviewCreateRequest.postId())
 			.orElseThrow(() -> new PostNotFoundException(PostErrorType.POST_NOT_FOUND));
 
@@ -65,26 +65,36 @@ public class ReviewService {
 		final ProjectStep projectStep = projectStepRepository.findById(post.getProjectStepId())
 			.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
 
-		if (!post.getAuthorId().equals(loginMemberDetail.memberId())) {
-			notificationService.save(
-				post.getAuthorId(),
-				post.getAuthorName(),
-				post.getTitle(),
-				loginMemberDetail.memberName(),
-				loginMemberDetail.memberId(),
-				TargetType.POST,
-				post.getId(),
-				NotificationActionType.REVIEW,
-				savedReview.getCreatedAt(),
-				projectStep.getProjectId(),
-				projectStep.getId()
-			);
+		final UUID memberId = loginMemberDetail.memberId();
+		final NotificationCreateEvent notificationCreateEvent = createNotificationCreateEvent(
+			loginMemberDetail, post, projectStep);
+
+		if (!post.isAuthor(memberId)) {
+			sendNotificationCreateEvent(notificationCreateEvent);
 		}
 
+		sendActivityLogCreateEvent(loginMemberDetail, savedReview);
 		return ReviewCreateResponse.fromEntity(savedReview);
 	}
 
-	public ReviewModifyResponse modifyComment(final ReviewModifyRequest reviewModifyRequest, LoginMemberDetail loginMemberDetail) {
+	private NotificationCreateEvent createNotificationCreateEvent(final LoginMemberDetail loginMemberDetail,
+		final Post post, final ProjectStep projectStep) {
+		return new NotificationCreateEvent(
+			post.getAuthorId(), post.getAuthorName(), post.getTitle(), loginMemberDetail.memberName(),
+			loginMemberDetail.memberId(), TargetType.POST, post.getId(), NotificationActionType.REVIEW,
+			LocalDateTime.now(), projectStep.getProjectId(), projectStep.getId());
+	}
+
+	private void sendActivityLogCreateEvent(final LoginMemberDetail loginMemberDetail, final Review savedReview) {
+		eventPublisher.publishEvent(new ActivityLogCreateEvent(savedReview, loginMemberDetail));
+	}
+
+	private void sendNotificationCreateEvent(final NotificationCreateEvent notificationCreateEvent) {
+		eventPublisher.publishEvent(notificationCreateEvent);
+	}
+
+	public ReviewModifyResponse modifyComment(final ReviewModifyRequest reviewModifyRequest,
+		LoginMemberDetail loginMemberDetail) {
 		final Review review = reviewRepository.findById(reviewModifyRequest.reviewId())
 			.orElseThrow(() -> new ReviewNotFoundException(ReviewErrorType.REVIEW_NOT_FOUND));
 
@@ -97,7 +107,8 @@ public class ReviewService {
 		return new ReviewModifyResponse(review.getId(), review.getComment());
 	}
 
-	public ReviewDeleteResponse deleteReview(final ReviewDeleteRequest reviewDeleteRequest, LoginMemberDetail loginMemberDetail) {
+	public ReviewDeleteResponse deleteReview(final ReviewDeleteRequest reviewDeleteRequest,
+		LoginMemberDetail loginMemberDetail) {
 		// TODO 본인 작성 검증 내용 추가
 		final Review review = reviewRepository.findById(reviewDeleteRequest.reviewId())
 			.orElseThrow(() -> new ReviewNotFoundException(ReviewErrorType.REVIEW_NOT_FOUND));

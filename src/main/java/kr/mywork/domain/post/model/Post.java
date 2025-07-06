@@ -1,6 +1,7 @@
 package kr.mywork.domain.post.model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -96,5 +97,9 @@ public class Post {
 
 	public boolean isApproved() {
 		return this.approval.equals(APPROVED);
+	}
+
+	public boolean isAuthor(final UUID memberId) {
+		return Objects.equals(this.authorId, memberId);
 	}
 }
