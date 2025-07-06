@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.uuid.Generators;
 
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
-import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogDeleteEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
 import kr.mywork.domain.company.errors.CompanyAlreadyExistException;
 import kr.mywork.domain.company.errors.CompanyErrorType;
 import kr.mywork.domain.company.errors.CompanyIdNotFoundException;
@@ -59,7 +59,7 @@ public class CompanyService {
 
 		final Company savedCompany = companyRepository.save(companyCreateRequest);
 
-		eventPublisher.publishEvent(new CreateEventObject(savedCompany, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogCreateEvent(savedCompany, loginMemberDetail));
 
 		return savedCompany.getId();
 	}
@@ -71,7 +71,7 @@ public class CompanyService {
 
 		company.setDeleted(true);
 
-		eventPublisher.publishEvent(new DeleteEventObject(company, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogDeleteEvent(company, loginMemberDetail));
 
 		return company.getId();
 	}
@@ -85,7 +85,7 @@ public class CompanyService {
 
 		company.updateFrom(companyUpdateRequest);
 
-		eventPublisher.publishEvent(new ModifyEventObject(before, company, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityModifyEvent(before, company, loginMemberDetail));
 
 		return company.getId();
 	}

@@ -2,8 +2,8 @@ package kr.mywork.domain.project_member.service;
 
 import jakarta.transaction.Transactional;
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
-import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogDeleteEvent;
 import kr.mywork.domain.project.model.ProjectMember;
 import kr.mywork.domain.project_member.error.ProjectMemberErrorType;
 import kr.mywork.domain.project_member.error.ProjectMemberNotFoundException;
@@ -39,7 +39,7 @@ public class ProjectMemberService {
 	private UUID createProjectMember(final UUID projectId, final UUID memberId, LoginMemberDetail loginMemberDetail) {
 		final ProjectMember savedMember = projectMemberRepository.save(new ProjectMember(projectId, memberId));
 
-		eventPublisher.publishEvent(new CreateEventObject(savedMember, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogCreateEvent(savedMember, loginMemberDetail));
 
 		return savedMember.getMemberId();
 	}
@@ -50,7 +50,7 @@ public class ProjectMemberService {
 
 		projectMember.restore();
 
-		eventPublisher.publishEvent(new CreateEventObject(projectMember, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogCreateEvent(projectMember, loginMemberDetail));
 
 		return projectMember.getId();
 	}
@@ -68,7 +68,7 @@ public class ProjectMemberService {
 
 		projectMember.delete();
 
-		eventPublisher.publishEvent(new DeleteEventObject(projectMember, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogDeleteEvent(projectMember, loginMemberDetail));
 
 		return projectMember.getId();
 	}

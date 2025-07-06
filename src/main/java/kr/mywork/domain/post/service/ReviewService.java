@@ -12,9 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
-import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogDeleteEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
+import kr.mywork.domain.notification.listener.event.NotificationCreateEvent;
 import kr.mywork.domain.notification.model.NotificationActionType;
 import kr.mywork.domain.notification.model.TargetType;
 import kr.mywork.domain.notification.service.NotificationService;
@@ -61,8 +62,6 @@ public class ReviewService {
 		final Review review = reviewCreateRequest.toEntity();
 		final Review savedReview = reviewRepository.save(review);
 
-		eventPublisher.publishEvent(new CreateEventObject(savedReview, loginMemberDetail));
-
 		final ProjectStep projectStep = projectStepRepository.findById(post.getProjectStepId())
 			.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
 
@@ -93,7 +92,7 @@ public class ReviewService {
 
 		review.modifyComment(reviewModifyRequest.comment());
 
-		eventPublisher.publishEvent(new ModifyEventObject(before, review, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityModifyEvent(before, review, loginMemberDetail));
 
 		return new ReviewModifyResponse(review.getId(), review.getComment());
 	}
@@ -105,7 +104,7 @@ public class ReviewService {
 
 		review.delete();
 
-		eventPublisher.publishEvent(new DeleteEventObject(review, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogDeleteEvent(review, loginMemberDetail));
 
 		return new ReviewDeleteResponse(review.getId());
 	}

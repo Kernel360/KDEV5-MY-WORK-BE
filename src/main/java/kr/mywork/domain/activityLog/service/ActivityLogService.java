@@ -7,9 +7,9 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogDeleteEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
 import kr.mywork.domain.activityLog.model.ActionType;
 import kr.mywork.domain.activityLog.model.ActivityLog;
 import kr.mywork.domain.activityLog.model.LogDetail;
@@ -38,65 +38,69 @@ public class ActivityLogService {
 	private final LogDetailService logDetailService;
 
 
+	public ActivityLog save(final ActivityLog activityLog) {
+		return activityLogRepository.save(activityLog);
+	}
+
 	// 액티비티 로그 객체 생성 - 생성 액션 전용
-	public ActivityLog makeCreatedActivityLog(CreateEventObject event) {
-		TargetType targetType = determineTargetType(event.getCreated());
+	public ActivityLog makeCreatedActivityLog(ActivityLogCreateEvent event) {
+		TargetType targetType = determineTargetType(event.created());
 
 		// 적절한 타입으로 캐스팅
-		LocalDateTime createdAt = extractCreatedDateTime(event.getCreated());
-		UUID targetId = extractTargetId(event.getCreated());
+		LocalDateTime createdAt = extractCreatedDateTime(event.created());
+		UUID targetId = extractTargetId(event.created());
 
 		return new ActivityLog(
 			createdAt,
 			ActionType.CREATE,
 			targetType,
 			targetId,
-			event.getLoginMemberDetail().memberId(),
-			event.getLoginMemberDetail().memberName(),
-			event.getLoginMemberDetail().companyId(),
-			event.getLoginMemberDetail().companyName(),
-			event.getLoginMemberDetail().companyType()
+			event.loginMemberDetail().memberId(),
+			event.loginMemberDetail().memberName(),
+			event.loginMemberDetail().companyId(),
+			event.loginMemberDetail().companyName(),
+			event.loginMemberDetail().companyType()
 		);
 	}
 
 	// 액티비티 로그 객체 생성 - 수정 액션 전용
-	public ActivityLog makeModifiedActivityLog(ModifyEventObject event) {
-		TargetType targetType = determineTargetType(event.getBefore());
+	public ActivityLog makeModifiedActivityLog(ActivityModifyEvent event) {
+		TargetType targetType = determineTargetType(event.before());
 
-		LocalDateTime modifiedAt = extractModifiedDateTime(event.getAfter());
-		UUID targetId = extractTargetId(event.getAfter());
+		LocalDateTime modifiedAt = extractModifiedDateTime(event.after());
+		UUID targetId = extractTargetId(event.after());
 
 		return new ActivityLog(
 			modifiedAt,
 			ActionType.MODIFY,
 			targetType,
 			targetId,
-			event.getLoginMemberDetail().memberId(),
-			event.getLoginMemberDetail().memberName(),
-			event.getLoginMemberDetail().companyId(),
-			event.getLoginMemberDetail().companyName(),
-			event.getLoginMemberDetail().companyType()
+			event.loginMemberDetail().memberId(),
+			event.loginMemberDetail().memberName(),
+			event.loginMemberDetail().companyId(),
+			event.loginMemberDetail().companyName(),
+			event.loginMemberDetail().companyType()
 		);
 	}
 
 	// 액티비티 로그 객체 생성 - 삭제 액션 전용
-	public ActivityLog makeDeletedActivityLog(DeleteEventObject event) {
-		TargetType targetType = determineTargetType(event.getDeleted());
+	public ActivityLog makeDeletedActivityLog(final ActivityLogDeleteEvent event) {
+		TargetType targetType = determineTargetType(event.deleted());
 
 		// 적절한 타입으로 캐스팅
-		LocalDateTime deletedAt = extractModifiedDateTime(event.getDeleted());
-		UUID targetId = extractTargetId(event.getDeleted());
+		LocalDateTime deletedAt = extractModifiedDateTime(event.deleted());
+		UUID targetId = extractTargetId(event.deleted());
 
 		return new ActivityLog(
 			deletedAt,
 			ActionType.DELETE,
 			targetType,
 			targetId,
-			event.getLoginMemberDetail().memberId(),
-			event.getLoginMemberDetail().memberName(),
-			event.getLoginMemberDetail().companyId(),
-			event.getLoginMemberDetail().companyName(),
-			event.getLoginMemberDetail().companyType()
+			event.loginMemberDetail().memberId(),
+			event.loginMemberDetail().memberName(),
+			event.loginMemberDetail().companyId(),
+			event.loginMemberDetail().companyName(),
+			event.loginMemberDetail().companyType()
 		);
 	}
 
