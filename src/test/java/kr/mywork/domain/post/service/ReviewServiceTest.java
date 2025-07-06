@@ -16,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 
-import kr.mywork.domain.notification.repository.NotificationRepository;
-import kr.mywork.domain.notification.service.NotificationService;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.repository.ReviewRepository;
 import kr.mywork.domain.post.service.dto.ReviewSelectResponse;
@@ -29,7 +27,6 @@ class ReviewServiceTest {
 	private ReviewRepository reviewRepository;
 	private PostRepository postRepository;
 	private ProjectStepRepository projectStepRepository;
-	private NotificationService notificationService;
 	private ApplicationEventPublisher eventPublisher;
 
 	@BeforeEach
@@ -37,14 +34,8 @@ class ReviewServiceTest {
 		this.reviewRepository = Mockito.mock(ReviewRepository.class);
 		this.postRepository = Mockito.mock(PostRepository.class);
 		this.projectStepRepository = Mockito.mock(ProjectStepRepository.class);
-		this.notificationService = Mockito.mock(NotificationService.class);
-		this.reviewService = new ReviewService(
-			reviewRepository,
-			postRepository,
-			projectStepRepository,
-			notificationService,
-			eventPublisher
-		);
+		this.eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+		this.reviewService = new ReviewService(reviewRepository, postRepository, projectStepRepository, eventPublisher);
 	}
 
 	@Test

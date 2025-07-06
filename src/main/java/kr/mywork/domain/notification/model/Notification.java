@@ -78,9 +78,4 @@ public class Notification {
 	public void markAsRead() {
 		this.isRead = true;
 	}
-
-	// 타겟 삭제 처리
-	public void markTargetAsDeleted() {
-		this.isTargetDeleted = true;
-	}
 }
