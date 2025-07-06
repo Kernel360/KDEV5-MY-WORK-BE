@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
-import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogDeleteEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
 import kr.mywork.domain.notification.model.NotificationActionType;
 import kr.mywork.domain.notification.model.NotificationTitle;
 import kr.mywork.domain.notification.model.TargetType;
@@ -61,7 +61,7 @@ public class ProjectCheckListService {
 
 		ProjectCheckList projectCheckList = projectCheckListRepository.save(projectCheckListRequest);
 
-		eventPublisher.publishEvent(new CreateEventObject(projectCheckList, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogCreateEvent(projectCheckList, loginMemberDetail));
 		eventPublisher.publishEvent(new CheckListHistoryCreationEvent(
 			projectCheckList.getId(),
 			loginMemberDetail.companyName(),
@@ -92,7 +92,7 @@ public class ProjectCheckListService {
 
 		projectCheckList.update(projectCheckListUpdateRequest);
 
-		eventPublisher.publishEvent(new ModifyEventObject(before, projectCheckList, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityModifyEvent(before, projectCheckList, loginMemberDetail));
 
 		return ProjectCheckListUpdateResponse.from(projectCheckList);
 	}
@@ -105,7 +105,7 @@ public class ProjectCheckListService {
 
 		projectCheckList.softDelete();
 
-		eventPublisher.publishEvent(new DeleteEventObject(projectCheckList, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogDeleteEvent(projectCheckList, loginMemberDetail));
 
 		return projectCheckList.getId();
 	}
@@ -121,7 +121,7 @@ public class ProjectCheckListService {
 
 		projectCheckList.changeApproval(projectCheckListApprovalRequest);
 
-		eventPublisher.publishEvent(new ModifyEventObject(before, projectCheckList, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityModifyEvent(before, projectCheckList, loginMemberDetail));
 		applicationEventPublisher.publishEvent(
 			new CheckListApprovalUpdateEvent(
 				projectCheckListApprovalRequest.id(),

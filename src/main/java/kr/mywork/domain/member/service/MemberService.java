@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
-import kr.mywork.domain.activityLog.listener.eventObject.CreateEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.DeleteEventObject;
-import kr.mywork.domain.activityLog.listener.eventObject.ModifyEventObject;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogDeleteEvent;
+import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
 import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 import kr.mywork.domain.member.errors.*;
 import kr.mywork.domain.member.model.Member;
@@ -25,15 +25,6 @@ import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
 import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
 import kr.mywork.interfaces.member.controller.dto.request.ResetPasswordWebRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,7 +68,7 @@ public class MemberService {
 
 		final Member savedMember = memberRepository.save(member);
 
-		eventPublisher.publishEvent(new CreateEventObject(savedMember, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogCreateEvent(savedMember, loginMemberDetail));
 
 		return savedMember.getId();
 	}
@@ -90,7 +81,7 @@ public class MemberService {
 		//더티체킹
 		member.softDelete();
 
-		eventPublisher.publishEvent(new DeleteEventObject(member, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityLogDeleteEvent(member, loginMemberDetail));
 
 		return member.getId();
 	}
@@ -113,7 +104,7 @@ public class MemberService {
 			memberUpdateRequest.birthDate(),
 			memberUpdateRequest.deleted());
 
-		eventPublisher.publishEvent(new ModifyEventObject(before, member, loginMemberDetail));
+		eventPublisher.publishEvent(new ActivityModifyEvent(before, member, loginMemberDetail));
 
 		return member.getId();
 	}
