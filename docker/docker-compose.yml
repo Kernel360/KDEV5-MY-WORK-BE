@@ -5,12 +5,22 @@ services:
     image: mysql:8.0
     ports:
       - "3306:3306"
+    volumes:
+      - ./rdb/initdb.d:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: 'mywork2503'
       MYSQL_DATABASE: mywork_db
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 1GB
+    networks:
+      mywork-network:
+        ipv4_address: 172.10.0.2
   localstack:
     container_name: "localstack"
     image: localstack/localstack:0.14.3
@@ -33,3 +43,67 @@ services:
       - "./localstack:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./init-scripts:/etc/localstack/init/ready."
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      mywork-network:
+        ipv4_address: 172.10.0.4
+    depends_on:
+      - prometheus
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../grafana-data:/var/lib/grafana
+    command:
+      - '--web.enable-lifecycle'
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      mywork-network:
+        ipv4_address: 172.10.0.7
+    depends_on:
+      - mysqld-exporter
+  mysqld-exporter:
+    image: prom/mysqld-exporter:latest
+    ports:
+      - "9104:9104"
+    volumes:
+      - ./mysqld-exporter/.my.cnf:/cfg/.my.cnf
+    command:
+      - --config.my-cnf=/cfg/.my.cnf
+      - --mysqld.address=172.10.0.2:3306
+    networks:
+      mywork-network:
+        ipv4_address: 172.10.0.5
+    depends_on:
+      - mysql
+  influxdb:
+    image: bitnami/influxdb:1.8.5
+    container_name: mywork_influx
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=mywork_k6
+      - INFLUXDB_ADMIN_USER_PASSWORD=mywork2025
+    networks:
+      mywork-network:
+        ipv4_address: 172.10.0.6
+networks:
+  mywork-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.10.0.0/16
+          gateway: 172.10.0.1
