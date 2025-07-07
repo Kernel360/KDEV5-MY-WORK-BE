@@ -155,7 +155,7 @@ public class SecurityConfig {
 		CorsConfiguration config = new CorsConfiguration();
 
 		config.setAllowedOrigins(List.of("http://localhost:3000", "https://d16zykr4498a0c.cloudfront.net",
-			"https://kbe-mywork.com", "https://www.kbe-mywork.com"));
+			"https://kbe-mywork.com", "https://www.kbe-mywork.com", "http://mywork-frontend-bucket-only-s3.s3-website.ap-northeast-2.amazonaws.com"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true); // 쿠키, 인증 정보 포함 시 필수
