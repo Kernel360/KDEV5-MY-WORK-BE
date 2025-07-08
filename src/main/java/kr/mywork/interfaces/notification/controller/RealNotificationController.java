@@ -25,7 +25,7 @@ public class RealNotificationController {
 	public ResponseEntity<SseEmitter> connectForRealTimeNotification(@LoginMember LoginMemberDetail loginMemberDetail) {
 		final SseEmitter sseEmitter = realTimeNotificationService.addSseEmitter(loginMemberDetail.memberId());
 		long count = notificationService.countUnreadNotifications(loginMemberDetail.memberId());
-		realTimeNotificationService.sendNotification(loginMemberDetail.memberId(), "unread-notification-count", count);
+		realTimeNotificationService.sendNotification(loginMemberDetail.memberId(), "notification-unread-count", count);
 		return ResponseEntity.ok(sseEmitter);
 	}
 
