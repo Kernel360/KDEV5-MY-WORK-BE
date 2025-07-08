@@ -8,20 +8,26 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import kr.mywork.domain.notification.service.NotificationService;
-import kr.mywork.domain.post.listener.event.PostApprovalAlarmEvent;
+import kr.mywork.domain.notification.service.RealTimeNotificationService;
+import kr.mywork.domain.post.listener.event.PostApprovalNotificationEvent;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class PostApprovalAlarmTxListener {
+public class PostApprovalNotificationTxListener {
 
+	private final RealTimeNotificationService realTimeNotificationService;
 	private final NotificationService notificationService;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Async("eventTaskExecutor")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void handlePostApprovalAlarmEvent(final PostApprovalAlarmEvent event) {
+	public void handlePostApprovalAlarmEvent(final PostApprovalNotificationEvent event) {
+		realTimeNotificationService.sendNotification(event.authorId(), "notification-post-approval", event);
+		saveNotification(event);
+	}
 
+	private void saveNotification(final PostApprovalNotificationEvent event) {
 		notificationService.save(
 			event.authorId(), event.authorName(), event.postTitle(), event.memberName(), event.memberId(),
 			event.targetType(), event.postId(), event.notificationActionType(), event.modifiedAt(), event.projectId(),
