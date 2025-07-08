@@ -79,7 +79,7 @@ public class JwtTokenProvider {
 			.compact();
 	}
 
-	public String createRefreshToken(final UUID memberId, final String email, final String role, final UUID companyId, final String companyName, final String companyType,final String logoImagePath) {
+	public String createRefreshToken(final UUID memberId, final String email, final String role,final String name, final UUID companyId, final String companyName, final String companyType,final String logoImagePath) {
 		final Date now = new Date();
 		final Date expiry = new Date(now.getTime() + refreshTokenExpirationMillis);
 
@@ -87,6 +87,7 @@ public class JwtTokenProvider {
 		claims.put("memberId", memberId);
 		claims.put("email", email);
 		claims.put("role", role);
+		claims.put("name", name);
 		claims.put("companyId", companyId);
 		claims.put("companyName", companyName);
 		claims.put("logoImagePath", logoImagePath);

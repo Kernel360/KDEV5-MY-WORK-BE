@@ -49,6 +49,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 			memberDetails.getId(),
 			memberDetails.getEmail(),
 			memberDetails.getAuthorityAsStr(),
+			memberDetails.getName(),
 			memberDetails.getCompanyId(),
 			memberDetails.getCompanyName(),
 			memberDetails.getLogoImagePath(),
