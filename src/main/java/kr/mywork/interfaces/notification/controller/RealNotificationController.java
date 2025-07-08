@@ -11,11 +11,11 @@ import kr.mywork.common.auth.components.annotation.LoginMember;
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.notification.service.NotificationService;
 import kr.mywork.domain.notification.service.RealTimeNotificationService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class RealNotificationController {
 
 	private final RealTimeNotificationService realTimeNotificationService;
