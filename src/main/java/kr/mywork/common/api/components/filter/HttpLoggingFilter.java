@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,10 +38,18 @@ public class HttpLoggingFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 		throws IOException, ServletException {
 
+		final HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+		final HttpServletResponse httpServletResponse = (HttpServletResponse)response;
+
+		if (isAcceptTextEventStream(httpServletRequest)) {
+			chain.doFilter(request, response);
+			return;
+		}
+
 		HttpRequestBodyCachedWrapper requestWrapper =
-			new HttpRequestBodyCachedWrapper((HttpServletRequest)request);
+			new HttpRequestBodyCachedWrapper(httpServletRequest);
 		HttpResponseBodyCachedWrapper responseWrapper =
-			new HttpResponseBodyCachedWrapper((HttpServletResponse)response);
+			new HttpResponseBodyCachedWrapper(httpServletResponse);
 
 		logRequest(requestWrapper);
 
@@ -48,6 +57,10 @@ public class HttpLoggingFilter implements Filter {
 
 		logResponse(responseWrapper);
 		writeResponseBody(responseWrapper, response);
+	}
+
+	private boolean isAcceptTextEventStream(final HttpServletRequest httpServletRequest) {
+		return MediaType.TEXT_EVENT_STREAM_VALUE.equalsIgnoreCase(httpServletRequest.getHeader(HttpHeaders.ACCEPT));
 	}
 
 	private void logRequest(HttpRequestBodyCachedWrapper request) throws IOException {
@@ -76,7 +89,7 @@ public class HttpLoggingFilter implements Filter {
 		return headers.toString().trim();
 	}
 
-	private String getRequestBodyAsString(final HttpRequestBodyCachedWrapper request) throws IOException {
+	private String getRequestBodyAsString(final HttpRequestBodyCachedWrapper request) {
 		return new String(request.getCachedBody(), StandardCharsets.UTF_8);
 	}
 
@@ -144,6 +157,14 @@ public class HttpLoggingFilter implements Filter {
 	private void writeResponseBody(HttpResponseBodyCachedWrapper cachedResponse, ServletResponse response)
 		throws IOException {
 		final byte[] responseBody = cachedResponse.getCachedBody();
-		response.getOutputStream().write(responseBody);
+
+		try (final ServletOutputStream outputStream = response.getOutputStream()) {
+			outputStream.write(responseBody);
+		} catch (IOException e) {
+			log.error("Error writing response body", e);
+			throw e;
+		} finally {
+			cachedResponse.setContentLength(responseBody.length);
+		}
 	}
 }

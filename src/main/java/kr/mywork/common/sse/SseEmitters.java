@@ -1,9 +1,11 @@
 package kr.mywork.common.sse;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -21,11 +23,24 @@ public class SseEmitters {
 	public SseEmitter add(UUID clientId) {
 		final SseEmitter sseEmitter = new SseEmitter(600 * 1000L);
 
-		sseEmitters.put(clientId, sseEmitter);
+		if (sseEmitters.containsKey(clientId)) {
+			return sseEmitters.get(clientId);
+		} else {
+			sseEmitters.put(clientId, sseEmitter);
+		}
 
-		sseEmitter.onCompletion(() -> sseEmitters.remove(clientId));
-		sseEmitter.onTimeout(() -> sseEmitters.remove(clientId));
-		sseEmitter.onError(e -> this.sseEmitters.remove(clientId));
+		sseEmitter.onCompletion(() -> {
+			log.info("onCompletion sseEmitter : {}", sseEmitter);
+			sseEmitters.remove(clientId);
+		});
+		sseEmitter.onTimeout(() -> {
+			log.info("onTimeout sseEmitter : {}", sseEmitter);
+			sseEmitters.remove(clientId);
+		});
+		sseEmitter.onError(e -> {
+			log.info("onError sseEmitter : {}, error: {}", sseEmitter, e.getMessage());
+			this.sseEmitters.remove(clientId);
+		});
 
 		log.info("added sseEmitter id : {}, sseEmitters size: {}", clientId, sseEmitters.size());
 		return sseEmitter;
@@ -46,7 +61,7 @@ public class SseEmitters {
 
 	public <T> boolean send(UUID clientId, String eventName, T data) {
 		if (!sseEmitters.containsKey(clientId)) {
-			throw new NotificationEmitterNotFoundException(NotificationErrorType.EMITTER_NOT_FOUND);
+			return false;
 		}
 
 		SseEmitter emitter = sseEmitters.get(clientId);
@@ -60,10 +75,29 @@ public class SseEmitters {
 
 			return true;
 		} catch (Exception exception) {
+			log.info("send sseEmitter error : {}", exception.getMessage());
 			sseEmitters.remove(clientId);
 			emitter.completeWithError(exception);
 		}
 
 		return false;
+	}
+
+	@Scheduled(fixedDelay = 30 * 1000L)
+	public void ping() {
+		for (Map.Entry<UUID, SseEmitter> emitterEntry : sseEmitters.entrySet()) {
+			final SseEmitter emitter = emitterEntry.getValue();
+			try {
+				emitter.send(SseEmitter.event().name("ping").data("ping"));
+			} catch (IOException e) {
+				log.error("Error sending ping to emitter for clientId {}: {}", emitterEntry.getKey(), e.getMessage());
+				sseEmitters.remove(emitterEntry.getKey());
+				emitter.completeWithError(e);
+			} catch (Exception e) {
+				log.error("Unexpected error while sending ping: {}", e.getMessage());
+				sseEmitters.remove(emitterEntry.getKey());
+				emitter.completeWithError(e);
+			}
+		}
 	}
 }
