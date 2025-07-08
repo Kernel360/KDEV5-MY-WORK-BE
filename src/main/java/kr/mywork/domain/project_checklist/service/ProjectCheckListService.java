@@ -24,6 +24,7 @@ import kr.mywork.domain.project.model.Project;
 import kr.mywork.domain.project.repository.ProjectRepository;
 import kr.mywork.domain.project_checklist.errors.ProjectCheckListErrorType;
 import kr.mywork.domain.project_checklist.errors.ProjectCheckListNotFoundException;
+import kr.mywork.domain.project_checklist.listener.event.CheckListApprovalNotificationEvent;
 import kr.mywork.domain.project_checklist.listener.event.CheckListApprovalUpdateEvent;
 import kr.mywork.domain.project_checklist.listener.event.CheckListHistoryCreationEvent;
 import kr.mywork.domain.project_checklist.model.ProjectCheckList;
@@ -131,24 +132,30 @@ public class ProjectCheckListService {
 				loginMemberDetail.memberName()));
 
 		ProjectStep projectStep = projectStepRepository.findById(projectCheckList.getProjectStepId())
-				.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
+			.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
 
-		notificationService.save(
-			projectCheckList.getAuthorId(),
-			projectCheckList.getAuthorName(),
-			projectCheckList.getTitle(),
-			loginMemberDetail.memberName(),
-			loginMemberDetail.memberId(),
-			TargetType.PROJECT_CHECK_LIST,
-			projectCheckList.getId(),
-			determineProjectCheckListActionType(projectCheckList.getApproval()),
-			projectCheckList.getModifiedAt(),
-			projectStep.getProjectId(),
-			projectStep.getId()
-		);
-
+		final CheckListApprovalNotificationEvent checkListApprovalNotificationEvent =
+			createCheckListApprovalNotificationEvent(loginMemberDetail, projectCheckList, projectStep);
+		applicationEventPublisher.publishEvent(checkListApprovalNotificationEvent);
 
 		return ProjectCheckListApprovalResponse.from(projectCheckList);
+	}
+
+	private CheckListApprovalNotificationEvent createCheckListApprovalNotificationEvent(final LoginMemberDetail loginMemberDetail,
+		final ProjectCheckList projectCheckList, final ProjectStep projectStep) {
+		return new CheckListApprovalNotificationEvent(
+				projectCheckList.getAuthorId(),
+				projectCheckList.getAuthorName(),
+				determineProjectCheckListTitle(projectCheckList.getApproval()),
+				loginMemberDetail.memberName(),
+				loginMemberDetail.memberId(),
+				TargetType.PROJECT_CHECK_LIST,
+				projectCheckList.getId(),
+				determineProjectCheckListActionType(projectCheckList.getApproval()),
+				projectCheckList.getModifiedAt(),
+				projectStep.getProjectId(),
+				projectStep.getId()
+			);
 	}
 
 	private String determineProjectCheckListTitle(final String approvalStatus) {
