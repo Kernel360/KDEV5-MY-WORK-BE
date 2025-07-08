@@ -20,7 +20,7 @@ import kr.mywork.domain.post.errors.PostDeletedException;
 import kr.mywork.domain.post.errors.PostErrorType;
 import kr.mywork.domain.post.errors.PostIdNotFoundException;
 import kr.mywork.domain.post.errors.PostNotFoundException;
-import kr.mywork.domain.post.listener.event.PostApprovalAlarmEvent;
+import kr.mywork.domain.post.listener.event.PostApprovalNotificationEvent;
 import kr.mywork.domain.post.listener.event.PostAttachmentDeleteEvent;
 import kr.mywork.domain.post.listener.event.PostReviewsDeleteEvent;
 import kr.mywork.domain.post.model.Post;
@@ -71,7 +71,21 @@ public class PostService {
 
 		post.changeApproval(postApprovalRequest.getApprovalStatus());
 
-		final PostApprovalAlarmEvent postApprovalAlarmEvent = new PostApprovalAlarmEvent(
+		final PostApprovalNotificationEvent postApprovalNotificationEvent = createPostApprovalAlarmEvent(
+			loginMemberDetail, post, projectStep);
+
+		if (!post.getAuthorId().equals(loginMemberDetail.memberId())) {
+			eventPublisher.publishEvent(postApprovalNotificationEvent);
+		}
+		
+		eventPublisher.publishEvent(new ActivityModifyEvent(before, post, loginMemberDetail));
+
+		return new PostApprovalResponse(post.getId(), post.getApproval());
+	}
+
+	private PostApprovalNotificationEvent createPostApprovalAlarmEvent(final LoginMemberDetail loginMemberDetail, final Post post,
+		final ProjectStep projectStep) {
+		return new PostApprovalNotificationEvent(
 			post.getAuthorId(), post.getAuthorName(),
 			post.getTitle(),
 			loginMemberDetail.memberId(),
@@ -82,12 +96,6 @@ public class PostService {
 			post.getModifiedAt(),
 			projectStep.getProjectId(),
 			projectStep.getId());
-
-		if (!post.getAuthorId().equals(loginMemberDetail.memberId()))
-			eventPublisher.publishEvent(postApprovalAlarmEvent);
-		eventPublisher.publishEvent(new ActivityModifyEvent(before, post, loginMemberDetail));
-
-		return new PostApprovalResponse(post.getId(), post.getApproval());
 	}
 
 	@Transactional
