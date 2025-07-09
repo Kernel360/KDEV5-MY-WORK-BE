@@ -38,3 +38,6 @@ out/
 
 /docker/localstack/
 /grafana-data/**
+
+/sample_data/**
+!/sample_data/.gitkeep
