@@ -7,8 +7,8 @@ import kr.mywork.domain.post.model.Post;
 import kr.mywork.domain.post.repository.PostRepository;
 import kr.mywork.domain.post.service.dto.request.PostCreateRequest;
 import kr.mywork.domain.post.service.dto.response.PostSelectResponse;
-import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
 import kr.mywork.domain.post.service.dto.response.PostTotalCountInStepResponse;
+import kr.mywork.domain.project.service.dto.response.DashboardMostPostProjectResponse;
 import kr.mywork.domain.project_step.model.ProjectStep;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.querydsl.core.types.dsl.Expressions.booleanTemplate;
 import static kr.mywork.domain.post.model.QPost.post;
 import static kr.mywork.domain.project_step.model.QProjectStep.projectStep;
 
@@ -176,7 +177,7 @@ public class QueryDslPostRepository implements PostRepository {
 	// 동적 조건 메서드 추가
 	private BooleanExpression inProjectStepIds(List<ProjectStep> projectSteps) {
 		if (projectSteps == null || projectSteps.isEmpty()) {
-			return null;
+			return booleanTemplate("1 = 2");
 		}
 
 		List<UUID> projectStepIds = projectSteps.stream()
