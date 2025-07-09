@@ -23,7 +23,8 @@ public class PostApprovalNotificationTxListener {
 	@Async("eventTaskExecutor")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handlePostApprovalAlarmEvent(final PostApprovalNotificationEvent event) {
-		realTimeNotificationService.sendNotification(event.authorId(), "notification-post-approval", event);
+		final long unreadCount = notificationService.countUnreadNotifications(event.authorId());
+		realTimeNotificationService.sendNotification(event.authorId(), "notification-unread-count", unreadCount);
 		saveNotification(event);
 	}
 

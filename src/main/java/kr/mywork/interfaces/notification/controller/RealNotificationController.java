@@ -21,11 +21,12 @@ public class RealNotificationController {
 	private final RealTimeNotificationService realTimeNotificationService;
 	private final NotificationService notificationService;
 
-	@GetMapping( value = "/real-notifications/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/real-notifications/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public ResponseEntity<SseEmitter> connectForRealTimeNotification(@LoginMember LoginMemberDetail loginMemberDetail) {
 		final SseEmitter sseEmitter = realTimeNotificationService.addSseEmitter(loginMemberDetail.memberId());
-		long count = notificationService.countUnreadNotifications(loginMemberDetail.memberId());
-		realTimeNotificationService.sendNotification(loginMemberDetail.memberId(), "notification-unread-count", count);
+		long unreadCount = notificationService.countUnreadNotifications(loginMemberDetail.memberId());
+		realTimeNotificationService.sendNotification(loginMemberDetail.memberId(), "notification-unread-count",
+			unreadCount);
 		return ResponseEntity.ok(sseEmitter);
 	}
 
