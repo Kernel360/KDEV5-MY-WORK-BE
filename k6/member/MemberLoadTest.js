@@ -19,7 +19,7 @@ export default function() {
 
     let response = loginMember({
       email: user.email,
-      password: user.password
+      password: '1234'
     });
 
     check(response, {
