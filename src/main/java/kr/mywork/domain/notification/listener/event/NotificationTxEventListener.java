@@ -24,8 +24,8 @@ public class NotificationTxEventListener {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleNotificationCreateEvent(final NotificationCreateEvent event) {
-		realTimeNotificationService.sendNotification(event.authorId(), "review-notification", event);
-		log.info("saved notification content: {}", event);
+		long unreadCount = notificationService.countUnreadNotifications(event.authorId());
+		realTimeNotificationService.sendNotification(event.authorId(), "notification-unread-count", unreadCount);
 		saveNotification(event);
 	}
 
