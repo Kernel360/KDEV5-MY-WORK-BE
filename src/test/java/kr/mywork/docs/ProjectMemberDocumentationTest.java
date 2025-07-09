@@ -165,7 +165,7 @@ public class ProjectMemberDocumentationTest extends RestDocsDocumentation {
 		final ProjectManagerUpdateWebRequest request =  new ProjectManagerUpdateWebRequest(memberId,projectId);
 
 		// when
-		final ResultActions result = mockMvc.perform(put("/api/project-member/updateProjectManager")
+		final ResultActions result = mockMvc.perform(put("/api/project-member/update-project-manager")
 				.content(objectMapper.writeValueAsString(request))
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken))
 				.contentType(MediaType.APPLICATION_JSON));
