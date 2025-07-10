@@ -1,19 +1,5 @@
 package kr.mywork.interfaces.company.controller;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import kr.mywork.common.api.support.response.ApiResponse;
@@ -29,18 +15,15 @@ import kr.mywork.domain.member.service.MemberService;
 import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
 import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyCreateWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyDeleteWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyDetailWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyIdCreateWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyListWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyNameWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyNamesWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanySelectWebResponse;
-import kr.mywork.interfaces.company.controller.dto.response.CompanyUpdateWebResponse;
+import kr.mywork.interfaces.company.controller.dto.response.*;
 import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberListWebResponse;
 import kr.mywork.interfaces.member.controller.dto.response.CompanyMemberWebResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -141,11 +124,14 @@ public class CompanyController {
 	}
 
 	@GetMapping("/{companyId}/members")
-	public ApiResponse<CompanyMemberWebResponse> getCompanyMember(@PathVariable(name = "companyId") UUID companyId,
-		@RequestParam(defaultValue = "1") @Min(value = 1, message = "{invalid.page-size}") int page) {
-		List<CompanyMemberResponse> companyMemberResponses = memberService.findMemberByCompanyId(companyId, page);
+	public ApiResponse<CompanyMemberWebResponse> getCompanyMember(
+			@PathVariable(name = "companyId") UUID companyId,
+			@RequestParam(defaultValue = "1") @Min(value = 1, message = "{invalid.page-size}") int page,
+			@RequestParam(name = "memberName", required = false) final String memberName
+	) {
+		List<CompanyMemberResponse> companyMemberResponses = memberService.findMemberByCompanyId(companyId, page,memberName);
 
-		long total = memberService.countMembersByCompanyId(companyId);
+		long total = memberService.countMembersByCompanyId(companyId,memberName);
 
 		List<CompanyMemberListWebResponse> companyMemberWebResponses = companyMemberResponses.stream()
 			.map(CompanyMemberListWebResponse::fromService)
