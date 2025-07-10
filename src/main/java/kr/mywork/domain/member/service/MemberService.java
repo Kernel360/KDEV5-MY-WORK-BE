@@ -1,16 +1,5 @@
 package kr.mywork.domain.member.service;
 
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
 import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogDeleteEvent;
@@ -25,6 +14,16 @@ import kr.mywork.domain.member.service.dto.response.CompanyMemberResponse;
 import kr.mywork.domain.member.service.dto.response.MemberSelectResponse;
 import kr.mywork.interfaces.member.controller.dto.request.ResetPasswordWebRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +37,9 @@ public class MemberService {
 	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
-	public List<CompanyMemberResponse> findMemberByCompanyId(UUID companyId, int page) {
+	public List<CompanyMemberResponse> findMemberByCompanyId(UUID companyId, int page, String memberName) {
 
-		return memberRepository.findMemberByCompanyId(companyId, page, memberPageSize)
+		return memberRepository.findMemberByCompanyId(companyId, page, memberPageSize, memberName)
 			.stream()
 			.map(CompanyMemberResponse::fromEntity)
 			.collect(Collectors.toList());
@@ -48,8 +47,8 @@ public class MemberService {
 	}
 
 	@Transactional
-	public long countMembersByCompanyId(UUID companyId) {
-		return memberRepository.countByCompanyIdAndDeletedFalse(companyId);
+	public long countMembersByCompanyId(UUID companyId, String memberName) {
+		return memberRepository.countByCompanyIdAndDeletedFalse(companyId,memberName);
 	}
 
 	@Transactional
