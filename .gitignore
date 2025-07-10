@@ -41,3 +41,5 @@ out/
 
 /sample_data/**
 !/sample_data/.gitkeep
+
+.DS_Store
