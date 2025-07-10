@@ -1,19 +1,11 @@
 package kr.mywork.docs;
 
-import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.UUID;
-
+import com.epages.restdocs.apispec.ResourceSnippet;
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.fasterxml.uuid.Generators;
+import kr.mywork.common.api.support.response.ResultType;
+import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
+import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -23,13 +15,14 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.epages.restdocs.apispec.ResourceSnippet;
-import com.epages.restdocs.apispec.ResourceSnippetParameters;
-import com.fasterxml.uuid.Generators;
+import java.util.UUID;
 
-import kr.mywork.common.api.support.response.ResultType;
-import kr.mywork.interfaces.company.controller.dto.request.CompanyCreateWebRequest;
-import kr.mywork.interfaces.company.controller.dto.request.CompanyUpdateWebRequest;
+import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.ResourceDocumentation.*;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class CompanyDocumentationTest extends RestDocsDocumentation {
 
@@ -464,6 +457,7 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 		final ResultActions result = mockMvc.perform(
 			get("/api/companies/{companyId}/members", id)
 				.param("page", "1")
+				.param("memberName","김민수")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, toBearerAuthorizationHeader(accessToken)));
 
@@ -483,7 +477,8 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 				.summary("회사의 직원 목록 조회 API")
 				.description("회사의 직원 목록을 조회한다.")
 				.queryParameters(
-					parameterWithName("page").description("페이지 번호"))
+					parameterWithName("page").description("페이지 번호"),
+					parameterWithName("memberName").optional().description("이름 검색어 (부분 일치 검색)"))
 				.requestHeaders(
 					headerWithName(HttpHeaders.CONTENT_TYPE).description("컨텐츠 타입"),
 					headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"))
