@@ -2,6 +2,7 @@ package kr.mywork.infrastructure.member.rdb;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.mywork.domain.company.service.dto.response.MemberDetailResponse;
 import kr.mywork.domain.member.model.Member;
@@ -31,23 +32,41 @@ public class QueryDslMemberRepository implements MemberRepository {
 	}
 
 	@Override
-	public List<Member> findMemberByCompanyId(UUID companyId, int page, int memberPageSize) {
+	public List<Member> findMemberByCompanyId(UUID companyId, int page, int memberPageSize,String memberName) {
 		final int offset = (page - 1) * memberPageSize;
 
 		return queryFactory
-			.selectFrom(member)
-			.where(
-				member.companyId.eq(companyId),
-				member.deleted.eq(false))
-			.orderBy(member.name.asc())
-			.offset(offset)
-			.limit(memberPageSize)
-			.fetch();
+				.selectFrom(member)
+				.where(
+						member.companyId.eq(companyId),
+						member.deleted.eq(false),
+						memberNameCondition(memberName)
+				)
+				.orderBy(member.name.asc())
+				.offset(offset)
+				.limit(memberPageSize)
+				.fetch();
+	}
+
+	private BooleanExpression memberNameCondition(String memberName) {
+		if (memberName == null || memberName.trim().isEmpty()) {
+			return null;
+		}
+		return member.name.containsIgnoreCase(memberName);
 	}
 
 	@Override
-	public long countByCompanyIdAndDeletedFalse(UUID companyId) {
-		return memberRepository.countByCompanyIdAndDeletedFalse(companyId);
+	public long countByCompanyIdAndDeletedFalse(UUID companyId,String memberName) {
+		Long result =  queryFactory
+				.select(member.count())
+				.from(member)
+				.where(
+						member.companyId.eq(companyId),
+						member.deleted.eq(false),
+						memberNameCondition(memberName) // 부분 검색 조건
+				)
+				.fetchOne();
+		return result != null ? result : 0L;
 	}
 
 	@Override
