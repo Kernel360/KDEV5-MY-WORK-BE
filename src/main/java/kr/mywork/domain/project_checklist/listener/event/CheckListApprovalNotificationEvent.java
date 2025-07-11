@@ -7,7 +7,7 @@ import kr.mywork.domain.notification.model.NotificationActionType;
 import kr.mywork.domain.notification.model.TargetType;
 
 public record CheckListApprovalNotificationEvent(UUID authorId, String authorName, String checkListTitle,
-												 String memberName, UUID memberId, TargetType targetType,
+												 String actorName, UUID actorId, TargetType targetType,
 												 UUID checkListId, NotificationActionType notificationActionType,
 												 LocalDateTime modifiedAt, UUID projectId, UUID projectStepId) {
 
