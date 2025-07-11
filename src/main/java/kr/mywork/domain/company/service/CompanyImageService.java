@@ -29,7 +29,7 @@ public class CompanyImageService {
 	private final CompanyRepository companyRepository;
 	private final CompanyImageFileHandler companyImageFileHandler;
 
-	@Transactional(readOnly = true)
+	@Transactional
 	public CompanyImageUploadUrlIssueResponse issueCompanyImageUploadUrl(final UUID companyId, final String fileName) {
 		final Optional<Company> companyOptional = companyRepository.findById(companyId);
 
