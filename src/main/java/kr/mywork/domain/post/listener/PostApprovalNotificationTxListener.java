@@ -30,7 +30,7 @@ public class PostApprovalNotificationTxListener {
 
 	private void saveNotification(final PostApprovalNotificationEvent event) {
 		notificationService.save(
-			event.authorId(), event.authorName(), event.postTitle(), event.memberName(), event.memberId(),
+			event.authorId(), event.authorName(), event.postTitle(), event.actorName(), event.actorId(),
 			event.targetType(), event.postId(), event.notificationActionType(), event.modifiedAt(), event.projectId(),
 			event.projectStepId());
 	}
