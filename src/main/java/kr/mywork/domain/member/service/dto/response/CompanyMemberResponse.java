@@ -9,7 +9,9 @@ public record CompanyMemberResponse(
 	String name,
 	String phoneNumber,
 	String position,
-	String department
+	String department,
+	String role,
+	String email
 
 ){
 	public static CompanyMemberResponse fromEntity(Member member) {
@@ -18,6 +20,8 @@ public record CompanyMemberResponse(
 		member.getName(),
 		member.getPhoneNumber(),
 		member.getPosition(),
-		member.getDepartment());
+		member.getDepartment(),
+		member.getRole().name(),
+		member.getEmail());
 	}
 }
