@@ -490,6 +490,8 @@ public class CompanyDocumentationTest extends RestDocsDocumentation {
 					fieldWithPath("data.members[].phoneNumber").type(JsonFieldType.STRING).description("멤버 전화번호"),
 					fieldWithPath("data.members[].position").type(JsonFieldType.STRING).description("멤버 직급"),
 					fieldWithPath("data.members[].department").type(JsonFieldType.STRING).description("멤버 부서"),
+					fieldWithPath("data.members[].email").type(JsonFieldType.STRING).description("멤버 이메일"),
+					fieldWithPath("data.members[].role").type(JsonFieldType.STRING).description("멤버 권한"),
 					fieldWithPath("error").type(JsonFieldType.NULL).description("에러 정보"))
 				.build()
 		);
