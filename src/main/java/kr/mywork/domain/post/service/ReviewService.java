@@ -16,7 +16,7 @@ import kr.mywork.common.auth.components.dto.LoginMemberDetail;
 import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogCreateEvent;
 import kr.mywork.domain.activityLog.listener.eventObject.ActivityLogDeleteEvent;
 import kr.mywork.domain.activityLog.listener.eventObject.ActivityModifyEvent;
-import kr.mywork.domain.notification.listener.event.NotificationCreateEvent;
+import kr.mywork.domain.post.listener.event.ReviewNotificationCreateEvent;
 import kr.mywork.domain.notification.model.NotificationActionType;
 import kr.mywork.domain.notification.model.TargetType;
 import kr.mywork.domain.post.errors.PostErrorType;
@@ -66,20 +66,20 @@ public class ReviewService {
 			.orElseThrow(() -> new ProjectStepNotFoundException(ProjectStepErrorType.PROJECT_STEP_NOT_FOUND));
 
 		final UUID memberId = loginMemberDetail.memberId();
-		final NotificationCreateEvent notificationCreateEvent = createNotificationCreateEvent(
+		final ReviewNotificationCreateEvent reviewNotificationCreateEvent = createNotificationCreateEvent(
 			loginMemberDetail, post, projectStep);
 
 		if (!post.isAuthor(memberId)) {
-			sendNotificationCreateEvent(notificationCreateEvent);
+			sendReviewNotificationCreateEvent(reviewNotificationCreateEvent);
 		}
 
 		sendActivityLogCreateEvent(loginMemberDetail, savedReview);
 		return ReviewCreateResponse.fromEntity(savedReview);
 	}
 
-	private NotificationCreateEvent createNotificationCreateEvent(final LoginMemberDetail loginMemberDetail,
+	private ReviewNotificationCreateEvent createNotificationCreateEvent(final LoginMemberDetail loginMemberDetail,
 		final Post post, final ProjectStep projectStep) {
-		return new NotificationCreateEvent(
+		return new ReviewNotificationCreateEvent(
 			post.getAuthorId(), post.getAuthorName(), post.getTitle(), loginMemberDetail.memberName(),
 			loginMemberDetail.memberId(), TargetType.POST, post.getId(), NotificationActionType.REVIEW,
 			LocalDateTime.now(), projectStep.getProjectId(), projectStep.getId());
@@ -89,8 +89,8 @@ public class ReviewService {
 		eventPublisher.publishEvent(new ActivityLogCreateEvent(savedReview, loginMemberDetail));
 	}
 
-	private void sendNotificationCreateEvent(final NotificationCreateEvent notificationCreateEvent) {
-		eventPublisher.publishEvent(notificationCreateEvent);
+	private void sendReviewNotificationCreateEvent(final ReviewNotificationCreateEvent reviewNotificationCreateEvent) {
+		eventPublisher.publishEvent(reviewNotificationCreateEvent);
 	}
 
 	public ReviewModifyResponse modifyComment(final ReviewModifyRequest reviewModifyRequest,
