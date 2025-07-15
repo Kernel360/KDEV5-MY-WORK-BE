@@ -23,12 +23,12 @@ public class CheckListNotificationTxListener {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handleCheckListCreatedHistory(final CheckListApprovalNotificationEvent event) {
+		saveCheckListNotification(event);
 		final long unreadCount = notificationService.countUnreadNotifications(event.authorId());
 		realTimeNotificationService.sendNotification(event.authorId(), "notification-unread-count", unreadCount);
-		saveNotification(event);
 	}
 
-	private void saveNotification(final CheckListApprovalNotificationEvent event) {
+	private void saveCheckListNotification(final CheckListApprovalNotificationEvent event) {
 		notificationService.save(
 			event.authorId(),
 			event.authorName(),
