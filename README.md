@@ -151,6 +151,28 @@
 
 </details>
 
+## 📌 3. 이슈 및 해결 과정
+
+### (1) Presigned URL 기반 파일 업로드
+
+<img src="images/presigned_url.png" width="700">
+
+
+### (2) 알림 & 로그 트랜잭션 분리
+
+<img src="images/tx01.png" width="700">
+<img src="images/tx02.png" width="700">
+<img src="images/tx03.png" width="700">
+
+### (3) 실시간 알림을 위한 SSE 적용
+
+<img src="images/sse01.png" width="700">
+<img src="images/sse02.png" width="700">
+
+
+<br>
+
+
 ## 🛠️ 4. 기술 스택
 
 <div style="display:flex; flex-direction:column; align-items:flex-start;">
@@ -179,7 +201,7 @@
 
 <br>
 
-## 📍 5. 프로젝트 아키텍처
+## 📍 6. 프로젝트 아키텍처
 
 <img src="images/server-architecture.png" width="900">
 
