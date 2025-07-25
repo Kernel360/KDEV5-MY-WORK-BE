@@ -56,3 +56,21 @@ jwt:
   refresh-token:
     private-key: 408a96ae4affd8bce03d11385d9a8dfbd4c0cbc9c5a83675864192dbb50eaa965acf2ef84e60bb1a38798f612caed4f383466a4be14957bf87370b62be71c2e1
     expiration: 86400000
+
+security:
+  allow:
+    origins:
+      - http://localhost:3000
+      - https://d16zykr4498a0c.cloudfront.net
+      - https://kbe-mywork.com
+      - https://www.kbe-mywork.com
+      - http://mywork-frontend-bucket-only-s3.s3-website.ap-northeast-2.amazonaws.com
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+    headers:
+      - '*'
+    credential: true
